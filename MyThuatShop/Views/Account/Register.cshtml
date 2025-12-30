@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Đăng ký</title>
+        <link rel="stylesheet" href="UI/assets/css/style.css">
+        <link rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+            integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
+            crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    </head>
+    <style>
+    .container {
+        width: 1200px;
+        margin: auto;
+    }
+
+    /* Begin header */
+    #header-trang-chu {
+        background-color: var(--color-main);
+        display: flex;
+        align-items: center;
+        position: fixed;
+        z-index: 999;
+        width: 100%;
+    }
+
+    #header-trang-chu .logo-trang-chu {
+        margin-left: 50px;
+        margin-right: 50px;
+        margin-top: 25px;
+        margin-bottom: 25px;
+    }
+
+    #header-trang-chu .logo-trang-chu img {
+        background-color: transparent;
+        width: 200px;
+        height: 100%;
+    }
+
+    #header-trang-chu .tim-kiem-san-pham {
+        position: relative;
+    }
+
+    #header-trang-chu .tim-kiem-san-pham input {
+        padding: 10px 15px;
+        width: 600px;
+        border-radius: 10px;
+        border: none;
+    }
+
+    #header-trang-chu .tim-kiem-san-pham {
+        display: flex;
+    }
+
+    #header-trang-chu .tim-kiem-san-pham i {
+        position: absolute;
+        right: 0;
+        width: 50px;
+        height: 100%;
+        background-color: #0b234d;
+        line-height: 40px;
+        cursor: pointer;
+        color: white;
+        border-top-right-radius: 10px;
+        border-bottom-right-radius: 10px;
+    }
+
+    #header-trang-chu .header-contact {
+        display: flex;
+        align-items: center;
+    }
+
+    #header-trang-chu .header-contact i {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background-color: #0b234d;
+        line-height: 30px;
+        color: white;
+    }
+
+    #header-trang-chu .header-contact {
+        margin-left: 100px;
+        margin-right: 50px;
+        cursor: pointer;
+    }
+
+    #header-trang-chu .header-contact .contact {
+        margin-left: 15px;
+    }
+
+    #header-trang-chu .header-contact .contact .contact-phone-number {
+        color: white;
+        font-weight: 600;
+        font-size: 18px;
+    }
+
+    #header-trang-chu .header-contact .contact .contact-phone-help {
+        color: white;
+        font-size: 16px;
+    }
+
+    #header-trang-chu .header-dangnhap-dangki {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+    }
+
+    #header-trang-chu .header-dangnhap-dangki i {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background-color: #0b234d;
+        line-height: 30px;
+        color: white;
+    }
+
+    #header-trang-chu .header-dangnhap-dangki {
+        margin-right: 50px;
+    }
+
+    #header-trang-chu .header-dangnhap-dangki .dangnhap-dangki {
+        margin-left: 15px;
+    }
+
+    #header-trang-chu .header-dangnhap-dangki .dangnhap-dangki .dangnhap {
+        color: white;
+        font-weight: 600;
+        font-size: 18px;
+    }
+
+    #header-trang-chu .header-dangnhap-dangki .dangnhap-dangki .dangki {
+        color: white;
+        font-size: 16px;
+    }
+
+    #header-trang-chu .header-giohang {
+        font-size: 25px;
+        color: white;
+        position: relative;
+        cursor: pointer;
+    }
+
+    #header-trang-chu .header-giohang::after {
+        display: inline-flex;
+        content: "0";
+        width: 20px;
+        height: 20px;
+        left: 20px;
+        bottom: 15px;
+        justify-content: center;
+        align-items: center;
+        font-size: 15px;
+        background-color: red;
+        position: absolute;
+        border-radius: 50%;
+    }
+
+    /* End header */
+    /* Begin footer */
+    #footer-trang-chu {
+        display: flex;
+        background-color: #17479d;
+        border-top-left-radius: 70px;
+        border-top-right-radius: 70px;
+        gap: 30px;
+        align-items: center;
+        justify-content: space-around;
+        position: relative;
+    }
+
+    #footer-trang-chu .footer-title {
+        text-align: justify;
+        margin-left: 30px;
+    }
+
+    #footer-trang-chu .footer-title .img-main {
+        background-color: transparent;
+        width: 400px;
+    }
+
+    #footer-trang-chu .footer-title .footer-title-header {
+        color: #fbe263;
+    }
+
+    #footer-trang-chu .footer-title .footer-title-description {
+        color: white;
+    }
+
+    #footer-trang-chu .footer-title .footer-title-form {
+        position: relative;
+    }
+
+    #footer-trang-chu .footer-title .footer-title-form input {
+        padding: 10px 15px;
+        border-radius: 10px;
+        width: 300px;
+        border: none;
+    }
+
+    #footer-trang-chu .footer-title .footer-title-form a {
+        position: absolute;
+        display: inline-flex;
+        width: 100px;
+        height: 36px;
+        background-color: #0b234d;
+        border-top-right-radius: 10px;
+        border-bottom-right-radius: 10px;
+        top: 0;
+        right: 69px;
+        justify-content: center;
+        align-items: center;
+        text-decoration: none;
+        color: white;
+    }
+
+    #footer-trang-chu .footer-title .img-footer {
+        width: 250px;
+        margin-top: 15px;
+        cursor: pointer;
+        margin-bottom: 50px;
+    }
+
+    #footer-trang-chu .footer-diachi {
+        width: 25%;
+    }
+
+    #footer-trang-chu .footer-diachi h2 {
+        font-size: 20px;
+        color: #fbe263;
+        margin: 0;
+    }
+
+    #footer-trang-chu .footer-diachi span {
+        color: #fbe263;
+        display: block;
+        padding-top: 15px;
+    }
+
+    #footer-trang-chu .footer-diachi .footer-diachi-header {
+        display: inline;
+        color: white;
+    }
+
+    #footer-trang-chu .footer-diachi .footer-diachi-description {
+        display: inline;
+        color: white;
+    }
+
+    #footer-trang-chu .footer-diachi .img-main {
+        display: block;
+        margin-top: 20px;
+    }
+
+    #footer-trang-chu .footer-help h2 {
+        font-size: 20px;
+        color: #fbe263;
+        margin: 0;
+    }
+
+    #footer-trang-chu .footer-help span {
+        display: block;
+        color: #fbe263;
+        padding-top: 15px;
+    }
+
+    #footer-trang-chu .footer-help .footer-help-header {
+        display: inline;
+        color: white;
+    }
+
+    #footer-trang-chu .footer-help .footer-help-header-list a {
+        display: block;
+        text-decoration: none;
+        color: white;
+        line-height: 1.4;
+    }
+
+    #footer-trang-chu .footer-diachi .img-main {
+        cursor: pointer;
+    }
+
+    #footer-trang-chu .footer-information h2 {
+        font-size: 20px;
+        color: #fbe263;
+        margin: 0;
+    }
+
+    #footer-trang-chu .footer-information .footer-information-header-list a {
+        display: block;
+        color: white;
+        text-decoration: none;
+        line-height: 1.4;
+    }
+
+    #footer-trang-chu .footer-information .footer-information-socials {
+        padding-top: 35px;
+    }
+
+    #footer-trang-chu .footer-information .footer-information-socials i {
+        width: 50px;
+        height: 50px;
+        background: white;
+        border-radius: 50%;
+        line-height: 50px;
+        font-size: 25px;
+        color: #17479d;
+    }
+
+    #footer-trang-chu .footer-information .footer-information-socials i:nth-child(1) {
+        margin-right: 10px;
+    }
+
+    #footer-trang-chu::after {
+        display: block;
+        position: absolute;
+        content: "2025 © Thienlong.vn - Bản quyền thuộc Tập đoàn Thiên Long";
+        bottom: 0;
+        color: white;
+    }
+
+    /* End footer */
+
+    /* style login */
+    .main {
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        background-color: #1E76EF;
+        padding-top: 50px;
+    }
+
+    .container {
+        background-color: rgba(0, 0, 0, 0.4);
+        padding: 40px 50px;
+        /* box-sizing: border-box; */
+        /* overflow: hidden; */
+        transition: 0.5s ease;
+        /* border-radius: 10px; */
+        width: 530px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+        border-radius: 10px;
+    }
+
+    h2 {
+        color: white;
+        text-align: center;
+        text-transform: uppercase;
+        margin-bottom: 15px;
+    }
+
+    .label {
+        color: white;
+        padding-left: 38%;
+        font-size: 18px;
+    }
+
+    .btn-doi {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 25px;
+        background-color: white;
+        border-radius: 30px;
+        padding: 5px;
+    }
+
+    .btn-doi button {
+        flex: 1;
+        border: none;
+        border-radius: 25px;
+        padding: 12px 0;
+        font-weight: bold;
+        cursor: pointer;
+        font-size: 14px;
+        transition: 0.3s;
+    }
+
+    .infor {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px 20px;
+        margin-bottom: 20px;
+    }
+
+    .infor .tt-chitiet label {
+        font-size: 17px;
+        font-weight: normal;
+        color: white;
+    }
+
+    .infor .tt-chitiet input {
+        width: 100%;
+        border: none;
+        padding: 8px;
+        border-bottom: 1px solid #ccc;
+        outline: none;
+        font-size: 14px;
+        background: none;
+        color: white;
+        outline: none;
+
+        border-radius: 8px;
+        padding: 10px;
+        color: #fff;
+        transition: border-color 0.3s;
+
+    }
+
+    .infor .tt-chitiet input::placeholder {
+        color: #B0B0B0;
+    }
+
+
+
+    .btn-DangKy {
+        background: linear-gradient(90deg, #FFD700, #FFC107);
+        width: 100%;
+        background-color: #F5DF4D;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-bottom: 15px;
+        /* color: #343A40; */
+        color: #000;
+        font-weight: bold;
+        transition: 0.3s;
+    }
+
+    .btn-DangKy:hover {
+        transform: scale(1.05);
+    }
+
+    .dang-nhap {
+        text-align: center;
+        font-size: 17px;
+        color: white;
+        margin-bottom: 20px;
+    }
+
+    .dang-nhap a {
+        color: #FFD700;
+        text-decoration: none;
+
+    }
+
+    .dang-nhap a:hover {
+        color: #6C785B;
+
+    }
+
+    .btn-dang-nhap-tt {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .btn-dang-nhap-tt button {
+        width: 48%;
+        border: none;
+        border-radius: 8px;
+        padding: 10px;
+        font-size: 14px;
+        color: white;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .btn-gg {
+        background-color: #DE3F32;
+        margin-left: 140px;
+    }
+
+    /* .btn-fb{
+        background-color: #49669C;
+
+    } */
+    .btn-dang-nhap-tt i {
+        font-size: 16px;
+    }
+    .text-login {
+    margin-top: 16px;
+    text-align: center;
+    color: #ffffff;          /* màu chữ “Bạn đã có tài khoản” */
+    font-size: 16px;
+}
+
+/* Style riêng cho link Đăng nhập */
+.text-login a {
+    color: #FFD700;          /* màu vàng giống theme */
+    text-decoration: none;   /* bỏ gạch chân */
+    font-weight: 500;
+}
+
+.text-login a:hover {
+    text-decoration: underline;  /* nếu muốn hover có gạch chân */
+}
+
+
+    /* end login */
+</style>
+
+    <body>
+        <header id="header-trang-chu" class="trang-chu">
+            <div class="logo-trang-chu">
+                <a href="index.html">
+                    <img src="UI/assets/images/logo/logo.png" alt>
+                </a>
+            </div>
+            <form action class="tim-kiem-san-pham">
+                <input type="text" name placeholder="Tìm kiếm sản phẩm...">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </form>
+            <div class="header-contact">
+                <i class="fa-solid fa-phone"></i>
+                <div class="contact">
+                    <div class="contact-phone-number">1900 866 819</div>
+                    <div class="contact-phone-help">Hỗ trợ khách hàng</div>
+                </div>
+            </div>
+            <div class="header-dangnhap-dangki">
+                <i class="fa-solid fa-user"></i>
+                <div class="dangnhap-dangki">
+                    <div class="dangnhap">Đăng nhập</div>
+                    <div class="dangki">Đăng kí</div>
+                </div>
+            </div>
+            <div class="header-giohang">
+                <i class="fa-solid fa-bag-shopping"></i>
+            </div>
+        </header>
+
+        <div class="main">
+            <div class="container">
+                <h2>Đăng Ký</h2>
+
+                <form action class="infor">
+                    <div class="tt-chitiet" style="grid-column: span 2;">
+                        <label for="Ho">Họ và Tên:</label>
+                        <input type="text" id="Ho" name="fullName"
+                            placeholder="Họ và Tên" required>
+                    </div>
+
+                    <div class="tt-chitiet">
+                        <label for="Email">Email cá nhân:</label>
+                        <input type="email" id="email" name="email"
+                            placeholder="Email cá nhân" required>
+                        <span id="email-error"
+                            style="color: #FFD700; font-size: 14px;"></span>
+                    </div>
+
+                    <div class="tt-chitiet">
+                        <label for="sdt">Số điện thoại:</label>
+                        <input type="text" id="sdt" name="phone"
+                            placeholder="Số điện thoại">
+                    </div>
+
+                    <div class="tt-chitiet"
+                        style="grid-column: span 2; position: relative;">
+                        <label for="Mk">Mật khẩu:</label>
+                        <input type="password" id="Mk" name="password"
+                            placeholder="Mật khẩu" required>
+                        <i class="hide-display" id="togglePassword"
+                            style="position:absolute; right:10px; top:38px; cursor:pointer;"></i>
+                    </div>
+
+                    <button type="submit" class="btn-DangKy"
+                        style="grid-column: span 2;">
+                        Đăng ký
+                    </button>
+                </form>
+
+                <p class="text-login">
+                    Bạn đã có tài khoản
+                    <a href="Login.html">Đăng nhập tại đây</a>
+                </p>
+
+                <div class="btn-dang-nhap-tt">
+                    <button class="btn-gg"><i
+                            class="fa-brands fa-google"></i>Google</button>
+
+                </div>
+            </div>
+        </div>
+
+        <footer id="footer-trang-chu">
+            <div class="footer-title">
+                <img src="UI/assets/images/logo/logo.png" alt class="img-main">
+                <p class="footer-title-header">Thienlong.vn - Website thương mại
+                    điện tử thuộc Tập đoàn Thiên Long</p>
+                <p class="footer-title-description">Công ty Cổ Phần Tập Đoàn
+                    Thiên Long
+                    <br>
+                    <br>
+                    GPĐKKD số 0301464830 do Sở KHĐT TP. Hồ Chí Minh cấp ngày
+                    14/03/2005.
+                </p>
+                <form action class="footer-title-form">
+                    <input type="email" placeholder="Nhập địa chỉ email">
+                    <a href>Đăng ký</a>
+                </form>
+                <img
+                    src="UI/assets/images/logo/logo-parker_53d035f3ab7645168e62cd9e3f595090.png"
+                    alt class="img-footer">
+            </div>
+            <div class="footer-diachi">
+                <h2>ĐỊA CHỈ CÔNG TY</h2>
+                <span>
+                    Head Office:
+                    <p class="footer-diachi-header"> Tầng 10, Sofic Tower, Số 10
+                        Đường Mai Chí Thọ, Phường An Khánh,
+                        Thành Phố Hồ Chí Minh, Việt Nam
+                    </span>
+                    <br>
+                    <span>
+                        Miền Bắc:
+                        <p class="footer-diachi-description"> Số 38, đường
+                            Gamuda Gardens 2-5, Khu đô thị mới C2 - Gamuda
+                            Gardens, Phường Trần Phú, Thành phố Hà Nội, Việt
+                            Nam.
+                        </span>
+
+                        <img src="UI/assets/images/logo/footer_bct.png" alt
+                             class="img-main">
+                    </div>
+                    <div class="footer-help">
+                        <h2>HỖ TRỢ KHÁCH HÀNG</h2>
+                        <span>
+                            Hotline:
+                            <p class="footer-help-header">1900 866 819
+                            </span>
+                            <span>
+                                Thứ 2 - Thứ 6 (8h - 17h)
+                                salesonline@thienlongvn.com
+                                <div class="footer-help-header-list">
+                                    <a href>
+                                        - Hướng dẫn mua hàng
+                                    </a>
+                                    <a href>
+                                        - Hướng dẫn thanh toán
+                                    </a>
+                                    <a href>
+                                        - Chính sách giao hàng
+                                    </a>
+                                    <a href>
+                                        - Chính sách đổi trả & hoàn tiền
+                                    </a>
+                                    <a href>
+                                        - Khách hàng thân thiết
+                                    </a>
+                                    <a href>
+                                        - Khách hàng ưu tiên
+                                    </a>
+                                    <a href>
+                                        - Phản ánh chất lượng sản phẩm
+                                    </a>
+                                </div>
+                            </span>
+                        </div>
+                        <div class="footer-information">
+                            <h2>VỀ THIENLONG.VN</h2>
+                            <div class="footer-information-header-list">
+                                <a href>
+                                    - Giới thiệu
+                                </a>
+                                <a href>
+                                    - Dịch vụ in ấn quảng cáo
+                                </a>
+                                <a href>
+                                    - Chính sách bảo mật chung
+                                </a>
+                                <a href>
+                                    - Chính sách bảo mật thông tin cá nhân
+                                </a>
+                                <a href>
+                                    - Thông tin liên hệ
+                                </a>
+                                <a href>
+                                    - Chương trình Affiliate
+                                </a>
+                            </div>
+                            <div class="footer-information-socials">
+                                <i class="fa-brands fa-facebook"></i>
+                                <i class="fa-brands fa-youtube"></i>
+                            </div>
+                        </div>
+                    </footer>
+                    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.querySelector('.infor');
+
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            alert('Đăng ký thành công!');
+        });
+    });
+</script>
+                </body>
+
+            </html>

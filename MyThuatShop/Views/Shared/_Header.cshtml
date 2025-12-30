@@ -1,0 +1,43 @@
+﻿<header id="header-trang-chu" class="trang-chu">
+    <div class="logo-trang-chu">
+        <a href>
+            <img src="~/images/logo/logo.png">
+
+        </a>
+    </div>
+    <form class="tim-kiem-san-pham" asp-controller="Product" asp-action="Search" method="get">
+        <input type="text" name="q" placeholder="Tìm kiếm sản phẩm..." />
+        <button type="submit" class="btn-search" aria-label="Tìm kiếm">
+            <i class="fa-solid fa-magnifying-glass"></i>
+        </button>
+    </form>
+
+    <div class="header-contact">
+        <i class="fa-solid fa-phone"></i>
+        <div class="contact">
+            <div class="contact-phone-number">1900 866 819</div>
+            <div class="contact-phone-help">Hỗ trợ khách hàng</div>
+        </div>
+    </div>
+    <div class="header-dangnhap-dangki">
+
+        <i class="fa-solid fa-user"></i>
+        <div class="dangnhap-dangki">
+            <a href="Login.html">
+                <div class="dangnhap">
+                    Đăng
+                    nhập
+                </div>
+            </a>
+            <a href="Register.html"><div class="dangki">Đăng kí</div></a>
+
+        </div>
+
+    </div>
+    <div class="header-giohang">
+        <a class href="Cart.html">
+            <i class="fa-solid fa-bag-shopping"></i>
+        </a>
+
+    </div>
+</header>

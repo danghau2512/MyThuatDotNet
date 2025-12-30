@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "New Profile",
+    "Projects": [
+      {
+        "Path": "MyThuatShop\\MyThuatShop.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "MyThuatShop.Api\\MyThuatShop.Api.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]

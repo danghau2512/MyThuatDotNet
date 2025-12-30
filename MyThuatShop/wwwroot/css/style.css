@@ -1,0 +1,366 @@
+﻿body {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: var(--font-family);
+}
+:root {
+  --color-main: #17479d;
+  --font-family: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", Arial,
+    sans-serif;
+}
+/* Begin header */
+#header-trang-chu {
+    background-color: var(--color-main);
+    display: flex;
+    align-items: center;
+    position: fixed;
+    z-index: 999;
+    width: 100%;
+}
+
+    #header-trang-chu .logo-trang-chu {
+        margin-left: 50px;
+        margin-right: 50px;
+        margin-top: 25px;
+        margin-bottom: 25px;
+    }
+
+        #header-trang-chu .logo-trang-chu img {
+            background-color: transparent;
+            width: 200px;
+            height: 100%;
+        }
+
+    #header-trang-chu .tim-kiem-san-pham {
+        position: relative;
+    }
+
+        #header-trang-chu .tim-kiem-san-pham input {
+            padding: 10px 15px;
+            width: 600px;
+            border-radius: 10px;
+            border: none;
+        }
+
+    #header-trang-chu .tim-kiem-san-pham {
+        display: flex;
+    }
+
+        #header-trang-chu .tim-kiem-san-pham button {
+            position: absolute;
+            right: 0;
+            width: 50px;
+            height: 100%;
+            background-color: #0b234d;
+            line-height: 40px;
+            cursor: pointer;
+            color: white;
+            border-top-right-radius: 10px;
+            border-bottom-right-radius: 10px;
+            border: none;
+        }
+
+    #header-trang-chu .header-contact {
+        display: flex;
+        align-items: center;
+    }
+
+        #header-trang-chu .header-contact i {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #0b234d;
+            line-height: 30px;
+            color: white;
+        }
+
+    #header-trang-chu .header-contact {
+        margin-left: 100px;
+        margin-right: 50px;
+        cursor: pointer;
+    }
+
+        #header-trang-chu .header-contact .contact {
+            margin-left: 15px;
+        }
+
+            #header-trang-chu .header-contact .contact .contact-phone-number {
+                color: white;
+                font-weight: 600;
+                font-size: 18px;
+            }
+
+            #header-trang-chu .header-contact .contact .contact-phone-help {
+                color: white;
+                font-size: 16px;
+            }
+
+    #header-trang-chu .header-dangnhap-dangki {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+    }
+
+        #header-trang-chu .header-dangnhap-dangki i {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #0b234d;
+            line-height: 30px;
+            color: white;
+        }
+
+    #header-trang-chu .header-dangnhap-dangki {
+        margin-right: 50px;
+    }
+
+        #header-trang-chu .header-dangnhap-dangki .dangnhap-dangki {
+            margin-left: 15px;
+        }
+
+            #header-trang-chu .header-dangnhap-dangki .dangnhap-dangki .dangnhap {
+                color: white;
+                font-weight: 600;
+                font-size: 18px;
+            }
+
+            #header-trang-chu .header-dangnhap-dangki .dangnhap-dangki .dangki {
+                color: white;
+                font-size: 16px;
+            }
+
+    #header-trang-chu .header-giohang {
+        font-size: 25px;
+        color: white;
+        position: relative;
+        cursor: pointer;
+    }
+
+        #header-trang-chu .header-giohang a i {
+            color: white;
+        }
+
+        #header-trang-chu .header-giohang::after {
+            display: inline-flex;
+            content: "0";
+            width: 20px;
+            height: 20px;
+            left: 20px;
+            bottom: 15px;
+            justify-content: center;
+            align-items: center;
+            font-size: 15px;
+            background-color: red;
+            position: absolute;
+            border-radius: 50%;
+        }
+
+/* End header */
+/* Begin footer */
+#footer-trang-chu {
+    display: flex;
+    background-color: #17479d;
+    border-top-left-radius: 70px;
+    border-top-right-radius: 70px;
+    gap: 30px;
+    align-items: center;
+    justify-content: space-around;
+    position: relative;
+}
+
+    #footer-trang-chu .footer-title {
+        text-align: justify;
+        margin-left: 30px;
+    }
+
+        #footer-trang-chu .footer-title .img-main {
+            background-color: transparent;
+            width: 400px;
+        }
+
+        #footer-trang-chu .footer-title .footer-title-header {
+            color: #fbe263;
+        }
+
+        #footer-trang-chu .footer-title .footer-title-description {
+            color: white;
+        }
+
+        #footer-trang-chu .footer-title .footer-title-form {
+            position: relative;
+        }
+
+            #footer-trang-chu .footer-title .footer-title-form input {
+                padding: 10px 15px;
+                border-radius: 10px;
+                width: 300px;
+                border: none;
+            }
+
+            #footer-trang-chu .footer-title .footer-title-form button {
+                position: absolute;
+                display: inline-flex;
+                width: 100px;
+                height: 36px;
+                background-color: #0b234d;
+                border-top-right-radius: 10px;
+                border-bottom-right-radius: 10px;
+                top: 0;
+                right: 69px;
+                justify-content: center;
+                align-items: center;
+                text-decoration: none;
+                color: white;
+                border: none;
+                cursor: pointer;
+            }
+
+        #footer-trang-chu .footer-title .img-footer {
+            width: 250px;
+            margin-top: 15px;
+            cursor: pointer;
+            margin-bottom: 50px;
+        }
+
+    #footer-trang-chu .footer-diachi {
+        width: 25%;
+    }
+
+        #footer-trang-chu .footer-diachi h2 {
+            font-size: 20px;
+            color: #fbe263;
+            margin: 0;
+        }
+
+        #footer-trang-chu .footer-diachi span {
+            color: #fbe263;
+            display: block;
+            padding-top: 15px;
+        }
+
+        #footer-trang-chu .footer-diachi .footer-diachi-header {
+            display: inline;
+            color: white;
+        }
+
+        #footer-trang-chu .footer-diachi .footer-diachi-description {
+            display: inline;
+            color: white;
+        }
+
+        #footer-trang-chu .footer-diachi .img-main {
+            display: block;
+            margin-top: 20px;
+        }
+
+    #footer-trang-chu .footer-help h2 {
+        font-size: 20px;
+        color: #fbe263;
+        margin: 0;
+    }
+
+    #footer-trang-chu .footer-help span {
+        display: block;
+        color: #fbe263;
+        padding-top: 15px;
+    }
+
+    #footer-trang-chu .footer-help .footer-help-header {
+        display: inline;
+        color: white;
+    }
+
+    #footer-trang-chu .footer-help .footer-help-header-list a {
+        display: block;
+        text-decoration: none;
+        color: white;
+        line-height: 1.4;
+    }
+
+    #footer-trang-chu .footer-diachi .img-main {
+        cursor: pointer;
+    }
+
+    #footer-trang-chu .footer-information h2 {
+        font-size: 20px;
+        color: #fbe263;
+        margin: 0;
+    }
+
+    #footer-trang-chu .footer-information .footer-information-header-list a {
+        display: block;
+        color: white;
+        text-decoration: none;
+        line-height: 1.4;
+    }
+
+    #footer-trang-chu .footer-information .footer-information-socials {
+        padding-top: 35px;
+    }
+
+        #footer-trang-chu .footer-information .footer-information-socials i {
+            width: 50px;
+            height: 50px;
+            background: white;
+            border-radius: 50%;
+            line-height: 50px;
+            font-size: 25px;
+            color: #17479d;
+        }
+
+            #footer-trang-chu .footer-information .footer-information-socials i:nth-child(1) {
+                margin-right: 10px;
+            }
+
+    #footer-trang-chu::after {
+        display: block;
+   position: absolute;
+        content: "2025 © Thienlong.vn - B?n quy?n thu?c T?p ?oàn Thiên Long";
+        bottom: 0;
+    color: white;
+    }
+    .tim-kiem-san-pham{
+    display:flex;
+    align-items:center;
+    width: 700px;              /* chỉnh theo layout của bạn */
+    height: 44px;
+    background:#fff;
+    border-radius: 999px;
+    overflow:hidden;           /* để bo tròn ăn vào cả nút */
+}
+
+.tim-kiem-san-pham input{
+    flex:1;
+    height:100%;
+    border:none;
+    outline:none;
+    padding:0 15px;
+    font-size:14px;
+    border-radius:0;           /* tránh input tự bo */
+}
+
+.tim-kiem-san-pham .btn-search{
+    width:45px;
+    height:100%;
+    border:none;
+    cursor:pointer;
+    background:#0b2f73;        /* màu xanh nút (đổi theo bạn) */
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.tim-kiem-san-pham .btn-search i{
+    font-size:18px;
+}
+
+.tim-kiem-san-pham .btn-search:hover{
+    opacity:0.95;
+}
+
+
+
+/* End footer */
+

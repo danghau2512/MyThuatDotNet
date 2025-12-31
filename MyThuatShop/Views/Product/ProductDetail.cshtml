@@ -5,7 +5,7 @@
     Layout = "_Layout";
     ViewData["Title"] = "Chi tiết sản phẩm";
 
-    // Gom ảnh: ưu tiên Thumbnail + SubImages (distinct)
+    // Gom ảnh: Thumbnail + SubImages (distinct)
     var images = new List<string>();
     if (!string.IsNullOrWhiteSpace(Model.Thumbnail)) images.Add(Model.Thumbnail!);
     if (Model.SubImages != null && Model.SubImages.Any())
@@ -67,7 +67,7 @@
             box-shadow: 0 2px 8px rgba(0,0,0,.08);
         }
 
-        /* Images */
+        /* Product Images */
         .product-images {
             display: flex;
             flex-direction: column;
@@ -124,6 +124,7 @@
                 font-weight: 700;
             }
 
+        /* Main Image Navigation Buttons */
         .main-image-nav {
             position: absolute;
             top: 50%;
@@ -161,6 +162,7 @@
             right: 15px;
         }
 
+        /* Thumbnail Gallery */
         .thumbnail-gallery {
             display: flex;
             justify-content: center;
@@ -215,7 +217,7 @@
                 object-fit: contain;
             }
 
-        /* Info */
+        /* Product Info */
         .product-info {
             display: flex;
             flex-direction: column;
@@ -226,6 +228,7 @@
             font-size: 1.5rem;
             font-weight: 700;
             color: #1f2937;
+            line-height: 1.3;
             margin: 0;
         }
 
@@ -254,6 +257,7 @@
             font-weight: 600;
         }
 
+        /* Price Section */
         .product-price-section {
             background: #f9fafb;
             padding: 1.5rem;
@@ -280,6 +284,7 @@
             text-decoration: line-through;
         }
 
+        /* Quantity Selector */
         .quantity-section {
             display: flex;
             flex-direction: column;
@@ -303,9 +308,10 @@
             min-width: 35px;
             height: 35px;
             border: 1px solid #d1d5db;
-            background: #fff;
+            background: white;
             border-radius: 6px;
             cursor: pointer;
+            font-size: 1.125rem;
         }
 
         .quantity-input {
@@ -316,6 +322,7 @@
             text-align: center;
         }
 
+        /* Action Buttons */
         .product-actions {
             display: flex;
             gap: 1rem;
@@ -338,7 +345,7 @@
         }
 
         .btn-add-cart {
-            background: #fff;
+            background: white;
             color: #2659F3;
             border: 2px solid #2659F3;
         }
@@ -351,8 +358,9 @@
 
         .btn-buy-now {
             background: linear-gradient(135deg, #2659F3 0%, #1e40af 100%);
-            color: #fff;
+            color: white;
             text-decoration: none;
+            border: 2px solid transparent;
         }
 
             .btn-buy-now:hover {
@@ -463,7 +471,7 @@
                 color: #fff;
             }
 
-        /* ========== POLICY + SPECS + REVIEWS (JSP style) ========== */
+        /* ========== POLICY + SPECS (JSP style) ========== */
         .policy, .product_content, .product_rate {
             max-width: 1400px;
             margin: 1.5rem auto 0;
@@ -543,6 +551,7 @@
             line-height: 1.6;
         }
 
+        /* Button "Xem đánh giá" giống JSP */
         .btn_view {
             display: inline-block;
             width: 100%;
@@ -560,47 +569,41 @@
                 opacity: .95;
             }
 
-       
-        #reviews, #specBlock {
-            scroll-margin-top: 120px;
-        }
-
+        /* responsive */
         @@media (max-width: 1200px) {
-            .list-product .card
-
-        {
-            width: calc(25% - 15px);
+            .list-product .card {
+                width: calc(25% - 15px);
+            }
         }
 
-        }
         @@media (max-width: 992px) {
-            .product-detail
+            .product-detail {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
 
-        {
-            grid-template-columns: 1fr;
-            gap: 2rem;
+            .list-product .card {
+                width: calc(33.33% - 14px);
+            }
         }
 
-        .list-product .card {
-            width: calc(33.33% - 14px);
-        }
-
-        }
         @@media (max-width: 768px) {
-            .product-detail-container, .section-but, .policy, .product_content, .product_rate
+            .product-detail-container, .section-but, .policy, .product_content, .product_rate {
+                padding: 0 1rem;
+            }
 
-        {
-            padding: 0 1rem;
-        }
+            .breadcrumb {
+                margin: 0 1rem 1rem;
+                padding: 1rem;
+            }
 
-        .list-product .card {
-            width: calc(50% - 10px);
-        }
+            .list-product .card {
+                width: calc(50% - 10px);
+            }
 
-        .item-main li {
-            grid-template-columns: 1fr;
-        }
-
+            .item-main li {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 }
@@ -637,6 +640,7 @@
                     <a href="javascript:void(0)" id="nextImageBtn" class="main-image-nav main-image-next">&gt;</a>
                 </div>
 
+                <!-- Thumbnail Gallery -->
                 <div class="thumbnail-gallery">
                     <div class="thumbnail-container" id="thumbnailContainer">
                         @if (images.Any())
@@ -690,6 +694,7 @@
                     </div>
                 </div>
 
+                <!-- Form add cart (demo như bạn đang dùng) -->
                 <form id="addToCartForm">
                     <input type="hidden" name="productId" value="@Model.Id" />
 
@@ -707,8 +712,13 @@
                             <i class="fa-solid fa-cart-plus"></i> THÊM VÀO GIỎ
                         </button>
 
-                        <!-- JSP: nút mua ngay -->
-                        <a class="btn btn-buy-now" href="#reviews">MUA NGAY</a>
+                        <!-- ✅ JSP: mua ngay -> sang trang reviews (bạn có thể đổi sau thành checkout) -->
+                        <a class="btn btn-buy-now"
+                           asp-controller="Product"
+                           asp-action="Reviews"
+                           asp-route-id="@Model.Id">
+                            MUA NGAY
+                        </a>
                     </div>
                 </form>
             </div>
@@ -731,7 +741,8 @@
                         var thumb = string.IsNullOrWhiteSpace(p.Thumbnail) ? "/assets/images/logo/list1-1.jpg" : p.Thumbnail;
 
                         <div class="card">
-                            <a asp-controller="Product" asp-action="Detail" asp-route-id="@p.Id" style="text-decoration:none;color:inherit;">
+                            <a asp-controller="Product" asp-action="Detail" asp-route-id="@p.Id"
+                               style="text-decoration:none;color:inherit;">
                                 <img src="@thumb" alt="@p.Name" />
                                 <div class="content">
                                     <div class="name">@p.Name</div>
@@ -786,7 +797,7 @@
     </div>
 
     <!-- ✅ THÔNG SỐ KĨ THUẬT -->
-    <div class="product_content" id="specBlock">
+    <div class="product_content">
         <div class="box">
             <div class="box-title">Thông số kĩ thuật</div>
 
@@ -820,41 +831,15 @@
         </div>
     </div>
 
-    <!-- ✅ NÚT XEM ĐÁNH GIÁ (giống JSP) -->
+    <!-- ✅ NÚT XEM ĐÁNH GIÁ -> NHẢY SANG TRANG RIÊNG -->
     <div class="product_rate">
-        <a class="btn_view" href="#reviews">Xem đánh giá</a>
+        <a class="btn_view"
+           asp-controller="Product"
+           asp-action="Reviews"
+           asp-route-id="@Model.Id">
+            Xem đánh giá
+        </a>
     </div>
-
-    <!-- ✅ SECTION ĐÁNH GIÁ -->
-    <div class="product_content" id="reviews">
-        <div class="box">
-            <div class="box-title">Đánh giá gần đây</div>
-
-            @if (Model.Reviews == null || !Model.Reviews.Any())
-            {
-                <p>Chưa có đánh giá.</p>
-            }
-            else
-            {
-                <div style="display:grid;gap:12px;">
-                    @foreach (var r in Model.Reviews)
-                    {
-                        <div style="padding:12px;border:1px solid #e5e7eb;border-radius:12px;background:#fafafa;">
-                            <div style="display:flex;justify-content:space-between;gap:10px;">
-                                <b>@(string.IsNullOrWhiteSpace(r.UserFullName) ? "Khách" : r.UserFullName)</b>
-                                <span><b>@r.Rating</b>/5 @(r.CreateAt?.ToString("dd/MM/yyyy"))</span>
-                            </div>
-                            @if (!string.IsNullOrWhiteSpace(r.Comment))
-                            {
-                                <div style="margin-top:6px;">@r.Comment</div>
-                            }
-                        </div>
-                    }
-                </div>
-            }
-        </div>
-    </div>
-
 </div>
 
 @section Scripts {
@@ -865,6 +850,7 @@
             if (!isNaN(value)) input.value = value + 1;
             else input.value = 1;
         }
+
         function decreaseQuantity() {
             const input = document.getElementById("quantity");
             let value = parseInt(input.value);
@@ -873,7 +859,7 @@
             else input.value = min;
         }
 
-        // Gallery: click thumb + prev/next
+        // chuyển ảnh sản phẩm giống JSP
         document.addEventListener('DOMContentLoaded', function () {
             const mainImage = document.getElementById('mainProductImage');
             const thumbnails = document.querySelectorAll('.thumbnail-item');
@@ -883,33 +869,38 @@
 
             function updateImage(index) {
                 if (!thumbnails.length) return;
-
                 thumbnails.forEach(t => t.classList.remove('active'));
                 thumbnails[index].classList.add('active');
-
-                mainImage.src = thumbnails[index].querySelector('img').src;
+                const imgSrc = thumbnails[index].querySelector('img').src;
+                mainImage.src = imgSrc;
                 currentIndex = index;
             }
 
-            thumbnails.forEach((thumb, i) => {
-                thumb.addEventListener('click', () => updateImage(i));
+            thumbnails.forEach((thumb, index) => {
+                thumb.addEventListener('click', function () {
+                    updateImage(index);
+                });
             });
 
-            prevBtn?.addEventListener('click', function (e) {
-                e.preventDefault();
-                if (!thumbnails.length) return;
-                currentIndex = (currentIndex - 1 + thumbnails.length) % thumbnails.length;
-                updateImage(currentIndex);
-            });
+            if (prevBtn) {
+                prevBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    if (!thumbnails.length) return;
+                    currentIndex = (currentIndex - 1 + thumbnails.length) % thumbnails.length;
+                    updateImage(currentIndex);
+                });
+            }
 
-            nextBtn?.addEventListener('click', function (e) {
-                e.preventDefault();
-                if (!thumbnails.length) return;
-                currentIndex = (currentIndex + 1) % thumbnails.length;
-                updateImage(currentIndex);
-            });
+            if (nextBtn) {
+                nextBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    if (!thumbnails.length) return;
+                    currentIndex = (currentIndex + 1) % thumbnails.length;
+                    updateImage(currentIndex);
+                });
+            }
 
-            
+          
             document.getElementById('addToCartForm')?.addEventListener('submit', function (e) {
                 e.preventDefault();
                 alert('Đã thêm vào giỏ (demo). Phần Cart sẽ làm tiếp.');

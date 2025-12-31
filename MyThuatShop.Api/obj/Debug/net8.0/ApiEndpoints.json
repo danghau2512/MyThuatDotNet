@@ -49,6 +49,27 @@
   },
   {
     "ContainingType": "MyThuatShop.Api.Controllers.ProductsController",
+    "Method": "AddReview",
+    "RelativePath": "api/Products/{id}/reviews",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "req",
+        "Type": "MyThuatShop.Api.Dtos.CreateReviewRequestDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "MyThuatShop.Api.Controllers.ProductsController",
     "Method": "DetailFull",
     "RelativePath": "api/Products/detail/{id}",
     "HttpMethod": "GET",

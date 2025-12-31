@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using MyThuatShop.Api.Data;
 using MyThuatShop.Api.Dtos;
+using MyThuatShop.Api.Models;
 
 namespace MyThuatShop.Api.Controllers
 {
@@ -127,5 +128,42 @@ namespace MyThuatShop.Api.Controllers
 
             return Ok(dto);
         }
-    }
+        [HttpPost("{id:int}/reviews")]
+        public async Task<IActionResult> AddReview(int id, [FromBody] CreateReviewRequestDto req)
+        {
+            if (!await _db.Products.AnyAsync(p => p.Id == id))
+                return NotFound("Product not found");
+
+            var user = await _db.Users.FirstOrDefaultAsync(u => u.Id == req.UserId);
+            if (user == null)
+                return BadRequest("User not found");
+
+            var rating = req.Rating;
+            if (rating < 1 || rating > 5) rating = 5;
+
+            var review = new ProductReview
+            {
+                ProductId = id,
+                UserId = req.UserId,
+                Rating = rating,
+                Comment = string.IsNullOrWhiteSpace(req.Comment) ? null : req.Comment.Trim(),
+                CreateAt = DateTime.Now
+            };
+
+            _db.ProductReviews.Add(review);
+            await _db.SaveChangesAsync();
+
+            var dto = new ReviewDto
+            {
+                Id = review.Id,
+                UserId = review.UserId,
+                Rating = review.Rating,
+                Comment = review.Comment,
+                CreateAt = review.CreateAt,
+                UserFullName = user.FullName
+            };
+
+            return Ok(dto);
+        }
+}
 }

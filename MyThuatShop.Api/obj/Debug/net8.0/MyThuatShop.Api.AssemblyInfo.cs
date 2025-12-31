@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("MyThuatShop.Api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e87178b53ea5f62ff091bd9dec8dbbe92ed2bb87")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3f036e4ece9e86d500c75873776d2b85fac4c937")]
 [assembly: System.Reflection.AssemblyProductAttribute("MyThuatShop.Api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MyThuatShop.Api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

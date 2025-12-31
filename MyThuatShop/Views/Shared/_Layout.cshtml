@@ -21,6 +21,87 @@
 
     @await Html.PartialAsync("_Footer")
 
+    <!-- jQuery phải được load TRƯỚC -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    
     @RenderSection("Scripts", required: false)
+
+    <script>
+        $(function () {
+          console.log("Search suggest script initialized");
+
+          let timer = null;
+
+          function hideSuggest() {
+            $("#suggestBox").hide();
+            $("#suggestList").empty();
+          }
+
+          $(document).on("keyup", "#searchBox", function (e) {
+            const keyword = $(this).val().trim();
+
+            clearTimeout(timer);
+
+            if (e.key === "Enter") return;
+
+            if (keyword.length < 2) {
+              hideSuggest();
+              return;
+            }
+
+            timer = setTimeout(function () {
+              $.ajax({
+                url: "/Search/Suggest",
+                method: "GET",
+                data: { keyword: keyword, take: 8 },
+                success: function (data) {
+                  console.log("API response:", data);
+
+                  if (!data || data.length === 0) {
+                    hideSuggest();
+                    return;
+                  }
+
+                  var $list = $("#suggestList");
+                  $list.empty();
+
+                  for (var i = 0; i < data.length; i++) {
+                    var item = data[i];
+                    var detailUrl = "/Product/Detail/" + item.id;
+                    var thumb = item.thumbnailUrl || '';
+                    
+                    var li = '<li>' +
+                     '<a href="' + detailUrl + '">' +
+                     (thumb ? '<img src="' + thumb + '" alt="' + item.name + '" />' : '') +
+                       '<div>' +
+                     '<div class="suggest-name">' + item.name + '</div>' +
+                              '<div class="suggest-price">' + Number(item.price).toLocaleString('vi-VN') + ' đ</div>' +
+                     '</div>' +
+                     '</a>' +
+                    '</li>';
+                    
+                    $list.append(li);
+                   }
+
+                    $("#suggestBox").show();
+                     console.log("suggestBox is now visible");
+                },
+                error: function (xhr) {
+                  console.log("AJAX error:", xhr.status, xhr.responseText);
+                  hideSuggest();
+                }
+              });
+            }, 250);
+          });
+
+         $(document).on("click", function (e) {
+          if (!$(e.target).closest(".search-wrapper").length) {
+            hideSuggest();
+         }
+          });
+        });
+    </script>
+
+
 </body>
 </html>

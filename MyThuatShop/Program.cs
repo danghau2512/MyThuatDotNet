@@ -7,6 +7,11 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<HomeApiService>();
 
+builder.Services.AddHttpClient<SearchApiService>((sp, client) =>
+{
+    var config = sp.GetRequiredService<IConfiguration>();
+    client.BaseAddress = new Uri(config["ApiBaseUrl"]!);
+});
 
 var app = builder.Build();
 

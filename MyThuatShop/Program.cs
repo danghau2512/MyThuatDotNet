@@ -6,7 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<HomeApiService>();
-
+builder.Services.AddScoped<ProductAPIService>();
 
 var app = builder.Build();
 

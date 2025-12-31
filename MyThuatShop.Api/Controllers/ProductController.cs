@@ -27,7 +27,7 @@ namespace MyThuatShop.Api.Controllers
             return Ok(data);
         }
 
-        // ✅ GET: /api/products/5 (trả entity đơn giản)
+        
         [HttpGet("{id:int}")]
         public async Task<IActionResult> Detail(int id)
         {
@@ -36,7 +36,7 @@ namespace MyThuatShop.Api.Controllers
             return Ok(p);
         }
 
-        // ✅ GET: /api/products/detail/5 (trả DTO đầy đủ)
+        
         [HttpGet("detail/{id:int}")]
         public async Task<IActionResult> DetailFull(int id)
         {

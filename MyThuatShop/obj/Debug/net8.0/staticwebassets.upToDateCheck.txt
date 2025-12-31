@@ -1,4 +1,5 @@
 wwwroot\css\site.css
+wwwroot\css\style.css
 wwwroot\favicon.ico
 wwwroot\fonts\Arial\Arial-Black.woff
 wwwroot\fonts\Arial\Arial-Black.woff2
@@ -189,4 +190,3 @@ wwwroot\lib\jquery\dist\jquery.js
 wwwroot\lib\jquery\dist\jquery.min.js
 wwwroot\lib\jquery\dist\jquery.min.map
 wwwroot\lib\jquery\LICENSE.txt
-wwwroot\css\style.css

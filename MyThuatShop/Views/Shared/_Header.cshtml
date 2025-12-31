@@ -2,42 +2,56 @@
     <div class="logo-trang-chu">
         <a href>
             <img src="~/images/logo/logo.png">
-
         </a>
     </div>
-    <form class="tim-kiem-san-pham" asp-controller="Product" asp-action="Search" method="get">
-        <input type="text" name="q" placeholder="Tìm kiếm sản phẩm..." />
-        <button type="submit" class="btn-search" aria-label="Tìm kiếm">
+    
+    <!-- Wrapper chứa cả form và suggestBox -->
+    <div class="search-wrapper" style="position:relative;">
+      <form class="tim-kiem-san-pham" asp-controller="Product" asp-action="Search" method="get" autocomplete="off">
+            <input type="text" id="searchBox" name="q" placeholder="Tìm kiếm sản phẩm..." />
+       <button type="submit" class="btn-search" aria-label="Tìm kiếm">
             <i class="fa-solid fa-magnifying-glass"></i>
-        </button>
-    </form>
+            </button>
+        </form>
+        
+        <!-- Box gợi ý - ĐẶT NGOÀI form -->
+        <div id="suggestBox" style="
+  position:absolute; 
+            top:100%; 
+   left:0; 
+      right:0;
+      background:#fff; 
+            border:1px solid #ddd; 
+            border-radius:8px;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display:none;
+       z-index:999999; 
+    margin-top:4px;
+      max-height:400px;
+            overflow-y:auto;">
+     <ul id="suggestList" style="list-style:none; margin:0; padding:0;"></ul>
+        </div>
+    </div>
 
     <div class="header-contact">
         <i class="fa-solid fa-phone"></i>
-        <div class="contact">
-            <div class="contact-phone-number">1900 866 819</div>
+  <div class="contact">
+    <div class="contact-phone-number">1900 866 819</div>
             <div class="contact-phone-help">Hỗ trợ khách hàng</div>
         </div>
     </div>
-    <div class="header-dangnhap-dangki">
-
+ <div class="header-dangnhap-dangki">
         <i class="fa-solid fa-user"></i>
         <div class="dangnhap-dangki">
-            <a href="Login.html">
-                <div class="dangnhap">
-                    Đăng
-                    nhập
-                </div>
+         <a href="Login.html">
+     <div class="dangnhap">Đăng nhập</div>
             </a>
-            <a href="Register.html"><div class="dangki">Đăng kí</div></a>
-
+        <a href="Register.html"><div class="dangki">Đăng kí</div></a>
         </div>
-
     </div>
     <div class="header-giohang">
-        <a class href="Cart.html">
-            <i class="fa-solid fa-bag-shopping"></i>
+      <a class href="Cart.html">
+<i class="fa-solid fa-bag-shopping"></i>
         </a>
-
     </div>
 </header>

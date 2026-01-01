@@ -1,17 +1,22 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using MyThuatShop.Services;
+using MyThuatShop.ViewModels;
 
 namespace MyThuatShop.Controllers;
 
 public class ProductController : Controller
 {
     private readonly ProductAPIService _productApi;
+    private readonly SearchApiService _search;
 
-    public ProductController(ProductAPIService productApi)
+
+    public ProductController(ProductAPIService productApi, SearchApiService search)
     {
         _productApi = productApi;
+        _search = search;
     }
+
 
     public async Task<IActionResult> Detail(int id)
     {
@@ -52,4 +57,20 @@ public class ProductController : Controller
 
         return RedirectToAction(nameof(Reviews), new { id });
     }
+    // trang search load lần đầu
+    [HttpGet]
+    public async Task<IActionResult> Search(string q, string sort = "all", int page = 1)
+    {
+        var vm = await _search.SearchProductsPagedAsync(q, sort, page, 8);
+        return View(vm); // Views/Product/Search.cshtml
+    }
+
+    // ajax phân trang (không reload)
+    [HttpGet]
+    public async Task<IActionResult> SearchPartial(string q, string sort = "all", int page = 1)
+    {
+        var vm = await _search.SearchProductsPagedAsync(q, sort, page, 8);
+        return PartialView("_SearchResultsPartial", vm);
+    }
+
 }

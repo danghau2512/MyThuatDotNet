@@ -1,0 +1,42 @@
+﻿@model List<MyThuatShop.ViewModels.ProductCardVm>
+
+@foreach (var p in Model)
+{
+    var finalPrice = p.Price * (100 - p.DiscountDefault) / 100m;
+
+    <div class="list-product-list1">
+        <a asp-controller="Product" asp-action="Detail" asp-route-id="@p.Id">
+            <img src="@p.Thumbnail" alt="@p.Name" />
+
+            <div class="list-product-list1-content">
+                <div class="list-product-list1-content-socials">
+                    <div class="list-product-list1-content-socials-1">
+                    </div>
+
+                    <div class="list-product-list1-content-socials-2">
+                        <i class="fa-solid fa-arrow-up-right-dots"></i>
+                        <span>Đã bán @p.SoldQuantity</span>
+                    </div>
+                </div>
+
+                <div class="list-product-list1-content-description">
+                    <p class="content">@p.Name</p>
+
+                    <h2 class="price-product-after">@finalPrice.ToString("N0")₫</h2>
+
+                    
+                        <p class="price-product-before">@p.Price.ToString("N0")₫</p>
+                        <span class="price-product-discount">-@p.DiscountDefault%</span>
+                    
+
+                    <div class="button">
+                        <button type="button" class="btn-xemchitiet">
+                            <i class="fa-solid fa-eye"></i>
+                            Xem chi tiết
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+}

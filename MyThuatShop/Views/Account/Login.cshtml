@@ -1,16 +1,23 @@
+@model MyThuatShop.ViewModels.Auth.LoginVm
+@{
+    ViewData["Title"] = "Đăng nhập";
+    Layout = "_Layout";
+}
 <!DOCTYPE html>
 <html lang="en">
 
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Đăng Nhập</title>
-        <link rel="stylesheet" href="UI/assets/css/style.css">
-        <link rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
-            integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
-            crossorigin="anonymous" referrerpolicy="no-referrer" />
-    </head>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng Nhập</title>
+
+    <link rel="stylesheet" href="./assets/css/style.css">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+          integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
+          crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+
     <style>
     .container {
         width: 1200px;
@@ -843,46 +850,39 @@
         </header>
 
         <div class="main">
-            <div class="container">
-                <h4>Đăng Nhập</h4>
-                <form action="IndexKhachHang.html" class="form-login">
-                    <div class="form-1">
-                        <label for="email"> Email*</label>
-                        <input type="email" name placeholder="Nhập Email"
-                            required
-                            id="email">
-                        <span id="email-error"
-                            style="color: #FFD700; font-size: 14px;"></span>
-                    </div>
-                    <div class="form-1">
-                        <label for="password"> Mật Khẩu*</label>
-                        <input type="password" name placeholder="Nhập mật khẩu"
-                            required id="password">
-                    </div>
+    <div class="container">
+        <h4>Đăng Nhập</h4>
 
-                    <div class="forgot-password">
-                        <p>Quên mật khẩu? Nhấn vào <a
-                                href="ForgotPassword.html">đây</a></p>
-                    </div>
-                    <button type="submit"
-                        class="btn-login">Đăng
-                        Nhập</button>
+        <form asp-controller="Account" asp-action="Login" method="post" class="form-login">
+            @Html.AntiForgeryToken()
 
-                    <div class="chuataikhoan">
-                        Bạn chưa có tài khoản <a href="Register.html"
-                            class="link-dki">Đăng ký tại đây</a>
-                    </div>
-
-                    <div class="btn-login-gg">
-
-                        <button class="btn-gg"><i
-                                class="fa-brands fa-google"></i>Google</button>
-
-                    </div>
-
-                </form>
+            <div class="form-1">
+                <label asp-for="Email">Email*</label>
+                <input asp-for="Email" type="email" placeholder="Nhập Email" />
+                <span asp-validation-for="Email" style="color:#FFD700; font-size:14px;"></span>
             </div>
-        </div>
+
+            <div class="form-1" style="margin-top:10px;">
+                <label asp-for="Password">Mật khẩu*</label>
+                <input asp-for="Password" type="password" placeholder="Nhập mật khẩu" />
+                <span asp-validation-for="Password" style="color:#FFD700; font-size:14px;"></span>
+            </div>
+
+            <div asp-validation-summary="All" style="color:#FFD700; font-size:14px; margin-top:10px;"></div>
+
+            <div class="forgot-password">
+                <p style="color:white;">Quên mật khẩu? Nhấn vào <a href="#">đây</a></p>
+            </div>
+
+            <button type="submit" class="btn-login">Đăng Nhập</button>
+
+            <div class="chuataikhoan">
+                Bạn chưa có tài khoản
+                <a asp-controller="Account" asp-action="Register" class="link-dki">Đăng ký tại đây</a>
+            </div>
+        </form>
+    </div>
+</div>
 
         <footer id="footer-trang-chu">
             <div class="footer-title">
@@ -986,6 +986,22 @@
                             </div>
                         </div>
                     </footer>
+    @section Scripts {
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+        @if (ViewBag.SessionExpired == true)
+        {
+            <script>
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Phiên đăng nhập đã hết hạn',
+                    text: 'Vui lòng đăng nhập lại để tiếp tục sử dụng hệ thống.',
+                    confirmButtonText: 'Đóng',
+                    confirmButtonColor: '#f5d64e'
+                });
+            </script>
+        }
+    }
 
                 </body>
 

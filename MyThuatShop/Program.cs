@@ -6,8 +6,24 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddHttpClient();
 
-// DI services
 builder.Services.AddScoped<HomeApiService>();
+// login
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromSeconds(10);
+    // ho?c TimeSpan.FromMinutes(30);
+
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+builder.Services.AddHttpClient();
+builder.Services.AddHttpClient<AccountApiService>();
+
+//
+
+
+// DI services
+
 builder.Services.AddScoped<ProductAPIService>();
 
 // ✅ HttpClient cho SearchApiService (nếu bạn có dùng)
@@ -42,7 +58,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseSession();
+app.UseSession();// login
 
 app.UseAuthorization();
 

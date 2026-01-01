@@ -42,16 +42,35 @@
             <div class="contact-phone-help">Hỗ trợ khách hàng</div>
         </div>
     </div>
-
     <div class="header-dangnhap-dangki">
         <i class="fa-solid fa-user"></i>
+
         <div class="dangnhap-dangki">
-            <a asp-controller="Account" asp-action="Login">
-                <div class="dangnhap">Đăng nhập</div>
-            </a>
-            <a asp-controller="Account" asp-action="Register">
-                <div class="dangki">Đăng kí</div>
-            </a>
+            @{
+                var fullName = Context.Session.GetString("FullName");
+            }
+
+            @if (!string.IsNullOrEmpty(fullName))
+            {
+                <div class="dangnhap">Hi, @fullName</div>
+
+                <form asp-controller="Account" asp-action="Logout" method="post" style="margin:0;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit"
+                            class="dangki"
+                            style="background:none;border:none;color:white;padding:0;cursor:pointer;">
+                        Đăng xuất
+                    </button>
+                </form>
+            }
+            else
+            {
+                <div class="dangnhap">
+                    <a class="dangnhap" asp-controller="Account" asp-action="Login">Đăng nhập</a>
+                    <br />
+                    <a class="dangki" asp-controller="Account" asp-action="Register">Đăng ký</a>
+                </div>
+            }
         </div>
     </div>
 

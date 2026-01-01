@@ -4,47 +4,32 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 
+// HttpClient
 builder.Services.AddHttpClient();
-
-builder.Services.AddScoped<HomeApiService>();
-// login
-builder.Services.AddSession(options =>
-{
-    options.IdleTimeout = TimeSpan.FromSeconds(10);
-    // ho?c TimeSpan.FromMinutes(30);
-
-    options.Cookie.HttpOnly = true;
-    options.Cookie.IsEssential = true;
-});
-builder.Services.AddHttpClient();
-builder.Services.AddHttpClient<AccountApiService>();
-
-//
-
 
 // DI services
-
+builder.Services.AddScoped<HomeApiService>();
 builder.Services.AddScoped<ProductAPIService>();
+builder.Services.AddHttpClient<AccountApiService>();
 
-// ✅ HttpClient cho SearchApiService (nếu bạn có dùng)
 builder.Services.AddHttpClient<SearchApiService>((sp, client) =>
 {
     var config = sp.GetRequiredService<IConfiguration>();
     client.BaseAddress = new Uri(config["ApiBaseUrl"]!);
 });
+
 builder.Services.AddHttpContextAccessor();
 
-// ✅ Session
-builder.Services.AddHttpContextAccessor();
+// ✅ Session (CHỈ 1 LẦN)
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromHours(2);
+    options.Cookie.Name = ".MyThuatShop.Session";
+    options.IdleTimeout = TimeSpan.FromHours(2); // giống JSP: đủ lâu để test
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
-builder.Services.AddDistributedMemoryCache();
-builder.Services.AddSession();
+
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
@@ -52,13 +37,14 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
-app.UseSession();
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseSession();// login
+// ✅ Session middleware phải đặt SAU UseRouting và TRƯỚC MapControllerRoute
+app.UseSession();
 
 app.UseAuthorization();
 
@@ -67,4 +53,3 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
-

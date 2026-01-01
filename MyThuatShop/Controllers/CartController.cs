@@ -10,9 +10,10 @@ public class CartController : Controller
     [HttpGet("/cart")]
     public IActionResult Index()
     {
-        // (nếu bạn muốn bắt login giống JSP thì mở comment)
-        // var currentUser = HttpContext.Session.GetObject<object>("currentUser");
-        // if (currentUser == null) return Redirect("/login");
+        // ✅ CHẶN GIỎ HÀNG NẾU CHƯA LOGIN (giống JSP)
+        var currentUser = HttpContext.Session.GetObject<object>("currentUser");
+        if (currentUser == null)
+            return RedirectToAction("Login", "Account");
 
         var cart = HttpContext.Session.GetObject<Cart>("cart");
         if (cart == null)
@@ -21,7 +22,6 @@ public class CartController : Controller
             HttpContext.Session.SetObject("cart", cart);
         }
 
-        // ✅ giống JSP: totalQuantity + totalAmount + cartSize
         var vm = new CartPageVm
         {
             CartItems = cart.Carts.Values,
@@ -30,9 +30,9 @@ public class CartController : Controller
             CartSize = cart.CartSize()
         };
 
-        // ✅ giống JSP: lưu cartCount để badge header hiển thị
+        // ✅ lưu cartCount để badge header hiển thị
         HttpContext.Session.SetInt32("cartCount", vm.TotalQuantity);
 
-        return View(vm);
+        return View("~/Views/Cart/Cart.cshtml", vm);
     }
 }

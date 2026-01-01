@@ -886,49 +886,48 @@
             const cartUrl = '@Url.Action("Index", "Cart")';
             const loginUrl = '@Url.Action("Login", "Account", new { returnUrl = Url.Action("Detail", "Product", new { id = Model.Id }) })';
 
-            form.addEventListener('submit', async function (e) {
-                e.preventDefault();
+                    form.addEventListener('submit', async function (e) {
+            e.preventDefault();
 
-                const fd = new FormData(form);
-                const params = new URLSearchParams();
-                fd.forEach((v, k) => params.append(k, v));
+            const fd = new FormData(form);
+            const params = new URLSearchParams();
+            fd.forEach((v, k) => params.append(k, v));
 
-                try {
-                    const resp = await fetch(form.action, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
-                            'X-Requested-With': 'XMLHttpRequest',
-                            'Accept': 'application/json'
-                        },
-                        body: params.toString()
-                    });
+            try {
+                const resp = await fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    },
+                    body: params.toString()
+                });
 
-                    // Nếu sau này bạn bật check login ở controller: 401 -> về login
-                    if (resp.status === 401) {
-                        window.location.href = loginUrl;
-                        return;
-                    }
-
-                    const data = await resp.json().catch(() => null);
-
-                    if (!resp.ok || !data || !data.success) {
-                        alert((data && data.message) ? data.message : 'Không thể thêm vào giỏ hàng');
-                        return;
-                    }
-
-                    
-                    const cartIcon = document.getElementById('cartIcon');
-                    if (cartIcon) cartIcon.setAttribute('data-count', String(data.cartCount));
-
-                    
-                    window.location.href = cartUrl;
-
-                } catch (err) {
-                    console.error(err);
-                    alert('Có lỗi xảy ra. Vui lòng thử lại.');
+                if (resp.status === 401) {
+                    window.location.href = '@Url.Action("Login", "Account")';
+                    return;
                 }
-            });
+
+                const data = await resp.json().catch(() => null);
+
+                if (!resp.ok || !data || !data.success) {
+                    alert((data && data.message) ? data.message : 'Không thể thêm vào giỏ hàng');
+                    return;
+                }
+
+                // ✅ cập nhật badge
+                const cartIcon = document.getElementById('cartIcon');
+                if (cartIcon) cartIcon.setAttribute('data-count', String(data.cartCount));
+
+                // ✅ ở lại trang (không redirect)
+                alert('Đã thêm vào giỏ hàng');
+
+            } catch (err) {
+                console.error(err);
+                alert('Có lỗi xảy ra. Vui lòng thử lại.');
+            }
+        });
 
         });
     </script>

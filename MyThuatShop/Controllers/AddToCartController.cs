@@ -15,13 +15,13 @@ public class AddToCartController : Controller
         _productApi = productApi;
     }
 
-    // ===== GET: remove item (giống JSP: /AddToCart?action=remove&productId=...) =====
+    // ===== GET: remove item =====
     [HttpGet("/AddToCart")]
     public IActionResult Get([FromQuery] string? action, [FromQuery] int? productId)
     {
-        // (tùy bạn) bắt buộc login giống JSP
+        // ✅ BẮT BUỘC LOGIN (giống JSP)
         if (!IsLoggedIn())
-            return Redirect("/login");
+            return RedirectToAction("Login", "Account");
 
         if (action == "remove" && productId.HasValue)
         {
@@ -34,13 +34,18 @@ public class AddToCartController : Controller
         return RedirectToAction("Index", "Cart");
     }
 
-    // ===== POST: add / update / ajaxUpdate =====
+    // ===== POST: add / ajaxUpdate / update =====
     [HttpPost("/AddToCart")]
     public async Task<IActionResult> Post([FromQuery] string? action, [FromForm] int? productId, [FromForm] int? quantity)
     {
-        // (tùy bạn) bắt buộc login giống JSP
+        // ✅ BẮT BUỘC LOGIN (giống JSP) — phân biệt AJAX vs thường
         if (!IsLoggedIn())
-            return Redirect("/login");
+        {
+            if (IsAjaxRequest())
+                return Unauthorized(new { success = false, message = "Vui lòng đăng nhập" });
+
+            return RedirectToAction("Login", "Account");
+        }
 
         // validate
         if (!productId.HasValue || productId.Value <= 0 || !quantity.HasValue)
@@ -54,18 +59,17 @@ public class AddToCartController : Controller
             return await AjaxUpdate(pid, qty);
 
         if (action == "update")
-            return RedirectToAction("Index", "Cart"); // nếu sau này làm update list kiểu form
+            return RedirectToAction("Index", "Cart");
 
         // default: add
         return await Add(pid, qty);
     }
 
-    // ===== ADD 1 PRODUCT (giống JSP: check active + hết hàng, rồi add, set cartCount) =====
+    // ===== ADD 1 PRODUCT =====
     private async Task<IActionResult> Add(int productId, int quantity)
     {
         var p = await _productApi.GetProductForCart(productId);
 
-        // sản phẩm không tồn tại / ngừng bán
         if (p == null || !p.IsActive)
         {
             if (IsAjaxRequest())
@@ -74,7 +78,6 @@ public class AddToCartController : Controller
             return RedirectToRefererOr("/home");
         }
 
-        // hết hàng
         if (p.QuantityStock <= 0)
         {
             if (IsAjaxRequest())
@@ -82,10 +85,6 @@ public class AddToCartController : Controller
 
             return RedirectToRefererOr("/home");
         }
-
-        // NOTE: JSP của bạn không clamp quantity theo stock khi Add,
-        // chỉ clamp trong ajaxUpdate. Nếu bạn muốn clamp ở đây, mở comment dưới:
-        // if (quantity > p.QuantityStock) quantity = p.QuantityStock;
 
         var cart = GetOrCreateCart();
 
@@ -104,20 +103,18 @@ public class AddToCartController : Controller
         if (IsAjaxRequest())
             return Json(new { success = true, cartCount = cart.TotalQuantity() });
 
-        return RedirectToRefererOr("/cart");
+        return RedirectToRefererOr("/home");
     }
 
-    // ===== AJAX UPDATE (Y HỆT LOGIC JSP BẠN GỬI) =====
+    // ===== AJAX UPDATE (y hệt logic JSP) =====
     private async Task<IActionResult> AjaxUpdate(int productId, int quantity)
     {
         var cart = GetOrCreateCart();
 
         if (quantity < 1) quantity = 1;
 
-        // 1) Check sản phẩm đang update
         var pCheck = await _productApi.GetProductForCart(productId);
 
-        // ngừng bán -> remove khỏi cart + 404
         if (pCheck == null || !pCheck.IsActive)
         {
             cart.Remove(productId);
@@ -131,7 +128,6 @@ public class AddToCartController : Controller
             });
         }
 
-        // hết hàng -> remove + 400
         if (pCheck.QuantityStock <= 0)
         {
             cart.Remove(productId);
@@ -145,20 +141,11 @@ public class AddToCartController : Controller
             });
         }
 
-        // clamp qty theo tồn kho (đúng JSP)
         if (quantity > pCheck.QuantityStock) quantity = pCheck.QuantityStock;
         if (quantity < 1) quantity = 1;
 
         cart.UpdateQuantity(productId, quantity);
 
-        // 2) TÍNH LẠI total giống JSP:
-        //    - Duyệt toàn bộ cart
-        //    - Re-fetch từng product active
-        //    - Nếu null/!active -> remove
-        //    - Nếu hết hàng -> remove
-        //    - Clamp qty theo stock
-        //    - Cập nhật lại Name/Price/Discount/Thumbnail theo product mới nhất
-        //    - Tính itemSubtotal & totalAmount theo giá mới nhất
         decimal totalAmount = 0m;
         decimal itemSubtotal = 0m;
 
@@ -183,17 +170,14 @@ public class AddToCartController : Controller
                 continue;
             }
 
-            // clamp theo tồn kho
             if (item.Quantity > p.QuantityStock) item.Quantity = p.QuantityStock;
             if (item.Quantity < 1) item.Quantity = 1;
 
-            // cập nhật lại thông tin item theo product mới nhất
             item.Name = p.Name;
             item.Price = p.Price;
             item.DiscountDefault = p.DiscountDefault;
             item.Thumbnail = p.Thumbnail;
 
-            // tính tiền theo giá mới nhất
             var priceAfterDiscount = item.Price * (1m - (item.DiscountDefault / 100m));
             var sub = priceAfterDiscount * item.Quantity;
 
@@ -255,10 +239,8 @@ public class AddToCartController : Controller
         return Redirect(fallback);
     }
 
-    // Login check giống JSP nhưng không phụ thuộc class Users (để khỏi lỗi build)
     private bool IsLoggedIn()
     {
-        // Nếu bạn đang lưu currentUser bằng SetObject, dùng GetObject<object>
         var u = HttpContext.Session.GetObject<object>("currentUser");
         return u != null;
     }

@@ -9,7 +9,7 @@ public class RequireLoginAttribute : ActionFilterAttribute
 {
     public override void OnActionExecuting(ActionExecutingContext context)
     {
-        var user = context.HttpContext.Session.GetObject<AccountApiService.UserDto>("user");
+        var user = context.HttpContext.Session.GetObject<AccountApiService.UserDto>("currentUser");
         if (user == null)
         {
             context.Result = new RedirectToActionResult("Login", "Account", null);

@@ -11,6 +11,7 @@ builder.Services.AddHttpClient<SearchApiService>((sp, client) =>
 {
     var config = sp.GetRequiredService<IConfiguration>();
     client.BaseAddress = new Uri(config["ApiBaseUrl"]!);
+});
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddDistributedMemoryCache();
@@ -43,3 +44,4 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
+

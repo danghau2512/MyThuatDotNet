@@ -18,5 +18,30 @@ namespace MyThuatShop.Services
             var data = await _http.GetFromJsonAsync<List<ProductSuggestVm>>(url);
             return data ?? new List<ProductSuggestVm>();
         }
+
+        public async Task<SearchPageVm> SearchProductsPagedAsync(string q, string sort = "all", int page = 1, int pageSize = 8)
+        {
+            q = (q ?? "").Trim();
+            if (q.Length == 0) return new SearchPageVm { Keyword = q, Sort = sort, Page = page, PageSize = pageSize };
+
+            var url = $"/api/search/products?q={Uri.EscapeDataString(q)}&sort={sort}&page={page}&pageSize={pageSize}";
+
+            // nhận dạng object { page, pageSize, totalItems, totalPages, items }
+            var res = await _http.GetFromJsonAsync<PagedResultVm<ProductCardVm>>(url);
+
+            return new SearchPageVm
+            {
+                Keyword = q,
+                Sort = sort,
+                Page = res?.Page ?? page,
+                PageSize = res?.PageSize ?? pageSize,
+                TotalItems = res?.TotalItems ?? 0,
+                TotalPages = res?.TotalPages ?? 0,
+                Products = res?.Items ?? new()
+            };
+        }
+
+        
+
     }
 }

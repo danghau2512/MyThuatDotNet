@@ -46,5 +46,69 @@ namespace MyThuatShop.Api.Controllers
             var data = await query.ToListAsync();
             return Ok(data);
         }
+
+        [HttpGet("products")]
+        public async Task<IActionResult> SearchProducts(
+    [FromQuery] string q,
+    [FromQuery] string sort = "all",
+    [FromQuery] int page = 1,
+    [FromQuery] int pageSize = 8)
+        {
+            q = (q ?? "").Trim();
+            page = Math.Max(1, page);
+            pageSize = Math.Clamp(pageSize, 1, 60);
+
+            if (string.IsNullOrWhiteSpace(q))
+            {
+                return Ok(new PagedResultDto<ProductCardDto>
+                {
+                    Page = page,
+                    PageSize = pageSize,
+                    TotalItems = 0,
+                    TotalPages = 0,
+                    Items = new()
+                });
+            }
+
+            var query = _context.Products.AsNoTracking()
+                .Where(p => (p.IsActive ?? true) && p.Name.Contains(q));
+
+            query = sort switch
+            {
+                "bestseller" => query.OrderByDescending(p => p.SoldQuantity),
+                "new" => query.OrderByDescending(p => p.CreateAt),
+                "priceAsc" => query.OrderBy(p => p.Price * (100 - (p.DiscountDefault ?? 0)) / 100m),
+                "priceDesc" => query.OrderByDescending(p => p.Price * (100 - (p.DiscountDefault ?? 0)) / 100m),
+                _ => query.OrderBy(p => p.Name)
+            };
+
+            var totalItems = await query.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+            if (totalPages > 0 && page > totalPages) page = totalPages;
+
+            var items = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(p => new ProductCardDto
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    Price = p.Price,
+                    DiscountDefault = p.DiscountDefault ?? 0,
+                    Thumbnail = p.Thumbnail,
+                    SoldQuantity = p.SoldQuantity ?? 0
+                })
+                .ToListAsync();
+
+            return Ok(new PagedResultDto<ProductCardDto>
+            {
+                Page = page,
+                PageSize = pageSize,
+                TotalItems = totalItems,
+                TotalPages = totalPages,
+                Items = items
+            });
+        }
+
     }
 }

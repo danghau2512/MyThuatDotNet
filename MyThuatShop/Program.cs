@@ -6,7 +6,19 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<HomeApiService>();
+// login
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromSeconds(10);
+    // ho?c TimeSpan.FromMinutes(30);
 
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+builder.Services.AddHttpClient();
+builder.Services.AddHttpClient<AccountApiService>();
+
+//
 
 var app = builder.Build();
 
@@ -22,6 +34,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseSession();// login
 
 app.UseAuthorization();
 

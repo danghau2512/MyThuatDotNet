@@ -8,23 +8,23 @@
     "net8.0": []
   },
   "packageFolders": {
-    "C:\\Users\\hausi\\.nuget\\packages\\": {},
-    "D:\\cong_cu_nen\\vs_studio_SDK\\NuGetPackages": {}
+    "C:\\Users\\Hieu\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\hausi\\Desktop\\DotNET\\MythuatShop\\MyThuatShop\\MyThuatShop.csproj",
+      "projectUniqueName": "D:\\LT.NET\\DoAnCuoiKy\\MyThuatDotNet\\MyThuatShop\\MyThuatShop.csproj",
       "projectName": "MyThuatShop",
-      "projectPath": "C:\\Users\\hausi\\Desktop\\DotNET\\MythuatShop\\MyThuatShop\\MyThuatShop.csproj",
-      "packagesPath": "C:\\Users\\hausi\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\hausi\\Desktop\\DotNET\\MythuatShop\\MyThuatShop\\obj\\",
+      "projectPath": "D:\\LT.NET\\DoAnCuoiKy\\MyThuatDotNet\\MyThuatShop\\MyThuatShop.csproj",
+      "packagesPath": "C:\\Users\\Hieu\\.nuget\\packages\\",
+      "outputPath": "D:\\LT.NET\\DoAnCuoiKy\\MyThuatDotNet\\MyThuatShop\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
-        "D:\\cong_cu_nen\\vs_studio_SDK\\NuGetPackages"
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\hausi\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\Hieu\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -75,7 +75,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.306/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.305/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

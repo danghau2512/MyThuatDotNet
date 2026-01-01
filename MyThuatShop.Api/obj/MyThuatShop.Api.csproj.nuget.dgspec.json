@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\hausi\\Desktop\\DotNET\\MythuatShop\\MyThuatShop.Api\\MyThuatShop.Api.csproj": {}
+    "D:\\LT.NET\\DoAnCuoiKy\\MyThuatDotNet\\MyThuatShop.Api\\MyThuatShop.Api.csproj": {}
   },
   "projects": {
-    "C:\\Users\\hausi\\Desktop\\DotNET\\MythuatShop\\MyThuatShop.Api\\MyThuatShop.Api.csproj": {
+    "D:\\LT.NET\\DoAnCuoiKy\\MyThuatDotNet\\MyThuatShop.Api\\MyThuatShop.Api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\hausi\\Desktop\\DotNET\\MythuatShop\\MyThuatShop.Api\\MyThuatShop.Api.csproj",
+        "projectUniqueName": "D:\\LT.NET\\DoAnCuoiKy\\MyThuatDotNet\\MyThuatShop.Api\\MyThuatShop.Api.csproj",
         "projectName": "MyThuatShop.Api",
-        "projectPath": "C:\\Users\\hausi\\Desktop\\DotNET\\MythuatShop\\MyThuatShop.Api\\MyThuatShop.Api.csproj",
-        "packagesPath": "C:\\Users\\hausi\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\hausi\\Desktop\\DotNET\\MyThuatShop\\MyThuatShop.Api\\obj\\",
+        "projectPath": "D:\\LT.NET\\DoAnCuoiKy\\MyThuatDotNet\\MyThuatShop.Api\\MyThuatShop.Api.csproj",
+        "packagesPath": "C:\\Users\\Hieu\\.nuget\\packages\\",
+        "outputPath": "D:\\LT.NET\\DoAnCuoiKy\\MyThuatDotNet\\MyThuatShop.Api\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
-          "D:\\cong_cu_nen\\vs_studio_SDK\\NuGetPackages"
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\hausi\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Hieu\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -50,6 +50,10 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
+            "BCrypt.Net-Next": {
+              "target": "Package",
+              "version": "[4.0.3, )"
+            },
             "Microsoft.EntityFrameworkCore": {
               "target": "Package",
               "version": "[8.0.0, )"
@@ -94,7 +98,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.306/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.305/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

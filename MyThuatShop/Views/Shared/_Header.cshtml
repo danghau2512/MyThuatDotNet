@@ -20,19 +20,35 @@
         </div>
     </div>
     <div class="header-dangnhap-dangki">
-
         <i class="fa-solid fa-user"></i>
+
         <div class="dangnhap-dangki">
-            <a href="Login.html">
+            @{
+                var fullName = Context.Session.GetString("FullName");
+            }
+
+            @if (!string.IsNullOrEmpty(fullName))
+            {
+                <div class="dangnhap">Hi, @fullName</div>
+
+                <form asp-controller="Account" asp-action="Logout" method="post" style="margin:0;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit"
+                            class="dangki"
+                            style="background:none;border:none;color:white;padding:0;cursor:pointer;">
+                        Đăng xuất
+                    </button>
+                </form>
+            }
+            else
+            {
                 <div class="dangnhap">
-                    Đăng
-                    nhập
+                    <a class="dangnhap" asp-controller="Account" asp-action="Login">Đăng nhập</a>
+                    <br />
+                    <a class="dangki" asp-controller="Account" asp-action="Register">Đăng ký</a>
                 </div>
-            </a>
-            <a href="Register.html"><div class="dangki">Đăng kí</div></a>
-
+            }
         </div>
-
     </div>
     <div class="header-giohang">
         <a class href="Cart.html">

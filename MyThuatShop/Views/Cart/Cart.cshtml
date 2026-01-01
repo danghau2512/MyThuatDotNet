@@ -1,1147 +1,472 @@
-<!DOCTYPE html>
-<html lang="en">
+@using System.Globalization
+@using System.Linq
+@model MyThuatShop.ViewModels.CartPageVm
 
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Giỏ hàng</title>
-        <link rel="stylesheet" href="UI/assets/css/style.css">
-        <link rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
-            integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
-            crossorigin="anonymous" referrerpolicy="no-referrer" />
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Giỏ hàng";
+    var vi = CultureInfo.GetCultureInfo("vi-VN");
+}
 
-    </head>
-
+@section Styles {
     <style>
-    .container {
-        width: 1200px;
-        margin: auto;
-    }
-
-    /* Begin header */
-    #header-trang-chu {
-        background-color: var(--color-main);
-        display: flex;
-        align-items: center;
-        position: fixed;
-        z-index: 999;
-        width: 100%;
-    }
-
-    #header-trang-chu .logo-trang-chu {
-        margin-left: 50px;
-        margin-right: 50px;
-        margin-top: 25px;
-        margin-bottom: 25px;
-    }
-
-    #header-trang-chu .logo-trang-chu img {
-        background-color: transparent;
-        width: 200px;
-        height: 100%;
-    }
-
-    #header-trang-chu .tim-kiem-san-pham {
-        position: relative;
-    }
-
-    #header-trang-chu .tim-kiem-san-pham input {
-        padding: 10px 15px;
-        width: 600px;
-        border-radius: 10px;
-        border: none;
-    }
-
-    #header-trang-chu .tim-kiem-san-pham {
-        display: flex;
-    }
-
-    #header-trang-chu .tim-kiem-san-pham i {
-        position: absolute;
-        right: 0;
-        width: 50px;
-        height: 100%;
-        background-color: #0b234d;
-        line-height: 40px;
-        cursor: pointer;
-        color: white;
-        border-top-right-radius: 10px;
-        border-bottom-right-radius: 10px;
-    }
-
-    #header-trang-chu .header-contact {
-        display: flex;
-        align-items: center;
-    }
-
-    #header-trang-chu .header-contact i {
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        background-color: #0b234d;
-        line-height: 30px;
-        color: white;
-    }
-
-    #header-trang-chu .header-contact {
-        margin-left: 100px;
-        margin-right: 50px;
-        cursor: pointer;
-    }
-
-    #header-trang-chu .header-contact .contact {
-        margin-left: 15px;
-    }
-
-    #header-trang-chu .header-contact .contact .contact-phone-number {
-        color: white;
-        font-weight: 600;
-        font-size: 18px;
-    }
-
-    #header-trang-chu .header-contact .contact .contact-phone-help {
-        color: white;
-        font-size: 16px;
-    }
-
-    #header-trang-chu .header-dangnhap-dangki {
-        display: flex;
-        align-items: center;
-        cursor: pointer;
-    }
-
-    #header-trang-chu .header-dangnhap-dangki i {
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        background-color: #0b234d;
-        line-height: 30px;
-        color: white;
-    }
-
-    #header-trang-chu .header-dangnhap-dangki {
-        margin-right: 50px;
-    }
-
-    #header-trang-chu .header-dangnhap-dangki .dangnhap-dangki {
-        margin-left: 15px;
-    }
-
-    #header-trang-chu .header-dangnhap-dangki .dangnhap-dangki .dangnhap {
-        color: white;
-        font-weight: 600;
-        font-size: 18px;
-    }
-
-    #header-trang-chu .header-dangnhap-dangki .dangnhap-dangki .dangki {
-        color: white;
-        font-size: 16px;
-    }
-
-    #header-trang-chu .header-giohang {
-        font-size: 25px;
-        color: white;
-        position: relative;
-        cursor: pointer;
-    }
-
-    #header-trang-chu .header-giohang::after {
-        display: inline-flex;
-        content: "0";
-        width: 20px;
-        height: 20px;
-        left: 20px;
-        bottom: 15px;
-        justify-content: center;
-        align-items: center;
-        font-size: 15px;
-        background-color: red;
-        position: absolute;
-        border-radius: 50%;
-    }
-
-    /* End header */
-    /* Begin footer */
-    #footer-trang-chu {
-        display: flex;
-        background-color: #17479d;
-        border-top-left-radius: 70px;
-        border-top-right-radius: 70px;
-        gap: 30px;
-        align-items: center;
-        justify-content: space-around;
-        position: relative;
-    }
-
-    #footer-trang-chu .footer-title {
-        text-align: justify;
-        margin-left: 30px;
-    }
-
-    #footer-trang-chu .footer-title .img-main {
-        background-color: transparent;
-        width: 400px;
-    }
-
-    #footer-trang-chu .footer-title .footer-title-header {
-        color: #fbe263;
-    }
-
-    #footer-trang-chu .footer-title .footer-title-description {
-        color: white;
-    }
-
-    #footer-trang-chu .footer-title .footer-title-form {
-        position: relative;
-    }
-
-    #footer-trang-chu .footer-title .footer-title-form input {
-        padding: 10px 15px;
-        border-radius: 10px;
-        width: 300px;
-        border: none;
-    }
-
-    #footer-trang-chu .footer-title .footer-title-form a {
-        position: absolute;
-        display: inline-flex;
-        width: 100px;
-        height: 36px;
-        background-color: #0b234d;
-        border-top-right-radius: 10px;
-        border-bottom-right-radius: 10px;
-        top: 0;
-        right: 69px;
-        justify-content: center;
-        align-items: center;
-        text-decoration: none;
-        color: white;
-    }
-
-    #footer-trang-chu .footer-title .img-footer {
-        width: 250px;
-        margin-top: 15px;
-        cursor: pointer;
-        margin-bottom: 50px;
-    }
-
-    #footer-trang-chu .footer-diachi {
-        width: 25%;
-    }
-
-    #footer-trang-chu .footer-diachi h2 {
-        font-size: 20px;
-        color: #fbe263;
-        margin: 0;
-    }
-
-    #footer-trang-chu .footer-diachi span {
-        color: #fbe263;
-        display: block;
-        padding-top: 15px;
-    }
-
-    #footer-trang-chu .footer-diachi .footer-diachi-header {
-        display: inline;
-        color: white;
-    }
-
-    #footer-trang-chu .footer-diachi .footer-diachi-description {
-        display: inline;
-        color: white;
-    }
-
-    #footer-trang-chu .footer-diachi .img-main {
-        display: block;
-        margin-top: 20px;
-    }
-
-    #footer-trang-chu .footer-help h2 {
-        font-size: 20px;
-        color: #fbe263;
-        margin: 0;
-    }
-
-    #footer-trang-chu .footer-help span {
-        display: block;
-        color: #fbe263;
-        padding-top: 15px;
-    }
-
-    #footer-trang-chu .footer-help .footer-help-header {
-        display: inline;
-        color: white;
-    }
-
-    #footer-trang-chu .footer-help .footer-help-header-list a {
-        display: block;
-        text-decoration: none;
-        color: white;
-        line-height: 1.4;
-    }
-
-    #footer-trang-chu .footer-diachi .img-main {
-        cursor: pointer;
-    }
-
-    #footer-trang-chu .footer-information h2 {
-        font-size: 20px;
-        color: #fbe263;
-        margin: 0;
-    }
-
-    #footer-trang-chu .footer-information .footer-information-header-list a {
-        display: block;
-        color: white;
-        text-decoration: none;
-        line-height: 1.4;
-    }
-
-    #footer-trang-chu .footer-information .footer-information-socials {
-        padding-top: 35px;
-    }
-
-    #footer-trang-chu .footer-information .footer-information-socials i {
-        width: 50px;
-        height: 50px;
-        background: white;
-        border-radius: 50%;
-        line-height: 50px;
-        font-size: 25px;
-        color: #17479d;
-    }
-
-    #footer-trang-chu .footer-information .footer-information-socials i:nth-child(1) {
-        margin-right: 10px;
-    }
-
-    #footer-trang-chu::after {
-        display: block;
-        position: absolute;
-        content: "2025 © Thienlong.vn - Bản quyền thuộc Tập đoàn Thiên Long";
-        bottom: 0;
-        color: white;
-    }
-
-    /* End footer */
-
-
-    /* begin style shopping cart */
-
-    .main {
-        margin-top: 110px;
-    }
-
-
-    .container {
-        width: 1200px;
-        margin: auto;
-    }
-
-    /* Begin header */
-    #header-trang-chu {
-        background-color: var(--color-main);
-        display: flex;
-        align-items: center;
-        position: fixed;
-        z-index: 999;
-        width: 100%;
-    }
-
-    #header-trang-chu .logo-trang-chu {
-        margin-left: 50px;
-        margin-right: 50px;
-        margin-top: 25px;
-        margin-bottom: 25px;
-    }
-
-    #header-trang-chu .logo-trang-chu img {
-        background-color: transparent;
-        width: 200px;
-        height: 100%;
-    }
-
-    #header-trang-chu .tim-kiem-san-pham {
-        position: relative;
-    }
-
-    #header-trang-chu .tim-kiem-san-pham input {
-        padding: 10px 15px;
-        width: 600px;
-        border-radius: 10px;
-        border: none;
-    }
-
-    #header-trang-chu .tim-kiem-san-pham {
-        display: flex;
-    }
-
-    #header-trang-chu .tim-kiem-san-pham i {
-        position: absolute;
-        right: 0;
-        width: 50px;
-        height: 100%;
-        background-color: #0b234d;
-        line-height: 40px;
-        cursor: pointer;
-        color: white;
-        border-top-right-radius: 10px;
-        border-bottom-right-radius: 10px;
-    }
-
-    #header-trang-chu .header-contact {
-        display: flex;
-        align-items: center;
-    }
-
-    #header-trang-chu .header-contact i {
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        background-color: #0b234d;
-        line-height: 30px;
-        color: white;
-    }
-
-    #header-trang-chu .header-contact {
-        margin-left: 100px;
-        margin-right: 50px;
-        cursor: pointer;
-    }
-
-    #header-trang-chu .header-contact .contact {
-        margin-left: 15px;
-    }
-
-    #header-trang-chu .header-contact .contact .contact-phone-number {
-        color: white;
-        font-weight: 600;
-        font-size: 18px;
-    }
-
-    #header-trang-chu .header-contact .contact .contact-phone-help {
-        color: white;
-        font-size: 16px;
-    }
-
-    #header-trang-chu .header-dangnhap-dangki {
-        display: flex;
-        align-items: center;
-        cursor: pointer;
-    }
-
-    #header-trang-chu .header-dangnhap-dangki i {
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        background-color: #0b234d;
-        line-height: 30px;
-        color: white;
-    }
-
-    #header-trang-chu .header-dangnhap-dangki {
-        margin-right: 50px;
-    }
-
-    #header-trang-chu .header-dangnhap-dangki .dangnhap-dangki {
-        margin-left: 15px;
-    }
-
-    #header-trang-chu .header-dangnhap-dangki .dangnhap-dangki .dangnhap {
-        color: white;
-        font-weight: 600;
-        font-size: 18px;
-    }
-
-    #header-trang-chu .header-dangnhap-dangki .dangnhap-dangki .dangki {
-        color: white;
-        font-size: 16px;
-    }
-
-    #header-trang-chu .header-giohang {
-        font-size: 25px;
-        color: white;
-        position: relative;
-        cursor: pointer;
-    }
-
-    #header-trang-chu .header-giohang::after {
-        display: inline-flex;
-        content: "0";
-        width: 20px;
-        height: 20px;
-        left: 20px;
-        bottom: 15px;
-        justify-content: center;
-        align-items: center;
-        font-size: 15px;
-        background-color: red;
-        position: absolute;
-        border-radius: 50%;
-    }
-
-    /* End header */
-    /* Begin footer */
-    #footer-trang-chu {
-        display: flex;
-        background-color: #17479d;
-        border-top-left-radius: 70px;
-        border-top-right-radius: 70px;
-        gap: 30px;
-        align-items: center;
-        justify-content: space-around;
-        position: relative;
-    }
-
-    #footer-trang-chu .footer-title {
-        text-align: justify;
-        margin-left: 30px;
-    }
-
-    #footer-trang-chu .footer-title .img-main {
-        background-color: transparent;
-        width: 400px;
-    }
-
-    #footer-trang-chu .footer-title .footer-title-header {
-        color: #fbe263;
-    }
-
-    #footer-trang-chu .footer-title .footer-title-description {
-        color: white;
-    }
-
-    #footer-trang-chu .footer-title .footer-title-form {
-        position: relative;
-    }
-
-    #footer-trang-chu .footer-title .footer-title-form input {
-        padding: 10px 15px;
-        border-radius: 10px;
-        width: 300px;
-        border: none;
-    }
-
-    #footer-trang-chu .footer-title .footer-title-form a {
-        position: absolute;
-        display: inline-flex;
-        width: 100px;
-        height: 36px;
-        background-color: #0b234d;
-        border-top-right-radius: 10px;
-        border-bottom-right-radius: 10px;
-        top: 0;
-        right: 69px;
-        justify-content: center;
-        align-items: center;
-        text-decoration: none;
-        color: white;
-    }
-
-    #footer-trang-chu .footer-title .img-footer {
-        width: 250px;
-        margin-top: 15px;
-        cursor: pointer;
-        margin-bottom: 50px;
-    }
-
-    #footer-trang-chu .footer-diachi {
-        width: 25%;
-    }
-
-    #footer-trang-chu .footer-diachi h2 {
-        font-size: 20px;
-        color: #fbe263;
-        margin: 0;
-    }
-
-    #footer-trang-chu .footer-diachi span {
-        color: #fbe263;
-        display: block;
-        padding-top: 15px;
-    }
-
-    #footer-trang-chu .footer-diachi .footer-diachi-header {
-        display: inline;
-        color: white;
-    }
-
-    #footer-trang-chu .footer-diachi .footer-diachi-description {
-        display: inline;
-        color: white;
-    }
-
-    #footer-trang-chu .footer-diachi .img-main {
-        display: block;
-        margin-top: 20px;
-    }
-
-    #footer-trang-chu .footer-help h2 {
-        font-size: 20px;
-        color: #fbe263;
-        margin: 0;
-    }
-
-    #footer-trang-chu .footer-help span {
-        display: block;
-        color: #fbe263;
-        padding-top: 15px;
-    }
-
-    #footer-trang-chu .footer-help .footer-help-header {
-        display: inline;
-        color: white;
-    }
-
-    #footer-trang-chu .footer-help .footer-help-header-list a {
-        display: block;
-        text-decoration: none;
-        color: white;
-        line-height: 1.4;
-    }
-
-    #footer-trang-chu .footer-diachi .img-main {
-        cursor: pointer;
-    }
-
-    #footer-trang-chu .footer-information h2 {
-        font-size: 20px;
-        color: #fbe263;
-        margin: 0;
-    }
-
-    #footer-trang-chu .footer-information .footer-information-header-list a {
-        display: block;
-        color: white;
-        text-decoration: none;
-        line-height: 1.4;
-    }
-
-    #footer-trang-chu .footer-information .footer-information-socials {
-        padding-top: 35px;
-    }
-
-    #footer-trang-chu .footer-information .footer-information-socials i {
-        width: 50px;
-        height: 50px;
-        background: white;
-        border-radius: 50%;
-        line-height: 50px;
-        font-size: 25px;
-        color: #17479d;
-    }
-
-    #footer-trang-chu .footer-information .footer-information-socials i:nth-child(1) {
-        margin-right: 10px;
-    }
-
-    #footer-trang-chu::after {
-        display: block;
-        position: absolute;
-        content: "2025 © Thienlong.vn - Bản quyền thuộc Tập đoàn Thiên Long";
-        bottom: 0;
-        color: white;
-    }
-
-    /* End footer */
-
-    .breadcrumb {
-        /* background-color: #f3f4f6; */
-        background: #DBE8FF;
-        color: #17479d;
-        font-weight: 500;
-        font-size: 16px;
-        padding: 12px 40px;
-        border-bottom: 1px solid #e5e7eb;
-        margin-top: 100px;
-    }
-
-    .grid {
-        display: grid;
-        grid-template-columns: 2fr 1fr;
-        gap: 20px;
-    }
-
-    .card {
-        background: #fff;
-        border-radius: 12px;
-        box-shadow: 0 2px 16px rgba(0, 0, 0, .08);
-        border: 1px solid #e5e7eb;
-    }
-
-    .card-body {
-        padding: 22px 26px;
-    }
-
-    .card-title {
-        margin: 0 0 6px;
-        font-size: 28px;
-        font-weight: 700;
-        color: #111827;
-    }
-
-    .subtle {
-        color: #282b30;
-    }
-
-    .divider {
-        height: 1px;
-        background: #969aa3;
-        margin: 16px 0;
-    }
-
-    .cart-item-card {
-        background: #fff;
-        border: 1px solid #e5e7eb;
-        border-radius: 10px;
-        box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
-        padding: 16px;
-        margin-bottom: 16px;
-        transition: box-shadow 0.2s ease;
-    }
-
-    .cart-list .item {
-        padding: 8px 0;
-    }
-
-    .item-grid {
-        display: flex;
-        grid-template-columns: 84px 1fr auto auto;
-        align-items: center;
-        gap: 14px;
-    }
-
-    .thumb {
-        width: 74px;
-        height: 74px;
-        border-radius: 8px;
-        background: #f5f5f5;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        overflow: hidden;
-        border: 1px solid #eee;
-    }
-
-    .thumb img {
-        max-width: 100%;
-        max-height: 100%;
-        object-fit: cover;
-    }
-
-    .meta-title {
-        font-weight: 700;
-        color: #111827;
-        margin-bottom: 4px;
-        line-height: 1.35;
-    }
-
-    .muted {
-        color: #6b7280;
-        font-size: 14px;
-    }
-
-    .qty {
-        display: inline-flex;
-        align-items: center;
-        background: #fff;
-        border: 1px solid #e5e7eb;
-        border-radius: 8px;
-        overflow: hidden;
-    }
-
-    .qty button {
-        width: 34px;
-        height: 34px;
-        border: none;
-        background: #fff;
-        font-size: 18px;
-        cursor: pointer;
-    }
-
-    .qty button:hover {
-        background: #f3f4f6;
-    }
-
-    .qty input[type="number"] {
-        width: 50px;
-        height: 34px;
-        text-align: center;
-        border: none;
-        font-weight: 600;
-        outline: none;
-    }
-
-    .qty button:first-child {
-        border-right: 1px solid #e5e7eb;
-    }
-
-    .qty button:last-child {
-        border-left: 1px solid #e5e7eb;
-    }
-
-    .price {
-        font-weight: 600;
-        color: #ef4444;
-        font-size: 18px;
-    }
-
-    .summary .head {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-end;
-    }
-
-    .summary .total {
-        font-size: 22px;
-        font-weight: 800;
-        color: #ef4444;
-    }
-
-    .btn {
-        width: 100%;
-        border: none;
-        border-radius: 8px;
-        padding: 12px 14px;
-        letter-spacing: .3px;
-        background: #2659F3;
-        color: #fff;
-        cursor: pointer;
-        margin-top: 8px;
-        font-size: 1rem;
-        font-weight: 600;
-    }
-
-    .card,
-    .summary .card {
-        border-radius: 12px;
-    }
-
-    .summary {
-        height: fit-content;
-    }
-
-    .tinh-tien {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        font-weight: 600;
-        font-size: 18px;
-        margin: 10px 0;
-    }
-
-    .tinh-tien p {
-        margin: 0;
-        color: #111827;
-    }
-
-    .tinh-tien .thanh-tien {
-        color: #ef4444;
-        font-weight: 700;
-        font-size: 18px;
-    }
-
-    .qty-wrap {
-        position: relative;
-        display: inline-block;
-    }
-
-    .Xoa-sp {
-        position: absolute;
-        top: 0;
-        right: 0;
-        transform: translate(50%, -50%);
-        width: 28px;
-        height: 28px;
-        border: none;
-        border-radius: 50%;
-        background: #111;
-        color: #fff;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, .15);
-        z-index: 2;
-    }
-
-
-    /* từ sửa sau */
-    html,
-    body {
-        height: 100%;
-        margin: 0;
-        padding: 0;
-    }
-
-    body {
-        display: flex;
-        flex-direction: column;
-        min-height: 100vh;
-    }
-
-    main {
-        flex: 1;
-    }
-
-
-    /* end style shopping cart */
-</style>
-
-    <body>
-        <header id="header-trang-chu" class="trang-chu">
-            <div class="logo-trang-chu">
-                <a href="index.html">
-                    <img src="UI/assets/images/logo/logo.png" alt>
-                </a>
-            </div>
-            <form action class="tim-kiem-san-pham">
-                <input type="text" name placeholder="Tìm kiếm sản phẩm...">
-                <i class="fa-solid fa-magnifying-glass"></i>
-            </form>
-            <div class="header-contact">
-                <i class="fa-solid fa-phone"></i>
-                <div class="contact">
-                    <div class="contact-phone-number">1900 866 819</div>
-                    <div class="contact-phone-help">Hỗ trợ khách hàng</div>
-                </div>
-            </div>
-            <div class="header-dangnhap-dangki">
-                <i class="fa-solid fa-user"></i>
-                <div class="dangnhap-dangki">
-                    <div class="dangnhap">Đăng nhập</div>
-                    <div class="dangki">Đăng kí</div>
-                </div>
-
-            </div>
-            <div class="header-giohang">
-                <i class="fa-solid fa-bag-shopping"></i>
-            </div>
-        </header>
-        <!-- Breadcrumb -->
-        <div class="breadcrumb">Trang chủ / Giỏ hàng</div>
-
-        <div class="container">
-
-            <div class="grid">
-                <!-- Left: Cart -->
-                <div class="card">
-                    <div class="card-body">
-                        <h2 class="card-title">Giỏ hàng của bạn</h2>
-                        <p class="subtle">Bạn đang có 2 sản phẩm trong giỏ
-                            hàng</p>
-                        <div class="divider"></div>
-
-                        <div class="cart-list">
-                            <!-- Item 1 -->
-                            <div class="cart-item-card">
-                                <div class="item">
-                                    <div class="item-grid">
-                                        <div class="select-product">
-                                            <input type="checkbox" checked />
-                                        </div>
-                                        <div class="thumb">
-                                            <img
-                                                src="UI/assets/images/logo/list1-1.jpg"
-                                                alt="Bút màu Fiber pen Washable" />
-                                        </div>
-                                        <div>
-                                            <div class="meta-title">Bút Lông
-                                                Thiên Long 48/60 Màu Fiber Pen
-                                                Washable - Phiên
-                                                bản Demon Slayer</div>
-
-                                        </div>
-                                        <div class="price">336,600₫</div>
-                                        <div class="qty-wrap">
-                                            <button class="Xoa-sp"><i
-                                                    class="fa-solid fa-xmark"></i></button>
-                                            <div class="qty">
-                                                <button class="dec">−</button>
-                                                <input type="number" value="2"
-                                                    min="1" />
-                                                <button class="inc">+</button>
+        .container {
+            width: 1200px;
+            margin: auto;
+        }
+
+        .main {
+            margin-top: 110px;
+        }
+
+        .breadcrumb {
+            background: #DBE8FF;
+            color: #17479d;
+            font-weight: 500;
+            font-size: 16px;
+            padding: 12px 40px;
+            border-bottom: 1px solid #e5e7eb;
+            margin-top: 100px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 16px rgba(0,0,0,.08);
+            border: 1px solid #e5e7eb;
+        }
+
+        .card-body {
+            padding: 22px 26px;
+        }
+
+        .card-title {
+            margin: 0 0 6px;
+            font-size: 28px;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .subtle {
+            color: #282b30;
+        }
+
+        .divider {
+            height: 1px;
+            background: #969aa3;
+            margin: 16px 0;
+        }
+
+        .cart-item-card {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            box-shadow: 0 1px 6px rgba(0,0,0,.05);
+            padding: 16px;
+            margin-bottom: 16px;
+            transition: box-shadow .2s ease;
+        }
+
+        .cart-list .item {
+            padding: 8px 0;
+        }
+
+        .item-grid {
+            display: grid;
+            grid-template-columns: auto 80px 1fr auto auto;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .thumb {
+            width: 74px;
+            height: 74px;
+            border-radius: 8px;
+            background: #f5f5f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border: 1px solid #eee;
+        }
+
+            .thumb img {
+                max-width: 100%;
+                max-height: 100%;
+                object-fit: cover;
+            }
+
+        .product-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .meta-title {
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 4px;
+            line-height: 1.35;
+        }
+
+        .muted {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .qty {
+            display: inline-flex;
+            align-items: center;
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .qty-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all .2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+            .qty-btn:hover {
+                background: #f3f4f6;
+                border-color: #2659F3;
+                color: #2659F3;
+            }
+
+        .qty input[type="number"] {
+            width: 50px;
+            height: 34px;
+            text-align: center;
+            border: none;
+            font-weight: 600;
+            outline: none;
+        }
+
+        .price {
+            font-weight: 600;
+            color: #ef4444;
+            font-size: 18px;
+            min-width: 120px;
+            text-align: right;
+        }
+
+        .qty-wrap {
+            position: relative;
+            display: inline-block;
+            margin-left: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .btn {
+            width: 100%;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 14px;
+            letter-spacing: .3px;
+            background: #2659F3;
+            color: #fff;
+            cursor: pointer;
+            margin-top: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .summary {
+            height: fit-content;
+        }
+
+        .tinh-tien {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            font-size: 18px;
+            margin: 10px 0;
+        }
+
+            .tinh-tien p {
+                margin: 0;
+                color: #111827;
+            }
+
+            .tinh-tien .thanh-tien {
+                color: #ef4444;
+                font-weight: 700;
+                font-size: 18px;
+            }
+
+        .Xoa-sp {
+            position: absolute;
+            top: 0;
+            right: 0;
+            transform: translate(50%, -50%);
+            width: 28px;
+            height: 28px;
+            border: none;
+            border-radius: 50%;
+            background: #111;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,.15);
+            z-index: 2;
+            text-decoration: none;
+        }
+    </style>
+}
+
+<div class="breadcrumb">Trang chủ / Giỏ hàng</div>
+
+<div class="container">
+    <div class="grid">
+
+        <!-- LEFT: CART -->
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title">Giỏ hàng của bạn</h2>
+                <p class="subtle">
+                    Bạn đang có <span id="cart-total-quantity">@Model.TotalQuantity</span>
+                    sản phẩm trong giỏ hàng
+                </p>
+                <div class="divider"></div>
+
+                <form action="~/AddToCart?action=update" method="post">
+                    <div class="cart-list">
+                        @if (Model.CartItems == null || !Model.CartItems.Any())
+                        {
+                            <p>Giỏ hàng của bạn đang trống.</p>
+                        }
+                        else
+                        {
+                            foreach (var item in Model.CartItems)
+                            {
+                                // ✅ normalize thumbnail giống JSP
+                                var cartThumbUrl = item.Thumbnail ?? "";
+                                var thumbUrl = "";
+                                if (!string.IsNullOrWhiteSpace(cartThumbUrl))
+                                {
+                                    if (cartThumbUrl.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+                                        thumbUrl = cartThumbUrl;
+                                    else if (cartThumbUrl.StartsWith("/"))
+                                        thumbUrl = Url.Content("~" + cartThumbUrl);
+                                    else
+                                        thumbUrl = Url.Content("~/" + cartThumbUrl);
+                                }
+
+                                <div class="cart-item-card" id="cart-item-@item.ProductId">
+                                    <div class="item">
+                                        <div class="item-grid">
+                                            <div class="select-product">
+                                                <input type="checkbox" checked />
                                             </div>
+
+                                            <div class="thumb">
+                                                @if (!string.IsNullOrWhiteSpace(thumbUrl))
+                                                {
+                                                    <img src="@thumbUrl" alt="@item.Name" />
+                                                }
+                                            </div>
+
+                                            <div class="product-info">
+                                                <div class="meta-title">@item.Name</div>
+                                                <div class="muted">Mã SP: @item.ProductId</div>
+                                            </div>
+
+                                            <div class="price">
+                                                <span class="price-value" id="subtotal-@item.ProductId">
+                                                    @((item.GetPriceAfterDiscount() * item.Quantity).ToString("N0", vi))₫
+                                                </span>
+                                            </div>
+
+                                            <div class="qty-wrap">
+                                                <!-- ✅ nút Xóa (giống JSP) -->
+                                                <a class="Xoa-sp"
+                                                   href="~/AddToCart?action=remove&productId=@item.ProductId"
+                                                   aria-label="Xóa sản phẩm">
+                                                    <i class="fa-solid fa-xmark"></i>
+                                                </a>
+
+                                                <input type="hidden" name="productId" value="@item.ProductId" />
+
+                                                <div class="qty">
+                                                    <button type="button"
+                                                            class="qty-btn"
+                                                            onclick="decreaseQty(@item.ProductId)">
+                                                        <i class="fa-solid fa-minus"></i>
+                                                    </button>
+
+                                                    <input type="number"
+                                                           name="quantity"
+                                                           value="@item.Quantity"
+                                                           min="1"
+                                                           class="qty-input"
+                                                           id="qty-@item.ProductId"
+                                                           data-product-id="@item.ProductId"
+                                                           readonly />
+
+                                                    <button type="button"
+                                                            class="qty-btn"
+                                                            onclick="increaseQty(@item.ProductId)">
+                                                        <i class="fa-solid fa-plus"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+
                                         </div>
                                     </div>
-
                                 </div>
-                            </div>
-                            <!-- Item 2 -->
-                            <div class="cart-item-card">
-                                <div class="item">
-                                    <div class="item-grid">
-                                        <div class="select-product">
-                                            <input type="checkbox" checked />
-                                        </div>
-                                        <div class="thumb">
-                                            <!-- <a href="#" class="remove">Xóa</a> -->
-                                            <img
-                                                src="UI/assets/images/logo/list1-3.jpg"
-                                                alt="Bút màu Fiber pen Washable" />
-                                        </div>
-                                        <div>
-
-                                            <div class="meta-title">Bút lông
-                                                hiên
-                                                Long Colokit
-                                                - Màu sắc tươi sáng, Không thấm
-                                                qua
-                                                mặt
-                                                giấy</div>
-
-                                        </div>
-                                        <div class="price">45,500₫</div>
-                                        <div class="qty-wrap">
-                                            <button class="Xoa-sp"
-                                                aria-label="Xóa sản phẩm"><i
-                                                    class="fa-solid fa-xmark"></i></button>
-                                            <div class="qty">
-                                                <button class="dec"
-                                                    aria-label="Giảm">−</button>
-                                                <input type="number" value="1"
-                                                    min="1" />
-                                                <button class="inc"
-                                                    aria-label="Tăng">+</button>
-                                            </div>
-                                        </div>
-
-                                    </div>
-
-                                </div>
-                            </div>
-                        </div>
+                            }
+                        }
                     </div>
-                </div>
-
-                <!-- Tổng tiền với đặt hàng-->
-                <div class="card summary">
-                    <div class="card-body">
-                        <div class="head">
-                            <h3
-                                style="margin:0;font-size:28px;font-weight:700">Thông
-                                tin đơn hàng</h3>
-
-                        </div>
-                        <div class="divider"></div>
-                        <div class="tinh-tien">
-                            <p>Tổng tiền: </p>
-                            <span class="thanh-tien">382,100đ</span>
-                        </div>
-                        <p class="muted">Phí vận chuyển sẽ được tính ở trang
-                            Thanh toán</p>
-                        <p class="muted">Mã giảm giá được nhập ở trang Thanh
-                            toán</p>
-                        <a href="Payment.html"><button class="btn">Đặt
-                                hàng</button></a>
-                    </div>
-                </div>
+                </form>
             </div>
         </div>
 
-        <footer id="footer-trang-chu">
-            <div class="footer-title">
-                <img src="UI/assets/images/logo/logo.png" alt class="img-main">
-                <p class="footer-title-header">Thienlong.vn - Website thương mại
-                    điện tử thuộc Tập đoàn Thiên Long</p>
-                <p class="footer-title-description">Công ty Cổ Phần Tập Đoàn
-                    Thiên Long
-                    <br>
-                    <br>
-                    GPĐKKD số 0301464830 do Sở KHĐT TP. Hồ Chí Minh cấp ngày
-                    14/03/2005.
-                </p>
-                <form action class="footer-title-form">
-                    <input type="email" placeholder="Nhập địa chỉ email">
-                    <a href>Đăng ký</a>
-                </form>
-                <img
-                    src="UI/assets/images/logo/logo-parker_53d035f3ab7645168e62cd9e3f595090.png"
-                    alt class="img-footer">
-            </div>
-            <div class="footer-diachi">
-                <h2>ĐỊA CHỈ CÔNG TY</h2>
-                <span>
-                    Head Office:
-                    <p class="footer-diachi-header"> Tầng 10, Sofic Tower, Số 10
-                        Đường Mai Chí Thọ, Phường An Khánh,
-                        Thành Phố Hồ Chí Minh, Việt Nam
+        <!-- RIGHT: SUMMARY -->
+        <div class="card summary">
+            <div class="card-body">
+                <div class="head">
+                    <h3 style="margin:0;font-size:28px;font-weight:700">Thông tin đơn hàng</h3>
+                </div>
+                <div class="divider"></div>
+
+                <div class="tinh-tien">
+                    <p>Tổng tiền:</p>
+                    <span class="thanh-tien" id="cart-total-amount">
+                        @Model.TotalAmount.ToString("N0", vi)đ
                     </span>
-                    <br>
-                    <span>
-                        Miền Bắc:
-                        <p class="footer-diachi-description"> Số 38, đường
-                            Gamuda Gardens 2-5, Khu đô thị mới C2 - Gamuda
-                            Gardens, Phường Trần Phú, Thành phố Hà Nội, Việt
-                            Nam.
-                        </span>
+                </div>
 
-                        <img src="UI/assets/images/logo/footer_bct.png" alt
-                             class="img-main">
-                    </div>
-                    <div class="footer-help">
-                        <h2>HỖ TRỢ KHÁCH HÀNG</h2>
-                        <span>
-                            Hotline:
-                            <p class="footer-help-header">1900 866 819
-                            </span>
-                            <span>
-                                Thứ 2 - Thứ 6 (8h - 17h)
-                                salesonline@thienlongvn.com
-                                <div class="footer-help-header-list">
-                                    <a href>
-                                        - Hướng dẫn mua hàng
-                                    </a>
-                                    <a href="Payment.html">
-                                        - Hướng dẫn thanh toán
-                                    </a>
-                                    <a href>
-                                        - Chính sách giao hàng
-                                    </a>
-                                    <a href>
-                                        - Chính sách đổi trả & hoàn tiền
-                                    </a>
-                                    <a href>
-                                        - Khách hàng thân thiết
-                                    </a>
-                                    <a href>
-                                        - Khách hàng ưu tiên
-                                    </a>
-                                    <a href>
-                                        - Phản ánh chất lượng sản phẩm
-                                    </a>
-                                </div>
-                            </span>
-                        </div>
-                        <div class="footer-information">
-                            <h2>VỀ THIENLONG.VN</h2>
-                            <div class="footer-information-header-list">
-                                <a href="GioiThieu.html">
-                                    - Giới thiệu
-                                </a>
-                                <a href>
-                                    - Dịch vụ in ấn quảng cáo
-                                </a>
-                                <a href>
-                                    - Chính sách bảo mật chung
-                                </a>
-                                <a href>
-                                    - Chính sách bảo mật thông tin cá nhân
-                                </a>
-                                <a href>
-                                    - Thông tin liên hệ
-                                </a>
-                                <a href>
-                                    - Chương trình Affiliate
-                                </a>
-                            </div>
-                            <div class="footer-information-socials">
-                                <i class="fa-brands fa-facebook"></i>
-                                <i class="fa-brands fa-youtube"></i>
-                            </div>
-                        </div>
-                    </footer>
-                </body>
+                <p class="muted">Phí vận chuyển sẽ được tính ở trang Thanh toán</p>
+                <p class="muted">Mã giảm giá được nhập ở trang Thanh toán</p>
 
-            </html>
+                <a href="~/checkout">
+                    @if (Model.CartSize == 0)
+                    {
+                        <button class="btn" disabled>Đặt hàng</button>
+                    }
+                    else
+                    {
+                        <button class="btn">Đặt hàng</button>
+                    }
+                </a>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function increaseQty(productId) {
+            const input = document.getElementById('qty-' + productId);
+            let currentQty = parseInt(input.value, 10);
+            if (isNaN(currentQty)) currentQty = 0;
+            currentQty++;
+            input.value = currentQty;
+            updateCartItem(productId, currentQty);
+        }
+
+        function decreaseQty(productId) {
+            const input = document.getElementById('qty-' + productId);
+            let currentQty = parseInt(input.value, 10);
+            if (isNaN(currentQty)) currentQty = 1;
+            if (currentQty > 1) {
+                currentQty--;
+                input.value = currentQty;
+                updateCartItem(productId, currentQty);
+            }
+        }
+
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('vi-VN').format(value) + 'đ';
+        }
+
+        function setCartCountUI(count) {
+            // badge header
+            const cartIcon = document.getElementById('cartIcon');
+            if (cartIcon) cartIcon.setAttribute('data-count', count);
+
+            // total quantity in cart page
+            const cartTotalQty = document.getElementById('cart-total-quantity');
+            if (cartTotalQty) cartTotalQty.textContent = count;
+        }
+
+        function updateCartItem(productId, quantity) {
+            const updateUrl = '/AddToCart?action=ajaxUpdate';
+            const params =
+                'productId=' + encodeURIComponent(productId) +
+                '&quantity=' + encodeURIComponent(quantity);
+
+            fetch(updateUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+                },
+                body: params
+            })
+            .then(async (resp) => {
+                const data = await resp.json().catch(() => null);
+                return { ok: resp.ok, status: resp.status, data };
+            })
+            .then(({ ok, status, data }) => {
+                // ✅ giống JSP: nếu fail thì dừng
+                if (!data) {
+                    console.error('Update cart failed (no json)');
+                    return;
+                }
+
+                if (!ok || !data.success) {
+                    console.error(data.message || 'Update cart failed');
+
+                    // nếu server có trả cartCount thì vẫn update UI
+                    if (typeof data.cartCount !== 'undefined') {
+                        setCartCountUI(String(data.cartCount));
+                    }
+
+                    // ✅ Vì server có thể đã remove item (ngừng bán/hết hàng) -> reload để đồng bộ 100%
+                    if (status === 404 || status === 400) {
+                        alert(data.message || 'Sản phẩm không còn hợp lệ trong giỏ hàng');
+                        window.location.reload();
+                    }
+                    return;
+                }
+
+                // cập nhật thành tiền từng dòng
+                const subSpan = document.getElementById('subtotal-' + productId);
+                if (subSpan) {
+                    subSpan.textContent = formatCurrency(data.itemSubtotal);
+                }
+
+                // cập nhật tổng tiền
+                const totalSpan = document.getElementById('cart-total-amount');
+                if (totalSpan) {
+                    totalSpan.textContent = formatCurrency(data.totalAmount);
+                }
+
+                // cập nhật badge + tổng số lượng
+                setCartCountUI(String(data.cartCount));
+            })
+            .catch(err => console.error(err));
+        }
+    </script>
+}

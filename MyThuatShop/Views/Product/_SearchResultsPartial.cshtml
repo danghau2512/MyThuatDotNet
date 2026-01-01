@@ -1,0 +1,66 @@
+﻿@model MyThuatShop.ViewModels.SearchPageVm
+
+@if (Model.Products == null || !Model.Products.Any())
+{
+    <p>Không tìm thấy sản phẩm nào.</p>
+}
+else
+{
+    <div class="list-product" id="productList">
+        @await Html.PartialAsync("_ProductList", Model.Products)
+    </div>
+
+    @if (Model.TotalPages > 1)
+    {
+        var current = Model.Page;
+        var total = Model.TotalPages;
+
+        var start = Math.Max(1, current - 2);
+        var end = Math.Min(total, current + 2);
+
+        string UrlPage(int p) =>
+            Url.Action("Search", "Product", new { q = Model.Keyword, sort = Model.Sort, page = p }) ?? "#";
+
+        <div class="section-main-content-quantity">
+            <a class="page-link @(current <= 1 ? "disabled" : "")"
+               data-page="@(current - 1)"
+               href="@(current <= 1 ? "#" : UrlPage(current - 1))">
+                &laquo;
+            </a>
+
+            @* Trang đầu *@
+            @if (start > 1)
+            {
+                <a class="page-link" data-page="1" href="@UrlPage(1)">1</a>
+                if (start > 2)
+                {
+                    <span style="display:inline-block;width:35px;height:35px;line-height:35px;text-align:center;color:#999;">…</span>
+                }
+            }
+
+            @* Các trang quanh current *@
+            @for (var i = start; i <= end; i++)
+            {
+                <a class="page-link @(i == current ? "active" : "")"
+                   data-page="@i"
+                   href="@UrlPage(i)">@i</a>
+            }
+
+            @* Trang cuối *@
+            @if (end < total)
+            {
+                if (end < total - 1)
+                {
+                    <span style="display:inline-block;width:35px;height:35px;line-height:35px;text-align:center;color:#999;">…</span>
+                }
+                <a class="page-link" data-page="@total" href="@UrlPage(total)">@total</a>
+            }
+
+            <a class="page-link @(current >= total ? "disabled" : "")"
+               data-page="@(current + 1)"
+               href="@(current >= total ? "#" : UrlPage(current + 1))">
+                &raquo;
+            </a>
+        </div>
+    }
+}

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MyThuatShop.ViewModels;
+
 using System.Net.Http.Json;
 using System.Text.Json;
 
@@ -16,7 +17,7 @@ namespace MyThuatShop.Services
             PropertyNameCaseInsensitive = true
         };
 
-        // ✅ constructor phải trùng tên class
+     
         public ProductAPIService(IConfiguration config, ILogger<ProductAPIService> logger)
         {
             _config = config;
@@ -87,6 +88,34 @@ namespace MyThuatShop.Services
             {
                 _logger.LogError(ex, "Error calling API");
                 return false;
+            }
+        }
+        public async Task<CartProductDto?> GetProductForCart(int id)
+        {
+            var baseUrl = _config["ApiBaseUrl"]?.TrimEnd('/');
+            if (string.IsNullOrWhiteSpace(baseUrl))
+            {
+                _logger.LogError("ApiBaseUrl missing");
+                return null;
+            }
+
+            var handler = new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback =
+                    HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+            };
+
+            using var client = new HttpClient(handler);
+
+            var url = $"{baseUrl}/api/products/cart/{id}";
+            try
+            {
+                return await client.GetFromJsonAsync<CartProductDto>(url, _jsonOptions);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "GetProductForCart failed");
+                return null;
             }
         }
     }

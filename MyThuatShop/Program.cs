@@ -1,12 +1,16 @@
-using MyThuatShop.Services;
+﻿using MyThuatShop.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
+
 builder.Services.AddHttpClient();
+
+// DI services
 builder.Services.AddScoped<HomeApiService>();
 builder.Services.AddScoped<ProductAPIService>();
 
+// ✅ HttpClient cho SearchApiService (nếu bạn có dùng)
 builder.Services.AddHttpClient<SearchApiService>((sp, client) =>
 {
     var config = sp.GetRequiredService<IConfiguration>();
@@ -14,6 +18,8 @@ builder.Services.AddHttpClient<SearchApiService>((sp, client) =>
 });
 builder.Services.AddHttpContextAccessor();
 
+// ✅ Session
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
@@ -21,7 +27,8 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
-
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession();
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
@@ -29,7 +36,7 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
-
+app.UseSession();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 

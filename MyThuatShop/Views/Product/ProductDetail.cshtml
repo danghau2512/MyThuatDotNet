@@ -1,5 +1,6 @@
 @model MyThuatShop.ViewModels.ProductDetailVm
 @using System.Linq
+@using System.Collections.Generic
 
 @{
     Layout = "_Layout";
@@ -7,9 +8,16 @@
 
     // Gom ảnh: Thumbnail + SubImages (distinct)
     var images = new List<string>();
-    if (!string.IsNullOrWhiteSpace(Model.Thumbnail)) images.Add(Model.Thumbnail!);
+
+    if (!string.IsNullOrWhiteSpace(Model.Thumbnail))
+    {
+        images.Add(Model.Thumbnail!);
+    }
+
     if (Model.SubImages != null && Model.SubImages.Any())
+    {
         images.AddRange(Model.SubImages.Where(x => !string.IsNullOrWhiteSpace(x)));
+    }
 
     images = images.Distinct().ToList();
 
@@ -629,10 +637,10 @@
 
                     @if (Model.DiscountDefault > 0)
                     {
-                        <div class="discount-badge">
-                            <div>Tiết kiệm</div>
-                            <div style="font-size: 1rem;">@Model.DiscountDefault%</div>
-                        </div>
+                    <div class="discount-badge">
+                        <div>Tiết kiệm</div>
+                        <div style="font-size: 1rem;">@Model.DiscountDefault%</div>
+                    </div>
                     }
 
                     <a href="javascript:void(0)" id="prevImageBtn" class="main-image-nav main-image-prev">&lt;</a>
@@ -646,16 +654,16 @@
                         {
                             for (var i = 0; i < images.Count; i++)
                             {
-                                <div class="thumbnail-item @(i == 0 ? "active" : "")" data-index="@i">
-                                    <img src="@images[i]" alt="Ảnh phụ @(i + 1)" />
-                                </div>
+                        <div class="thumbnail-item @(i == 0 ? "active" : "")" data-index="@i">
+                            <img src="@images[i]" alt="Ảnh phụ @(i + 1)" />
+                        </div>
                             }
                         }
                         else
                         {
-                            <div class="thumbnail-item active" data-index="0">
-                                <img src="/assets/images/logo/list1-1.jpg" alt="Ảnh 1" />
-                            </div>
+                        <div class="thumbnail-item active" data-index="0">
+                            <img src="/assets/images/logo/list1-1.jpg" alt="Ảnh 1" />
+                        </div>
                         }
                     </div>
                 </div>
@@ -688,22 +696,24 @@
 
                         @if (Model.DiscountDefault > 0)
                         {
-                            <span class="price-original">@Model.Price.ToString("N0")₫</span>
+                        <span class="price-original">@Model.Price.ToString("N0")₫</span>
                         }
                     </div>
                 </div>
 
-                <!-- Form add cart (demo như bạn đang dùng) -->
-                <form id="addToCartForm">
+                
+                <form id="addToCartForm" action="@Url.Content("~/AddToCart")" method="post">
                     <input type="hidden" name="productId" value="@Model.Id" />
 
                     <div class="quantity-section">
                         <div class="variant-label">Số lượng:</div>
                         <div class="quantity-controls">
-                            <button type="button" class="quantity-btn" onclick="decreaseQuantity()">-</button>
+                            <button type="button" class="quantity-btn" id="qtyMinus">-</button>
                             <input type="number" class="quantity-input" id="quantity" name="quantity" value="1" min="1" />
-                            <button type="button" class="quantity-btn" onclick="increaseQuantity()">+</button>
+                            <button type="button" class="quantity-btn" id="qtyPlus">+</button>
+
                         </div>
+
                     </div>
 
                     <div class="product-actions">
@@ -739,34 +749,34 @@
                     {
                         var thumb = string.IsNullOrWhiteSpace(p.Thumbnail) ? "/assets/images/logo/list1-1.jpg" : p.Thumbnail;
 
-                        <div class="card">
-                            <a asp-controller="Product" asp-action="Detail" asp-route-id="@p.Id"
-                               style="text-decoration:none;color:inherit;">
-                                <img src="@thumb" alt="@p.Name" />
-                                <div class="content">
-                                    <div class="name">@p.Name</div>
+                <div class="card">
+                    <a asp-controller="Product" asp-action="Detail" asp-route-id="@p.Id"
+                       style="text-decoration:none;color:inherit;">
+                        <img src="@thumb" alt="@p.Name" />
+                        <div class="content">
+                            <div class="name">@p.Name</div>
 
-                                    <div class="price-after">@p.FinalPrice.ToString("N0")₫</div>
+                            <div class="price-after">@p.FinalPrice.ToString("N0")₫</div>
 
-                                    <p class="price-before">@p.Price.ToString("N0")₫</p>
+                            <p class="price-before">@p.Price.ToString("N0")₫</p>
 
                                    
                                         <span class="discount">-@p.DiscountDefault%</span>
                                     
 
-                                    <div>
-                                        <button class="btn-xemchitiet" type="button">
-                                            <i class="fa-solid fa-eye"></i> Xem chi tiết
-                                        </button>
-                                    </div>
-                                </div>
-                            </a>
+                            <div>
+                                <button class="btn-xemchitiet" type="button">
+                                    <i class="fa-solid fa-eye"></i> Xem chi tiết
+                                </button>
+                            </div>
                         </div>
+                    </a>
+                </div>
                     }
                 }
                 else
                 {
-                    <p>Không có sản phẩm cùng loại.</p>
+                <p>Không có sản phẩm cùng loại.</p>
                 }
             </div>
         </div>
@@ -802,28 +812,28 @@
             <div class="item-main">
                 @if (spec == null)
                 {
-                    <p>Chưa có thông số kỹ thuật cho sản phẩm này.</p>
+                <p>Chưa có thông số kỹ thuật cho sản phẩm này.</p>
                 }
                 else
                 {
-                    <ul>
-                        @if (!string.IsNullOrWhiteSpace(spec.Size))
+                <ul>
+                    @if (!string.IsNullOrWhiteSpace(spec.Size))
                         {
-                            <li><h3>Kích thước bút:</h3><p>@spec.Size</p></li>
+                    <li><h3>Kích thước bút:</h3><p>@spec.Size</p></li>
                         }
-                        @if (!string.IsNullOrWhiteSpace(spec.Standard))
+                    @if (!string.IsNullOrWhiteSpace(spec.Standard))
                         {
-                            <li><h3>Tiêu chuẩn :</h3><p>@spec.Standard</p></li>
+                    <li><h3>Tiêu chuẩn :</h3><p>@spec.Standard</p></li>
                         }
-                        @if (!string.IsNullOrWhiteSpace(spec.MadeIn))
+                    @if (!string.IsNullOrWhiteSpace(spec.MadeIn))
                         {
-                            <li><h3>Sản xuất :</h3><p>@spec.MadeIn</p></li>
+                    <li><h3>Sản xuất :</h3><p>@spec.MadeIn</p></li>
                         }
-                        @if (!string.IsNullOrWhiteSpace(spec.Warning))
+                    @if (!string.IsNullOrWhiteSpace(spec.Warning))
                         {
-                            <li><h3>Khuyến cáo :</h3><p>@spec.Warning</p></li>
+                    <li><h3>Khuyến cáo :</h3><p>@spec.Warning</p></li>
                         }
-                    </ul>
+                </ul>
                 }
             </div>
         </div>
@@ -842,67 +852,88 @@
 
 @section Scripts {
     <script>
-        function increaseQuantity() {
-            const input = document.getElementById("quantity");
-            let value = parseInt(input.value);
-            if (!isNaN(value)) input.value = value + 1;
-            else input.value = 1;
-        }
-
-        function decreaseQuantity() {
-            const input = document.getElementById("quantity");
-            let value = parseInt(input.value);
-            const min = parseInt(input.min) || 1;
-            if (!isNaN(value) && value > min) input.value = value - 1;
-            else input.value = min;
-        }
-
-        // chuyển ảnh sản phẩm giống JSP
         document.addEventListener('DOMContentLoaded', function () {
-            const mainImage = document.getElementById('mainProductImage');
-            const thumbnails = document.querySelectorAll('.thumbnail-item');
-            const prevBtn = document.getElementById('prevImageBtn');
-            const nextBtn = document.getElementById('nextImageBtn');
-            let currentIndex = 0;
 
-            function updateImage(index) {
-                if (!thumbnails.length) return;
-                thumbnails.forEach(t => t.classList.remove('active'));
-                thumbnails[index].classList.add('active');
-                const imgSrc = thumbnails[index].querySelector('img').src;
-                mainImage.src = imgSrc;
-                currentIndex = index;
+            // ===== +/- số lượng =====
+            const qtyInput = document.getElementById('quantity');
+            const btnMinus = document.getElementById('qtyMinus');
+            const btnPlus  = document.getElementById('qtyPlus');
+
+            function clampQty(v) {
+                const min = parseInt(qtyInput?.min || "1", 10);
+                if (isNaN(v) || v < min) return min;
+                return v;
             }
 
-            thumbnails.forEach((thumb, index) => {
-                thumb.addEventListener('click', function () {
-                    updateImage(index);
-                });
-            });
-
-            if (prevBtn) {
-                prevBtn.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    if (!thumbnails.length) return;
-                    currentIndex = (currentIndex - 1 + thumbnails.length) % thumbnails.length;
-                    updateImage(currentIndex);
+            if (btnPlus && qtyInput) {
+                btnPlus.addEventListener('click', function () {
+                    const v = parseInt(qtyInput.value || "1", 10);
+                    qtyInput.value = clampQty(v + 1);
                 });
             }
 
-            if (nextBtn) {
-                nextBtn.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    if (!thumbnails.length) return;
-                    currentIndex = (currentIndex + 1) % thumbnails.length;
-                    updateImage(currentIndex);
+            if (btnMinus && qtyInput) {
+                btnMinus.addEventListener('click', function () {
+                    const v = parseInt(qtyInput.value || "1", 10);
+                    qtyInput.value = clampQty(v - 1);
                 });
             }
 
-          
-            document.getElementById('addToCartForm')?.addEventListener('submit', function (e) {
+            // ===== ADD TO CART: giống flow JSP (thêm xong -> sang trang Cart) =====
+            const form = document.getElementById('addToCartForm');
+            if (!form) return;
+
+            const cartUrl = '@Url.Action("Index", "Cart")';
+            const loginUrl = '@Url.Action("Login", "Account", new { returnUrl = Url.Action("Detail", "Product", new { id = Model.Id }) })';
+
+            form.addEventListener('submit', async function (e) {
                 e.preventDefault();
-                alert('Đã thêm vào giỏ (demo). Phần Cart sẽ làm tiếp.');
+
+                const fd = new FormData(form);
+                const params = new URLSearchParams();
+                fd.forEach((v, k) => params.append(k, v));
+
+                try {
+                    const resp = await fetch(form.action, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json'
+                        },
+                        body: params.toString()
+                    });
+
+                    // Nếu sau này bạn bật check login ở controller: 401 -> về login
+                    if (resp.status === 401) {
+                        window.location.href = loginUrl;
+                        return;
+                    }
+
+                    const data = await resp.json().catch(() => null);
+
+                    if (!resp.ok || !data || !data.success) {
+                        alert((data && data.message) ? data.message : 'Không thể thêm vào giỏ hàng');
+                        return;
+                    }
+
+                    
+                    const cartIcon = document.getElementById('cartIcon');
+                    if (cartIcon) cartIcon.setAttribute('data-count', String(data.cartCount));
+
+                    
+                    window.location.href = cartUrl;
+
+                } catch (err) {
+                    console.error(err);
+                    alert('Có lỗi xảy ra. Vui lòng thử lại.');
+                }
             });
+
         });
     </script>
 }
+
+
+
+

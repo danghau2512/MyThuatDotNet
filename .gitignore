@@ -1,4 +1,5 @@
 .vs/
+
 # Build results
 **/bin/
 **/obj/
@@ -7,3 +8,4 @@
 .vs/
 *.user
 *.suo
+

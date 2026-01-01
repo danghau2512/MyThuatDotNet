@@ -34,39 +34,13 @@
             height: 100%;
         }
 
-    #header-trang-chu .tim-kiem-san-pham {
-        position: relative;
-    }
+    
 
-        #header-trang-chu .tim-kiem-san-pham input {
-            padding: 10px 15px;
-            width: 600px;
-            border-radius: 10px;
-            border: none;
-        }
+       
 
-    #header-trang-chu .tim-kiem-san-pham {
-        display: flex;
-    }
+    
 
-        #header-trang-chu .tim-kiem-san-pham button {
-            position: absolute;
-            right: 0;
-            width: 50px;
-            height: 100%;
-            background-color: #0b234d;
-            line-height: 40px;
-            cursor: pointer;
-            color: white;
-            border-top-right-radius: 10px;
-            border-bottom-right-radius: 10px;
-            border: none;
-        }
-
-    #header-trang-chu .header-contact {
-        display: flex;
-        align-items: center;
-    }
+        
 
         #header-trang-chu .header-contact i {
             width: 30px;
@@ -357,45 +331,6 @@
         bottom: 0;
     color: white;
     }
-    .tim-kiem-san-pham{
-    display:flex;
-    align-items:center;
-    width: 700px;              /* chỉnh theo layout của bạn */
-    height: 44px;
-    background:#fff;
-    border-radius: 999px;
-    overflow:hidden;           /* giữ để bo tròn ăn vào cả nút */
-}
-
-.tim-kiem-san-pham input{
-    flex:1;
-    height:100%;
-    border:none;
-    outline:none;
-    padding:0 15px;
-    font-size:14px;
-    border-radius:0;           /* tránh input tự bo */
-}
-
-.tim-kiem-san-pham .btn-search{
-    width:45px;
-    height:100%;
-    border:none;
-    cursor:pointer;
-    background:#0b2f73;        /* màu xanh nút (đổi theo bạn) */
-    color:#fff;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-}
-
-.tim-kiem-san-pham .btn-search i{
-    font-size:18px;
-}
-
-.tim-kiem-san-pham .btn-search:hover{
-    opacity:0.95;
-}
 .tim-kiem-san-pham {
     position: relative;
 }
@@ -466,6 +401,42 @@
     font-size: 13px;
     color: #e74c3c;
 }
+
+    #header-trang-chu .tim-kiem-san-pham {
+        position: relative;
+        display: flex;
+    }
+
+    #header-trang-chu .tim-kiem-san-pham input {
+        padding: 10px 15px;
+        width: 600px;
+        border-radius: 10px;
+        border: none;
+    }
+
+    /* NÚT KÍNH LÚP */
+    #header-trang-chu .tim-kiem-san-pham .btn-search {
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: 50px;
+        height: 100%;
+        background-color: #0b234d;
+        border: none;
+        cursor: pointer;
+        border-top-right-radius: 10px;
+        border-bottom-right-radius: 10px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Icon bên trong */
+    #header-trang-chu .tim-kiem-san-pham .btn-search i {
+        color: white;
+        font-size: 16px;
+    }
 
 /* End footer */
 

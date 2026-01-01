@@ -28,9 +28,8 @@
 
 @section Styles {
     <style>
-        /* ✅ chừa chỗ cho header fixed */
         .page-offset {
-            padding-top: 115px;
+            padding-top: 30px;
         }
 
         /* ========== BREADCRUMB ========== */
@@ -761,10 +760,9 @@
 
                             <p class="price-before">@p.Price.ToString("N0")₫</p>
 
-                            @if (p.DiscountDefault > 0)
-                                    {
-                            <span class="discount">-@p.DiscountDefault%</span>
-                                    }
+                                   
+                                        <span class="discount">-@p.DiscountDefault%</span>
+                                    
 
                             <div>
                                 <button class="btn-xemchitiet" type="button">

@@ -15,7 +15,8 @@ builder.Services.AddHttpClient<SearchApiService>((sp, client) =>
 {
     var config = sp.GetRequiredService<IConfiguration>();
     client.BaseAddress = new Uri(config["ApiBaseUrl"]!);
-}); // ✅ thiếu cái này trong code bạn
+});
+builder.Services.AddHttpContextAccessor();
 
 // ✅ Session
 builder.Services.AddHttpContextAccessor();
@@ -50,3 +51,4 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
+

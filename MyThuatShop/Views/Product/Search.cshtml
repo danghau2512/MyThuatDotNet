@@ -1,0 +1,495 @@
+﻿@model MyThuatShop.ViewModels.SearchPageVm
+
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Tìm kiếm";
+}
+@section Styles {
+    <style>
+        .container {
+            width: 1200px;
+            margin: auto;
+        }
+
+        #section-info-mithuat {
+            padding-top: 35px;
+            background: #E5EEFF;
+        }
+
+        /* Begin section-trangchinh-danhmuc-sanpham */
+        #section-trangchinh-danhmuc-sanpham {
+            background-color: #DBE8FF;
+        }
+
+            #section-trangchinh-danhmuc-sanpham .content {
+                padding: 20px 0;
+                margin-bottom: 30px;
+            }
+
+                #section-trangchinh-danhmuc-sanpham .content a {
+                    text-decoration: none;
+                }
+
+                #section-trangchinh-danhmuc-sanpham .content a {
+                    color: black;
+                }
+
+                    #section-trangchinh-danhmuc-sanpham .content a:nth-child(3) {
+                        color: #17479D;
+                    }
+
+        /* End section-trangchinh-danhmuc-sanpham */
+        /* Begin section-main */
+
+        #section-main .container {
+            display: flex;
+            border: 1px solid #ddd;
+            margin-bottom: 30px;
+            box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+            border-radius: 10px;
+        }
+
+
+        #section-main .section-main-content {
+            width: 100%;
+            padding: 0 30px;
+        }
+
+
+            #section-main .section-main-content .section-main-content-image img {
+                width: 100%;
+                margin-top: 30px;
+                border-radius: 20px;
+            }
+
+            #section-main .section-main-content .section-main-content-list {
+                /* margin được xử lý bởi padding của parent */
+            }
+
+                #section-main .section-main-content .section-main-content-list .list-product {
+                    display: flex;
+                    gap: 20px;
+                    margin-bottom: 30px;
+                    flex-wrap: wrap;
+                }
+
+                    #section-main .section-main-content .section-main-content-list .list-product .list-product-list1 {
+                        border-radius: 15px;
+                        background-color: #F8FAFF;
+                        border: 1px solid #D7E5FF;
+                        width: calc(25% - 17px);
+                        cursor: pointer;
+                        display: flex;
+                        flex-direction: column;
+                    }
+
+                        #section-main .section-main-content .section-main-content-list .list-product .list-product-list1 img {
+                            border-radius: 15px;
+                            width: 100%;
+                            height: 250px;
+                            object-fit: cover;
+                        }
+
+                        #section-main .section-main-content .section-main-content-list .list-product .list-product-list1 .list-product-list1-content-socials {
+                            display: flex;
+                            align-items: center;
+                            gap: 10px;
+                            margin-top: 10px;
+                        }
+
+                        #section-main .section-main-content .section-main-content-list .list-product .list-product-list1 .list-product-list1-content {
+                            padding: 0 15px 15px;
+                            text-align: center;
+                            display: flex;
+                            flex-direction: column;
+                            flex-grow: 1;
+                            justify-content: space-between;
+                        }
+
+                            /* chu y */
+                            #section-main .section-main-content .section-main-content-list .list-product .list-product-list1 .list-product-list1-content .content {
+                                width: 200px;
+                                white-space: nowrap;
+                                /* không cho xuống dòng */
+                                overflow: hidden;
+                                /* ẩn phần bị tràn */
+                                text-overflow: ellipsis;
+                                /* thêm dấu … */
+                            }
+
+                        #section-main .section-main-content .section-main-content-list .list-product .list-product-list1 .list-product-list1-content-socials .list-product-list1-content-socials-1 {
+                            width: 60px;
+                            border-radius: 10px;
+                            text-align: center;
+                            line-height: 30px;
+                            /* height: 30px; */
+                            /* padding: 5px; */
+                            background-color: #FFE0E2;
+                        }
+
+                            #section-main .section-main-content .section-main-content-list .list-product .list-product-list1 .list-product-list1-content-socials .list-product-list1-content-socials-1 i {
+                                color: #ED1C24;
+                                font-size: 10px;
+                            }
+
+                            #section-main .section-main-content .section-main-content-list .list-product .list-product-list1 .list-product-list1-content-socials .list-product-list1-content-socials-1 span {
+                                /* display: inline-block; */
+                                color: #ED1C24;
+                                font-size: 12px;
+                                font-weight: 600;
+                                margin-left: 5px;
+                            }
+
+                        #section-main .section-main-content .section-main-content-list .list-product .list-product-list1 .list-product-list1-content-socials .list-product-list1-content-socials-2 {
+                            width: 100px;
+                            border-radius: 10px;
+                            text-align: center;
+                            line-height: 30px;
+                            /* height: 30px; */
+                            background-color: #E0EBFF;
+                        }
+
+                            #section-main .section-main-content .section-main-content-list .list-product .list-product-list1 .list-product-list1-content-socials .list-product-list1-content-socials-2 i {
+                                color: #268EF8;
+                                font-size: 10px;
+                            }
+
+                            #section-main .section-main-content .section-main-content-list .list-product .list-product-list1 .list-product-list1-content-socials .list-product-list1-content-socials-2 span {
+                                color: #268EF8;
+                                font-size: 12px;
+                                font-weight: 600;
+                                margin-left: 5px;
+                            }
+
+                        #section-main .section-main-content .section-main-content-list .list-product .list-product-list1 .list-product-list1-content .list-product-list1-content-description p {
+                            font-size: 14px;
+                            color: black;
+                        }
+
+        a {
+            text-decoration: none;
+        }
+
+        #section-main .section-main-content .section-main-content-list .list-product .list-product-list1 .list-product-list1-content .list-product-list1-content-description .star i {
+            color: #F3C63F
+        }
+
+        #section-main .section-main-content .section-main-content-list .list-product .list-product-list1 .list-product-list1-content .list-product-list1-content-description .star span {
+            color: #F3C63F;
+            margin-left: 10px;
+        }
+
+        #section-main .section-main-content .section-main-content-list .list-product .list-product-list1 .list-product-list1-content .list-product-list1-content-description .price-product-after {
+            color: #268EF8;
+            font-weight: 600;
+        }
+
+        #section-main .section-main-content .section-main-content-list .list-product .list-product-list1 .list-product-list1-content .list-product-list1-content-description .price-product-before {
+            color: #ccc;
+            font-weight: 600;
+            text-decoration: line-through;
+            display: inline-block;
+            margin: 0;
+        }
+
+        #section-main .section-main-content .section-main-content-list .list-product .list-product-list1 .list-product-list1-content .list-product-list1-content-description .price-product-discount {
+            color: #ED1C24;
+            font-weight: 600;
+            margin-left: 5px;
+            width: 60px;
+            border-radius: 20px;
+            text-align: center;
+            line-height: 30px;
+            /* height: 30px; */
+            /* padding: 5px; */
+            display: inline-block;
+            background-color: #FFE0E2;
+        }
+
+        #section-main .section-main-content .section-main-content-list .list-product .list-product-list1 .list-product-list1-content .list-product-list1-content-description .button {
+            margin-top: 15px;
+            text-align: center;
+        }
+
+            #section-main .section-main-content .section-main-content-list .list-product .list-product-list1 .list-product-list1-content .list-product-list1-content-description .button .btn-xemchitiet {
+                min-width: 64%;
+                padding: 10px 0;
+                background-color: transparent;
+                border: 1px solid #268EF8;
+                border-radius: 10px;
+                color: white;
+                cursor: pointer;
+            }
+
+            #section-main .section-main-content .section-main-content-list .list-product .list-product-list1 .list-product-list1-content .list-product-list1-content-description .button .btn-xemchitiet {
+                color: #268EF8;
+            }
+
+                #section-main .section-main-content .section-main-content-list .list-product .list-product-list1 .list-product-list1-content .list-product-list1-content-description .button .btn-xemchitiet:hover {
+                    background-color: #268EF8;
+                    color: white;
+                }
+
+        #section-main .section-main-content .section-main-content-quantity {
+            display: flex;
+            align-items: center;
+            justify-content: end;
+            margin-bottom: 30px;
+            margin-top: 30px;
+        }
+
+            #section-main .section-main-content .section-main-content-quantity a {
+                display: inline-block;
+                width: 35px;
+                height: 35px;
+                background-color: transparent;
+                border: 1px solid #ddd;
+                margin: 10px;
+                text-align: center;
+                line-height: 35px;
+                text-decoration: none;
+                color: #666;
+                border-radius: 50%;
+                transition: all 0.3s ease;
+            }
+
+                /* Trang được chọn - class active */
+                #section-main .section-main-content .section-main-content-quantity a.active {
+                    background-color: #2659F3;
+                    color: white;
+                    border-color: #2659F3;
+                }
+
+                #section-main .section-main-content .section-main-content-quantity a:hover {
+                    background-color: #DEE2E6;
+                    color: #333;
+                }
+
+                #section-main .section-main-content .section-main-content-quantity a.active:hover {
+                    background-color: #1a47c9;
+                    color: white;
+                }
+
+        .search-sort {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            margin: 10px 0 20px;
+            gap: 12px;
+        }
+
+        .search-sort-label {
+            font-weight: 600;
+            margin-right: 8px;
+        }
+
+        .search-sort-tabs {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            font-size: 14px;
+        }
+
+        .sort-option {
+            position: relative;
+            cursor: pointer;
+            padding-bottom: 4px;
+            color: #333;
+        }
+
+            /* Gạch chân + màu khi được chọn */
+            .sort-option.active {
+                color: #17479D;
+                font-weight: 600;
+            }
+
+                .sort-option.active::after {
+                    content: "";
+                    position: absolute;
+                    left: 0;
+                    bottom: 0;
+                    height: 2px;
+                    width: 100%;
+                    background-color: #17479D;
+                    border-radius: 999px;
+
+                }
+
+        #section-main .section-main-content .section-main-content-quantity a.disabled {
+            pointer-events: none;
+            opacity: 0.5;
+        }
+
+
+
+        /* End section-main */
+
+    </style>
+}
+<div id="section-info-mithuat">
+    <div class="container">
+    </div>
+</div>
+<div id="section-main">
+    <div class="container">
+
+        <div class="section-main-content">
+            <div class="section-main-content-list">
+
+                <h2 class="header">
+                    @if (Model.Products.Count > 0)
+                    {
+                        <text>Có @Model.Products.Count kết quả tìm kiếm cho: "<b>@Model.Keyword</b>"</text>
+                    }
+                    else
+                    {
+                        <text>Kết quả tìm kiếm cho: "<b>@Model.Keyword</b>"</text>
+                    }
+                </h2>
+
+                @if (Model.Products == null || !Model.Products.Any())
+                {
+                    <p>Không tìm thấy sản phẩm nào.</p>
+                }
+                else
+                {
+                    <div class="search-sort">
+                        <span class="search-sort-label">Sắp xếp theo:</span>
+
+                        <div class="search-sort-tabs">
+                            <a class="sort-option js-sort @(Model.Sort=="all" ? "active" : "")"
+   data-sort="all"
+   asp-action="Search"
+   asp-route-q="@Model.Keyword"
+   asp-route-sort="all"
+   asp-route-page="1">Tất cả</a>
+
+<a class="sort-option js-sort @(Model.Sort=="bestseller" ? "active" : "")"
+   data-sort="bestseller"
+   asp-action="Search"
+   asp-route-q="@Model.Keyword"
+   asp-route-sort="bestseller"
+   asp-route-page="1">Bán chạy</a>
+
+<a class="sort-option js-sort @(Model.Sort=="new" ? "active" : "")"
+   data-sort="new"
+   asp-action="Search"
+   asp-route-q="@Model.Keyword"
+   asp-route-sort="new"
+   asp-route-page="1">Sản phẩm mới</a>
+
+<a class="sort-option js-sort @(Model.Sort=="priceAsc" ? "active" : "")"
+   data-sort="priceAsc"
+   asp-action="Search"
+   asp-route-q="@Model.Keyword"
+   asp-route-sort="priceAsc"
+   asp-route-page="1">Giá tăng dần</a>
+
+<a class="sort-option js-sort @(Model.Sort=="priceDesc" ? "active" : "")"
+   data-sort="priceDesc"
+   asp-action="Search"
+   asp-route-q="@Model.Keyword"
+   asp-route-sort="priceDesc"
+   asp-route-page="1">Giá giảm dần</a>
+
+                        </div>
+                    </div>
+
+                    <div id="searchResults" data-q="@Model.Keyword" data-sort="@Model.Sort">
+                        @await Html.PartialAsync("_SearchResultsPartial", Model)
+                    </div>
+
+                }
+
+            </div>
+        </div>
+
+    </div>
+</div>
+@section Scripts {
+    <script>
+        // click phân trang (ajax)
+        $(document).on('click', '#searchResults .page-link', function (e) {
+          const $a = $(this);
+
+          if ($a.hasClass('disabled') || $a.hasClass('active')) return;
+
+          e.preventDefault();
+
+          const page = $a.data('page');
+          const $wrap = $('#searchResults');
+          const q = $wrap.data('q') || '';
+          const sort = $wrap.data('sort') || 'all';
+
+          $.get('/Product/SearchPartial', { q, sort, page }, function (html) {
+            $wrap.html(html);
+
+            const url = `/Product/Search?q=${encodeURIComponent(q)}&sort=${encodeURIComponent(sort)}&page=${page}`;
+            history.pushState({ page }, '', url);
+
+            
+          });
+        });
+
+        // back/forward trình duyệt vẫn load đúng trang
+        window.addEventListener('popstate', function () {
+          const params = new URLSearchParams(window.location.search);
+          const q = params.get('q') || '';
+          const sort = params.get('sort') || 'all';
+          const page = parseInt(params.get('page') || '1', 10);
+
+          $.get('/Product/SearchPartial', { q, sort, page }, function (html) {
+            $('#searchResults').data('q', q).data('sort', sort).html(html);
+          });
+        });
+
+
+        //ajax sap xep
+               // CLICK SORT (ajax)
+        $(document).on('click', '.js-sort', function (e) {
+          e.preventDefault();
+
+          const $a = $(this);
+          const sort = $a.data('sort') || 'all';
+
+          const $wrap = $('#searchResults');
+          const q = $wrap.data('q') || '';
+          const page = 1;
+
+          $.get('/Product/SearchPartial', { q, sort, page }, function (html) {
+            // replace list + pagination
+            $wrap.html(html);
+
+            // cập nhật data-sort để pagination ajax dùng đúng sort mới
+            $wrap.data('sort', sort);
+
+            // cập nhật UI active của sort
+            $('.js-sort').removeClass('active');
+            $a.addClass('active');
+
+            // cập nhật URL
+            const url = `/Product/Search?q=${encodeURIComponent(q)}&sort=${encodeURIComponent(sort)}&page=1`;
+            history.pushState({ q, sort, page: 1 }, '', url);
+          });
+        });
+
+        window.addEventListener('popstate', function () {
+          const params = new URLSearchParams(window.location.search);
+          const q = params.get('q') || '';
+          const sort = params.get('sort') || 'all';
+          const page = parseInt(params.get('page') || '1', 10);
+
+          $.get('/Product/SearchPartial', { q, sort, page }, function (html) {
+            const $wrap = $('#searchResults');
+            $wrap.data('q', q).data('sort', sort).html(html);
+
+            // set active sort theo URL
+            $('.js-sort').removeClass('active');
+            $(`.js-sort[data-sort="${sort}"]`).addClass('active');
+          });
+        });
+    </script>
+}
+
+

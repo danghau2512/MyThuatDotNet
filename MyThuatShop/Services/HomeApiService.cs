@@ -74,5 +74,7 @@ public class HomeApiService
             _logger.LogError(ex, "Error calling API");
             return new List<CategorySectionVm>();
         }
+
     }
+
 }

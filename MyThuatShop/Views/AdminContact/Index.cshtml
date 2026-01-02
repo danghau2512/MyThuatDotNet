@@ -1,0 +1,160 @@
+﻿@model List<MyThuatShop.Services.ContactApiService.ContactDto>
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Admin - Contacts";
+    var toast = TempData["Toast"] as string;
+}
+
+@section Styles {
+    <style>
+        .wrap {
+            max-width: 1200px;
+            margin: 120px auto 60px;
+            padding: 0 16px;
+        }
+
+        .card {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            box-shadow: 0 2px 16px rgba(0,0,0,.06);
+        }
+
+        .card-body {
+            padding: 18px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            vertical-align: top;
+            text-align: left;
+        }
+
+        th {
+            background: #f8fafc;
+        }
+
+        .status {
+            font-weight: 600;
+        }
+
+        .btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .btn-del {
+            background: #111;
+            color: #fff;
+        }
+
+        .btn-reply {
+            background: #2659F3;
+            color: #fff;
+        }
+
+        .toast {
+            margin: 0 0 12px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            background: #DBE8FF;
+            color: #17479d;
+            font-weight: 600;
+        }
+
+        .replybox {
+            display: flex;
+            gap: 8px;
+            flex-direction: column;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #d7dee8;
+            border-radius: 8px;
+        }
+
+        textarea {
+            min-height: 90px;
+            resize: vertical;
+        }
+    </style>
+}
+
+<div class="wrap">
+    @if (!string.IsNullOrWhiteSpace(toast))
+    {
+        <div class="toast">@toast</div>
+    }
+
+    <div class="card">
+        <div class="card-body">
+            <h2 style="margin:0 0 12px">Danh sách liên hệ</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width:60px">ID</th>
+                        <th>Khách</th>
+                        <th style="width:180px">Email</th>
+                        <th style="width:140px">SĐT</th>
+                        <th>Nội dung</th>
+                        <th style="width:120px">Trạng thái</th>
+                        <th style="width:280px">Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model == null || Model.Count == 0)
+                    {
+                        <tr><td colspan="7">Chưa có liên hệ nào.</td></tr>
+                    }
+                    else
+                    {
+                        foreach (var c in Model)
+                        {
+                            <tr>
+                                <td>@c.Id</td>
+                                <td>
+                                    <div><b>@c.FullName</b></div>
+                                    <div style="color:#64748b;font-size:13px">UserId: @c.UserId</div>
+                                    <div style="color:#64748b;font-size:13px">@c.CreateAt.ToString("dd/MM/yyyy HH:mm")</div>
+                                </td>
+                                <td>@c.Email</td>
+                                <td>@c.PhoneNumber</td>
+                                <td>@c.Message</td>
+                                <td class="status">@c.Status</td>
+                                <td>
+                                    <form asp-controller="AdminContacts" asp-action="Delete" method="post" style="margin-bottom:8px">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@c.Id" />
+                                        <button class="btn btn-del" type="submit">Xóa</button>
+                                    </form>
+
+                                    <form asp-controller="AdminContacts" asp-action="Reply" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@c.Id" />
+                                        <div class="replybox">
+                                            <input name="subject" placeholder="Tiêu đề (mặc định nếu để trống)" />
+                                            <textarea name="replyMessage" placeholder="Nội dung phản hồi..." required></textarea>
+                                            <button class="btn btn-reply" type="submit">Gửi phản hồi</button>
+                                        </div>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

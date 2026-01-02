@@ -57,10 +57,12 @@ public class UsersController : ControllerBase
                 Id = user.Id,
                 FullName = user.FullName,
                 Email = user.Email,
+                PhoneNumber = user.PhoneNumber ?? "",   
                 Role = user.Role ?? "Customer"
             }
         };
 
         return Ok(res);
+
     }
 }

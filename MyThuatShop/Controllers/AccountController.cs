@@ -41,7 +41,10 @@ public class AccountController : Controller
         HttpContext.Session.SetObject("currentUser", res.User);
         HttpContext.Session.SetInt32("UserId", res.User.Id);
         HttpContext.Session.SetString("FullName", res.User.FullName ?? "");
+        HttpContext.Session.SetString("PhoneNumber", res.User.PhoneNumber ?? "");
         HttpContext.Session.SetString("Role", res.User.Role ?? "Customer");
+        HttpContext.Session.SetString("Email", res.User.Email ?? "");
+
 
         return RedirectToAction("Index", "Home");
     }

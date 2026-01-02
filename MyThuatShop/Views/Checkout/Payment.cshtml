@@ -1,18 +1,9 @@
-
-<!DOCTYPE html>
-<html lang="en">
-
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Thanh toán</title>
-        <link rel="stylesheet" href="UI/assets/css/style.css">
-        <link rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
-            integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
-            crossorigin="anonymous" referrerpolicy="no-referrer" />
-
-    </head>
+@model MyThuatShop.ViewModels.Checkout.CheckoutVm
+@{
+    ViewData["Title"] = "Thanh toán";
+    Layout = "_Layout";
+}
+@section Styles {
     <style>
   .container {
   width: 1200px;
@@ -813,6 +804,13 @@ button[type="submit"]:hover {
         width: 100%;
     }
 
+        .text-danger {
+            color: #dc3545;
+            font-size: 0.875rem;
+            margin-top: 5px;
+            display: block;
+        }
+
 /* Responsive Design */
 @@media (max-width: 992px) {
     .checkout-container {
@@ -877,313 +875,133 @@ button[type="submit"]:hover {
 
 
 </style>
+}
+<nav>
+    <div class="breadcrumb">
+        <a href="@Url.Action("Index", "Cart")">Giỏ hàng</a>
+        <span>/</span>
+        <span>Thông tin giao hàng</span>
+    </div>
 
-    <body>
-        <header id="header-trang-chu" class="trang-chu">
-            <div class="logo-trang-chu">
-                <a href="index.html">
-                    <img src="UI/assets/images/logo/logo.png" alt>
-                </a>
-            </div>
-            <form action class="tim-kiem-san-pham">
-                <input type="text" name placeholder="Tìm kiếm sản phẩm...">
-                <i class="fa-solid fa-magnifying-glass"></i>
-            </form>
-            <div class="header-contact">
-                <i class="fa-solid fa-phone"></i>
-                <div class="contact">
-                    <div class="contact-phone-number">1900 866 819</div>
-                    <div class="contact-phone-help">Hỗ trợ khách hàng</div>
-                </div>
-            </div>
-            <div class="header-dangnhap-dangki">
-                <i class="fa-solid fa-user"></i>
-                <div class="dangnhap-dangki">
-                    <div class="dangnhap">Đăng nhập</div>
-                    <div class="dangki">Đăng kí</div>
+    <div class="checkout-container">
+        <form asp-action="PlaceOrder" method="post" class="checkout-form-wrapper" style="display: contents;">
+
+            <div class="form-infor-checkout">
+                <h4 class="infor-delivery-label">Thông tin giao hàng</h4>
+
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <div class="input-group">
+                    <label asp-for="FullName">Họ và tên</label>
+                    <input asp-for="FullName" class="form-input-item" placeholder="Họ và tên">
+                    <span asp-validation-for="FullName" class="text-danger"></span>
                 </div>
 
-            </div>
-            <div class="header-giohang">
-                <i class="fa-solid fa-bag-shopping"></i>
-            </div>
-        </header>
-        <nav>
-            <div class="breadcrumb">
-                <a href="Cart.html">Giỏ hàng</a>
-                <span>/</span>
-                <span>Thông tin giao hàng</span>
-            </div>
-
-            <div class="checkout-container">
-                <!-- Left Column - Shipping Info -->
-                <div class="form-infor-checkout">
-                    <h4 class="infor-delivery-label">Thông tin giao hàng</h4>
-
-                    <form action="PaymentSuccess.html">
-                        <div class="input-group">
-                            <label for="fullname">Họ và tên</label>
-                            <input type="text" class="form-input-item"
-                                id="fullname" placeholder="Họ và tên"
-                                required>
-                        </div>
-                        <div class="row">
-                            <div class="input-group col-md-6">
-                                <label for="email">Email</label>
-                                <input type="email" class="form-input-item"
-                                    id="email" placeholder="Email" required>
-                                <span id="error_email"></span>
-                            </div>
-                            <div class="input-group col-md-6">
-                                <label for="phone">Số điện thoại</label>
-                                <input type="number" class="form-input-item"
-                                    id="phone" placeholder="Số điện thoại"
-                                    required>
-                                <span id="error_phone"></span>
-                            </div>
-                        </div>
-                        <div class="input-group">
-                            <label for="address">Địa chỉ</label>
-                            <input type="text" class="form-input-item"
-                                id="address" placeholder="Địa chỉ" required>
-                        </div>
-
-                        <div class="note">
-                            <label for="content-notes" class="bold">Ghi chú đơn
-                                hàng</label>
-                            <textarea class="form-control" id="content-notes"
-                                rows="5"
-                                placeholder="Ghi chú đơn hàng..."></textarea>
-                        </div>
-
-                        <div class="export-bill">
-                            <div class="check-export">
-                                <input type="checkbox" id="check-form-export">
-                                <label for="check-form-export"
-                                    class="label1">Xuất hoá đơn cho đơn
-                                    hàng</label>
-                            </div>
-                        </div>
-
-                        <!-- Payment Method -->
-                        <div class="payment-method">
-                            <h4 class="payment-title">Phương thức thanh
-                                toán</h4>
-                            <div class="payment-options">
-                                <label class="payment-option">
-                                    <input type="radio" name="payment"
-                                        value="cod" checked>
-                                    <div class="payment-content">
-                                        <img
-                                            src="UI/assets/images/logo/cod.svg"
-                                            alt="COD">
-                                        <span>Thanh toán khi nhận hàng</span>
-                                    </div>
-                                </label>
-                                <label class="payment-option">
-                                    <input type="radio" name="payment"
-                                        value="vnpay">
-                                    <div class="payment-content">
-                                        <img
-                                            src="UI/assets/images/logo/OIP.webp"
-                                            alt="VNPay">
-                                        <span>Thanh toán qua VNPay</span>
-                                    </div>
-                                </label>
-                            </div>
-                        </div>
-                        <button type="submit" class="btn-continue">Thanh toán
-                            ngay</button>
-
-                    </form>
+                <div class="row">
+                    <div class="input-group col-md-6">
+                        <label asp-for="Email">Email</label>
+                        <input asp-for="Email" class="form-input-item" placeholder="Email">
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                    <div class="input-group col-md-6">
+                        <label asp-for="PhoneNumber">Số điện thoại</label>
+                        <input asp-for="PhoneNumber" class="form-input-item" placeholder="Số điện thoại">
+                        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                    </div>
                 </div>
 
-                <div class="order-summary">
-                    <h4 class="cart-title">Giỏ hàng</h4>
+                <div class="input-group">
+                    <label asp-for="Address">Địa chỉ</label>
+                    <input asp-for="Address" class="form-input-item" placeholder="Địa chỉ giao hàng">
+                    <span asp-validation-for="Address" class="text-danger"></span>
+                </div>
 
-                    <div class="cart-items">
-                        <!-- Product 1 -->
+                <div class="note">
+                    <label asp-for="Note" class="bold">Ghi chú đơn hàng</label>
+                    <textarea asp-for="Note" class="form-control" rows="5" placeholder="Ghi chú (tùy chọn)..."></textarea>
+                </div>
+
+                <div class="payment-method">
+                    <h4 class="payment-title">Phương thức thanh toán</h4>
+                    <div class="payment-options">
+
+                        <label class="payment-option">
+                            <input type="radio" asp-for="PaymentMethod" value="COD" checked>
+                            <div class="payment-content">
+                                <img src="~/UI/assets/images/logo/cod.svg" alt="COD" onerror="this.src='https://placehold.co/40x40?text=COD'">
+                                <span>Thanh toán khi nhận hàng (COD)</span>
+                            </div>
+                        </label>
+
+                        <label class="payment-option">
+                            <input type="radio" asp-for="PaymentMethod" value="VNPay">
+                            <div class="payment-content">
+                                <img src="~/UI/assets/images/logo/OIP.webp" alt="VNPay" onerror="this.src='https://placehold.co/40x40?text=VNPAY'">
+                                <span>Thanh toán qua VNPay</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-continue">Thanh toán ngay</button>
+            </div>
+        </form>
+
+        <div class="order-summary">
+            <h4 class="cart-title">Giỏ hàng (@(Model.Cart?.Carts.Count ?? 0) sản phẩm)</h4>
+
+            <div class="cart-items">
+                @if (Model.Cart != null && Model.Cart.Carts.Any())
+                {
+                    foreach (var item in Model.Cart.Carts.Values)
+                    {
                         <div class="cart-item">
                             <div class="item-image">
-                                <img src="UI/assets/images/logo/list1-1.jpg"
-                                    alt="Sản phẩm 1">
-                                <span class="item-quantity">2</span>
+                                <img src="@item.Thumbnail" alt="@item.Name" onerror="this.src='https://placehold.co/80x80'">
+                                <span class="item-quantity">@item.Quantity</span>
                             </div>
                             <div class="item-details">
-                                <h5 class="item-name">Bút Lông Thiên Long Màu
-                                    Fiber Pen Washable - Phiên bản Demon
-                                    Slayer</h5>
-                                <p class="item-price">336,600₫</p>
+                                <h5 class="item-name">@item.Name</h5>
+
+                                <p class="item-price">@item.SubTotal.ToString("#,##0")₫</p>
                             </div>
                         </div>
+                    }
+                }
+                else
+                {
+                    <p>Giỏ hàng trống</p>
+                }
+            </div>
 
-                        <!-- Product 2 -->
-                        <div class="cart-item">
-                            <div class="item-image">
-                                <img src="UI/assets/images/logo/list1-3.jpg"
-                                    alt="Sản phẩm 2">
-                                <span class="item-quantity">1</span>
-                            </div>
-                            <div class="item-details">
-                                <h5 class="item-name">Bút lông hiên Long Colokit
-                                    - Màu sắc tươi sáng, Không thấm qua mặt
-                                    giấy</h5>
-                                <p class="item-price">45,500₫</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Discount Code -->
-                    <div class="discount-section">
-                        <div class="discount-input-group">
-                            <input type="text" placeholder="Mã giảm giá">
-                            <button class="btn-apply">Sử dụng</button>
-                        </div>
-                    </div>
-
-                    <!-- Price Summary -->
-                    <div class="price-summary">
-                        <div class="price-row">
-                            <span>Tạm tính</span>
-                            <span>382,120₫</span>
-                        </div>
-
-                        <div class="price-row">
-                            <span>Giảm giá</span>
-                            <span>0₫</span>
-                        </div>
-                        <div class="price-row total">
-                            <span>Tổng cộng</span>
-                            <span class="total-amount">382,120₫</span>
-                        </div>
-                    </div>
+            <div class="discount-section">
+                <div class="discount-input-group">
+                    <input type="text" placeholder="Mã giảm giá">
+                    <button type="button" class="btn-apply">Sử dụng</button>
                 </div>
             </div>
-        </nav>
 
-        <footer id="footer-trang-chu">
-            <div class="footer-title">
-                <img src="UI/assets/images/logo/logo.png" alt
-                     class="img-main">
-                <p class="footer-title-header">Thienlong.vn -
-                    Website thương mại
-                    điện tử thuộc Tập đoàn Thiên Long</p>
-                <p class="footer-title-description">Công ty Cổ
-                    Phần Tập Đoàn
-                    Thiên Long
-                    <br>
-                    <br>
-                    GPĐKKD số 0301464830 do Sở KHĐT TP. Hồ Chí
-                    Minh cấp ngày
-                    14/03/2005.
-                </p>
-                <form action class="footer-title-form">
-                    <input type="email"
-                        placeholder="Nhập địa chỉ email">
-                    <a href>Đăng ký</a>
-                </form>
-                <img
-                    src="UI/assets/images/logo/logo-parker_53d035f3ab7645168e62cd9e3f595090.png"
-                    alt class="img-footer">
+            <div class="price-summary">
+                <div class="price-row">
+                    <span>Tạm tính</span>
+                    <span>@Model.TotalAmount.ToString("#,##0")₫</span>
+                </div>
+
+                <div class="price-row">
+                    <span>Giảm giá</span>
+                    <span>0₫</span>
+                </div>
+
+                <div class="price-row">
+                    <span>Phí vận chuyển</span>
+                    <span>0₫</span>
+                </div>
+
+                <div class="price-row total">
+                    <span>Tổng cộng</span>
+                    <span class="total-amount">@Model.TotalAmount.ToString("#,##0")₫</span>
+                </div>
             </div>
-            <div class="footer-diachi">
-                <h2>ĐỊA CHỈ CÔNG TY</h2>
-                <span>
-                    Head Office:
-                    <p class="footer-diachi-header"> Tầng 10,
-                        Sofic Tower, Số 10
-                        Đường Mai Chí Thọ, Phường An Khánh,
-                        Thành Phố Hồ Chí Minh, Việt Nam
-                    </span>
-                    <br>
-                    <span>
-                        Miền Bắc:
-                        <p class="footer-diachi-description"> Số
-                            38, đường
-                            Gamuda Gardens 2-5, Khu đô thị mới
-                            C2 - Gamuda
-                            Gardens, Phường Trần Phú, Thành phố
-                            Hà Nội, Việt
-                            Nam.
-                        </span>
-
-                        <img
-                            src="UI/assets/images/logo/footer_bct.png"
-                            alt
-                            class="img-main">
-                    </div>
-                    <div class="footer-help">
-                        <h2>HỖ TRỢ KHÁCH HÀNG</h2>
-                        <span>
-                            Hotline:
-                            <p class="footer-help-header">1900
-                                866 819
-                            </span>
-                            <span>
-                                Thứ 2 - Thứ 6 (8h - 17h)
-                                salesonline@thienlongvn.com
-                                <div
-                                    class="footer-help-header-list">
-                                    <a href>
-                                        - Hướng dẫn mua hàng
-                                    </a>
-                                    <a href>
-                                        - Hướng dẫn thanh toán
-                                    </a>
-                                    <a href>
-                                        - Chính sách giao hàng
-                                    </a>
-                                    <a href>
-                                        - Chính sách đổi trả &
-                                        hoàn tiền
-                                    </a>
-                                    <a href>
-                                        - Khách hàng thân thiết
-                                    </a>
-                                    <a href>
-                                        - Khách hàng ưu tiên
-                                    </a>
-                                    <a href>
-                                        - Phản ánh chất lượng
-                                        sản phẩm
-                                    </a>
-                                </div>
-                            </span>
-                        </div>
-                        <div class="footer-information">
-                            <h2>VỀ THIENLONG.VN</h2>
-                            <div
-                                class="footer-information-header-list">
-                                <a href>
-                                    - Giới thiệu
-                                </a>
-                                <a href>
-                                    - Dịch vụ in ấn quảng cáo
-                                </a>
-                                <a href>
-                                    - Chính sách bảo mật chung
-                                </a>
-                                <a href>
-                                    - Chính sách bảo mật thông
-                                    tin cá nhân
-                                </a>
-                                <a href>
-                                    - Thông tin liên hệ
-                                </a>
-                                <a href>
-                                    - Chương trình Affiliate
-                                </a>
-                            </div>
-                            <div
-                                class="footer-information-socials">
-                                <i
-                                    class="fa-brands fa-facebook"></i>
-                                <i
-                                    class="fa-brands fa-youtube"></i>
-                            </div>
-                        </div>
-                    </footer>
-
-                </body>
-
-            </html>
+        </div>
+    </div>
+</nav>

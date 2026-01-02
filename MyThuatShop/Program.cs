@@ -10,6 +10,7 @@ builder.Services.AddHttpClient();
 // DI services
 builder.Services.AddScoped<HomeApiService>();
 builder.Services.AddScoped<ProductAPIService>();
+builder.Services.AddScoped<OrderApiService>();
 builder.Services.AddHttpClient<AccountApiService>();
 
 builder.Services.AddHttpClient<SearchApiService>((sp, client) =>
@@ -25,7 +26,7 @@ builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
     options.Cookie.Name = ".MyThuatShop.Session";
-    options.IdleTimeout = TimeSpan.FromHours(2); // giống JSP: đủ lâu để test
+    options.IdleTimeout = TimeSpan.FromHours(2);
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });

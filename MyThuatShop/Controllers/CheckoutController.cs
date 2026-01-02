@@ -22,7 +22,7 @@ public class CheckoutController : Controller
         if (cart == null || cart.Carts.Count == 0) return RedirectToAction("Index", "Cart");
 
         var fullName = HttpContext.Session.GetString("FullName") ?? "";
-        var currentUser = HttpContext.Session.GetObject<object>("currentUser"); // nếu bạn muốn lấy email thì đổi object -> UserDto
+        var currentUser = HttpContext.Session.GetObject<object>("currentUser"); 
 
         var vm = new CheckoutVm
         {

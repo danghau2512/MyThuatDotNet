@@ -46,12 +46,12 @@ public class AccountController : Controller
         return RedirectToAction("Index", "Home");
     }
 
-    // ===== REGISTER =====
-    //[HttpGet]
-    //public IActionResult Register()
-    //{
-    //    return View(new RegisterVm());
-    //}
+     //===== REGISTER =====
+    [HttpGet]
+    public IActionResult Register()
+    {
+        return View(new RegisterVm());
+    }
 
     [HttpPost]
     [ValidateAntiForgeryToken]

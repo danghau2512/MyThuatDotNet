@@ -25,7 +25,7 @@ builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
     options.Cookie.Name = ".MyThuatShop.Session";
-    options.IdleTimeout = TimeSpan.FromHours(2); // giống JSP: đủ lâu để test
+    options.IdleTimeout = TimeSpan.FromSeconds(10); // giống JSP: đủ lâu để test
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });

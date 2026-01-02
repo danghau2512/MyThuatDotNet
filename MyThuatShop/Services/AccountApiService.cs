@@ -35,7 +35,7 @@ public class AccountApiService
             email = vm.Email,
             password = vm.Password,
             phoneNumber = vm.PhoneNumber,
-            address = vm.Address
+           
         });
 
         if (resp.IsSuccessStatusCode)

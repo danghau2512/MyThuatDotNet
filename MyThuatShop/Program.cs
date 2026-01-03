@@ -12,6 +12,7 @@ builder.Services.AddScoped<HomeApiService>();
 builder.Services.AddScoped<ProductAPIService>();
 builder.Services.AddScoped<OrderApiService>();
 builder.Services.AddHttpClient<AccountApiService>();
+builder.Services.AddSingleton<IVnPayService, VnPayService>();
 
 builder.Services.AddHttpClient<SearchApiService>((sp, client) =>
 {

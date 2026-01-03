@@ -58,4 +58,19 @@ public class OrderApiService
         var url = $"{baseUrl}/api/orders/{orderId}";
         return await client.GetFromJsonAsync<JsonElement>(url, _jsonOptions);
     }
+    public async Task<bool> ConfirmPaymentAsync(int orderId)
+    {
+        var baseUrl = _config["ApiBaseUrl"]?.TrimEnd('/');
+        if (string.IsNullOrWhiteSpace(baseUrl)) return false;
+
+        using var client = new HttpClient(new HttpClientHandler
+        {
+            ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+        });
+
+        var url = $"{baseUrl}/api/orders/confirm-payment";
+        var resp = await client.PostAsJsonAsync(url, orderId);
+
+        return resp.IsSuccessStatusCode;
+    }
 }

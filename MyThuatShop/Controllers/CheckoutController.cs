@@ -10,8 +10,13 @@ namespace MyThuatShop.Controllers;
 public class CheckoutController : Controller
 {
     private readonly OrderApiService _orderApi;
+    private readonly IVnPayService _vnPayService;
 
-    public CheckoutController(OrderApiService orderApi) => _orderApi = orderApi;
+    public CheckoutController(OrderApiService orderApi, IVnPayService vnPayService)
+    {
+        _orderApi = orderApi;
+        _vnPayService = vnPayService;
+    }
 
     [HttpGet("/checkout")]
     public IActionResult Index()
@@ -38,23 +43,19 @@ public class CheckoutController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> PlaceOrder(CheckoutVm vm)
     {
-        // 1. Kiểm tra đăng nhập
         if (!IsLoggedIn()) return RedirectToAction("Login", "Account");
         var userId = HttpContext.Session.GetInt32("UserId");
-
-        // 2. Lấy giỏ hàng lại từ Session để đảm bảo tính đúng đắn (không tin tưởng dữ liệu submit từ form về giá tiền)
         var cart = HttpContext.Session.GetObject<Cart>("cart");
         if (cart == null || cart.Carts.Count == 0) return RedirectToAction("Index", "Cart");
 
-        // 3. Validate dữ liệu
         if (!ModelState.IsValid)
         {
             vm.Cart = cart;
             vm.TotalAmount = cart.TotalAmount();
-            return View("Payment", vm); // Trả về View nếu lỗi
+            return View("Payment", vm);
         }
 
-        // 4. Tạo payload gửi sang API
+        // Tạo payload
         var payload = new
         {
             userId = userId.Value,
@@ -63,14 +64,15 @@ public class CheckoutController : Controller
             phoneNumber = vm.PhoneNumber,
             address = vm.Address,
             note = vm.Note,
-            paymentName = vm.PaymentMethod,
-            shippingFee = 0, // Có thể cập nhật logic phí ship sau
-            discount = 0,    // Có thể cập nhật logic voucher sau
+            paymentName = vm.PaymentMethod, // "COD" hoặc "VNPAY" lấy từ radio button
+            shippingFee = 0,
+            discount = 0,
             voucherId = (int?)null,
             items = cart.Carts.Values.Select(i => new { productId = i.ProductId, quantity = i.Quantity }).ToList()
         };
 
-        // 5. Gọi API
+        // 1. Gọi API Tạo đơn hàng
+        // Lưu ý: Do logic ở OrdersController đã sửa, nếu là VNPAY thì Order được tạo nhưng kho chưa trừ
         var (ok, orderId, message) = await _orderApi.CreateAsync(payload);
 
         if (!ok || orderId == null)
@@ -81,11 +83,47 @@ public class CheckoutController : Controller
             return View("Payment", vm);
         }
 
-        // 6. Thành công: Xóa giỏ hàng và chuyển trang
+        // 2. Phân nhánh xử lý Payment
+        if (vm.PaymentMethod == "VNPAY")
+        {
+            // Nếu là VNPay, chuyển hướng sang trang thanh toán
+            vm.TotalAmount = cart.TotalAmount();
+            var url = _vnPayService.CreatePaymentUrl(HttpContext, vm, orderId.Value);
+            return Redirect(url);
+        }
+
+        // Nếu là COD (thì API đã trừ kho rồi), xóa session và xong
         HttpContext.Session.Remove("cart");
         HttpContext.Session.SetInt32("cartCount", 0);
-
         return RedirectToAction("Success", new { orderId = orderId.Value });
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> PaymentCallback()
+    {
+        var response = _vnPayService.PaymentExecute(Request.Query);
+
+        if (response.Success && response.VnPayResponseCode == "00")
+        {
+            // Thanh toán thành công -> Gọi API Confirm để trừ kho và update status
+            var orderId = int.Parse(response.OrderId);
+            var result = await _orderApi.ConfirmPaymentAsync(orderId);
+
+            if (result)
+            {
+                // Xóa Session giỏ hàng
+                HttpContext.Session.Remove("cart");
+                HttpContext.Session.SetInt32("cartCount", 0);
+
+                TempData["Message"] = "Thanh toán VNPay thành công!";
+                return RedirectToAction("Success", new { orderId = orderId });
+            }
+        }
+
+        // Nếu thất bại hoặc chữ ký sai
+        TempData["Error"] = "Thanh toán thất bại hoặc có lỗi xảy ra.";
+        // Có thể redirect về trang Cart hoặc trang báo lỗi tùy bạn
+        return RedirectToAction("Index", "Cart");
     }
     [HttpGet("/checkout/success/{orderId:int}")]
     public async Task<IActionResult> Success(int orderId)

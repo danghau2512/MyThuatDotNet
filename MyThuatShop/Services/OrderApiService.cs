@@ -73,4 +73,26 @@ public class OrderApiService
 
         return resp.IsSuccessStatusCode;
     }
+    public async Task<(bool success, decimal discount, int? voucherId, string message)> CheckVoucherAsync(string code, decimal total)
+    {
+        var baseUrl = _config["ApiBaseUrl"]?.TrimEnd('/');
+        using var client = new HttpClient(new HttpClientHandler { ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator });
+
+        var url = $"{baseUrl}/api/vouchers/check?code={code}&orderTotal={total}";
+        var response = await client.GetAsync(url);
+
+        var content = await response.Content.ReadFromJsonAsync<JsonElement>();
+
+        if (response.IsSuccessStatusCode)
+        {
+            return (true, content.GetProperty("discount").GetDecimal(), content.GetProperty("voucherId").GetInt32(), "Áp dụng thành công");
+        }
+        else
+        {
+            // Lấy message lỗi từ API
+            string msg = "Mã không hợp lệ";
+            if (content.TryGetProperty("message", out var m)) msg = m.GetString() ?? msg;
+            return (false, 0, null, msg);
+        }
+    }
 }

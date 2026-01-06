@@ -16,7 +16,7 @@ public class OrdersController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateOrderRequestDto req)
     {
-        // --- KHỐI VALIDATE DỮ LIỆU ĐẦU VÀO (GIỮ NGUYÊN) ---
+        // 1. VALIDATE CƠ BẢN
         if (req.UserId <= 0) return BadRequest("UserId không hợp lệ.");
         if (req.Items == null || req.Items.Count == 0) return BadRequest("Giỏ hàng trống.");
         if (string.IsNullOrWhiteSpace(req.FullName)) return BadRequest("Thiếu họ tên.");
@@ -24,32 +24,26 @@ public class OrdersController : ControllerBase
         var userExists = await _db.Users.AnyAsync(u => u.Id == req.UserId);
         if (!userExists) return BadRequest("User không tồn tại.");
 
-        // [NEW] 1. Xác định xem có phải là thanh toán VNPay không
-        // Giả sử client gửi lên chuỗi "VNPAY" hoặc "ThanhToanVnPay" trong req.PaymentName
+        // 2. XỬ LÝ PAYMENT & STATUS
         bool isVnPay = req.PaymentName?.ToUpper().Contains("VNPAY") == true;
-
-        // 2. Xử lý Payment (fallback)
         var paymentName = string.IsNullOrWhiteSpace(req.PaymentName) ? "COD" : req.PaymentName.Trim();
 
-        // Nếu là VNPay nhưng trong DB chưa có payment tên đó, cẩn thận fallback về COD sẽ sai logic
-        // Tốt nhất nên đảm bảo DB bảng Payments đã có dòng "VNPAY"
         var payment = await _db.Payments.FirstOrDefaultAsync(p => p.PaymentName == paymentName)
-                       ?? await _db.Payments.FirstOrDefaultAsync(p => p.PaymentName == "COD")
-                       ?? await _db.Payments.FirstOrDefaultAsync();
+                        ?? await _db.Payments.FirstOrDefaultAsync(p => p.PaymentName == "COD")
+                        ?? await _db.Payments.FirstOrDefaultAsync();
 
         if (payment == null) return BadRequest("Chưa có dữ liệu Payments trong DB.");
 
         var status = await _db.OrderStatuses.FirstOrDefaultAsync(s => s.StatusName == "Đang xử lý")
-                  ?? await _db.OrderStatuses.FirstOrDefaultAsync();
+                    ?? await _db.OrderStatuses.FirstOrDefaultAsync();
 
         if (status == null) return BadRequest("Chưa có dữ liệu Order_Statuses trong DB.");
 
-        // 3. Load sản phẩm
+        // 3. LOAD SẢN PHẨM VÀ TÍNH TIỀN HÀNG (itemsTotal)
         var ids = req.Items.Select(i => i.ProductId).Distinct().ToList();
         var products = await _db.Products.Where(p => ids.Contains(p.Id)).ToListAsync();
         if (products.Count != ids.Count) return Conflict("Có sản phẩm không tồn tại.");
 
-        // 4. Validate tồn + Tính tiền
         decimal itemsTotal = 0m;
         var details = new List<OrderDetail>();
 
@@ -57,21 +51,16 @@ public class OrdersController : ControllerBase
         {
             var p = products.First(x => x.Id == it.ProductId);
 
-            if (!(p.IsActive ?? false))
-                return Conflict($"Sản phẩm '{p.Name}' đã ngừng bán.");
+            if (!(p.IsActive ?? false)) return Conflict($"Sản phẩm '{p.Name}' đã ngừng bán.");
 
             var stock = p.QuantityStock ?? 0;
-
-            // Vẫn phải kiểm tra tồn kho kể cả VNPay để đảm bảo lúc bấm nút mua là còn hàng
-            if (stock <= 0)
-                return Conflict($"Sản phẩm '{p.Name}' đã hết hàng.");
+            if (stock <= 0) return Conflict($"Sản phẩm '{p.Name}' đã hết hàng.");
 
             if (it.Quantity < 1) it.Quantity = 1;
-            if (it.Quantity > stock)
-                return Conflict($"Sản phẩm '{p.Name}' chỉ còn {stock}.");
+            if (it.Quantity > stock) return Conflict($"Sản phẩm '{p.Name}' chỉ còn {stock}.");
 
-            var discount = p.DiscountDefault ?? 0;
-            var unitPrice = p.Price * (1m - discount / 100m);
+            var discountProduct = p.DiscountDefault ?? 0;
+            var unitPrice = p.Price * (1m - discountProduct / 100m);
             itemsTotal += unitPrice * it.Quantity;
 
             details.Add(new OrderDetail
@@ -82,16 +71,45 @@ public class OrdersController : ControllerBase
             });
         }
 
-        var total = itemsTotal - req.Discount + req.ShippingFee;
-        if (total < 0) total = 0;
-
-        // 5. Transaction tạo đơn
+        // 4. TRANSACTION: XỬ LÝ VOUCHER -> TẠO ĐƠN -> TRỪ KHO
         using var tx = await _db.Database.BeginTransactionAsync();
         try
         {
-            // [NEW] 2. Set trạng thái thanh toán ban đầu
-            // Nếu là VNPay: "Chờ thanh toán VNPay"
-            // Nếu là COD: "Chưa thanh toán"
+            // --- [START] LOGIC VOUCHER MỚI ---
+            decimal voucherDiscount = 0;
+
+            // Nếu client có gửi VoucherId lên
+            if (req.VoucherId.HasValue && req.VoucherId > 0)
+            {
+                var voucher = await _db.Vouchers.FirstOrDefaultAsync(v => v.Id == req.VoucherId);
+
+                // Validate kỹ lại ở Backend (đề phòng hack request)
+                if (voucher == null) throw new Exception("Voucher không tồn tại.");
+                if (!(voucher.IsActive ?? false)) throw new Exception("Voucher đang bị khóa.");
+
+                var now = DateTime.Now;
+                if (now < voucher.StartDate || now > voucher.EndDate)
+                    throw new Exception("Voucher chưa bắt đầu hoặc đã hết hạn.");
+
+                if (voucher.QuantityUsed >= voucher.Quantity)
+                    throw new Exception("Voucher đã hết lượt sử dụng.");
+
+                if (itemsTotal < voucher.MinOrderValue)
+                    throw new Exception($"Đơn hàng chưa đủ {voucher.MinOrderValue.ToString("#,##0")}đ để dùng voucher này.");
+
+                // Nếu thỏa mãn hết điều kiện:
+                voucherDiscount = voucher.VoucherCash; // Lấy số tiền giảm
+
+                // Tăng số lượt đã dùng lên 1
+                voucher.QuantityUsed = voucher.QuantityUsed + 1;
+            }
+            // --- [END] LOGIC VOUCHER ---
+
+
+            // Tính tổng tiền cuối cùng (Server tự tính, không tin tưởng req.Discount từ client)
+            var finalTotal = itemsTotal - voucherDiscount + req.ShippingFee;
+            if (finalTotal < 0) finalTotal = 0;
+
             string initialPaymentStatus = isVnPay ? "Chờ thanh toán VNPay" : "Chưa thanh toán";
 
             var order = new Order
@@ -106,26 +124,27 @@ public class OrdersController : ControllerBase
                 PaymentId = payment.Id,
                 OrderStatusId = status.Id,
 
-                VoucherId = req.VoucherId,
-                Discount = req.Discount,
+                // Lưu thông tin Voucher vào đơn hàng
+                VoucherId = (req.VoucherId.HasValue && req.VoucherId > 0) ? req.VoucherId : null,
+                Discount = voucherDiscount, // Lưu số tiền thực tế server tính được
                 ShippingFee = req.ShippingFee,
 
-                TotalPrice = total,
-                PaymentStatus = initialPaymentStatus, // [UPDATED]
+                TotalPrice = finalTotal,
+                PaymentStatus = initialPaymentStatus,
                 CreateAt = DateTime.Now
             };
 
             _db.Orders.Add(order);
-            await _db.SaveChangesAsync(); // Lưu để có OrderId
+            await _db.SaveChangesAsync(); // Lưu để sinh OrderId
 
+            // Lưu chi tiết đơn hàng & Trừ kho (theo logic VNPay/COD)
             foreach (var d in details)
             {
                 d.OrderId = order.Id;
                 _db.OrderDetails.Add(d);
 
-                // [NEW] 3. Logic trừ kho có điều kiện
-                // Nếu KHÔNG phải VNPay (tức là COD) -> Trừ kho ngay lập tức
-                // Nếu LÀ VNPay -> Giữ nguyên kho, chờ callback confirm mới trừ
+                // Nếu COD thì trừ kho ngay. 
+                // Nếu VNPay thì CHƯA trừ kho (chờ confirm).
                 if (!isVnPay)
                 {
                     var p = products.First(x => x.Id == d.ProductId);
@@ -139,10 +158,13 @@ public class OrdersController : ControllerBase
 
             return Ok(new { success = true, orderId = order.Id });
         }
-        catch
+        catch (Exception ex)
         {
             await tx.RollbackAsync();
-            throw;
+            var innerMessage = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
+
+            // Trả về lỗi chi tiết để hiện lên web
+            return BadRequest(new { success = false, message = "Lỗi DB: " + innerMessage });
         }
     }
     [HttpPost("confirm-payment")]

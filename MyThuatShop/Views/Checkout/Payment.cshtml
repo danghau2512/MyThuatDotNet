@@ -665,32 +665,88 @@ button[type="submit"]:hover {
 
             <div class="discount-section">
                 <div class="discount-input-group">
-                    <input type="text" placeholder="Mã giảm giá">
-                    <button type="button" class="btn-apply">Sử dụng</button>
+                    <input type="text" id="voucherCode" name="AppliedVoucherCode" placeholder="Mã giảm giá" value="@Model.AppliedVoucherCode">
+                    <button type="button" class="btn-apply" onclick="applyVoucher()">Sử dụng</button>
                 </div>
-            </div>
+                <small id="voucherMessage" class="text-danger" style="display:block; margin-top:5px;"></small>
 
+                <input type="hidden" id="hiddenVoucherId" name="VoucherId" value="@Model.VoucherId" />
+                <input type="hidden" id="hiddenDiscount" name="DiscountAmount" value="@Model.DiscountAmount" />
+            </div>
             <div class="price-summary">
                 <div class="price-row">
                     <span>Tạm tính</span>
                     <span>@Model.TotalAmount.ToString("#,##0")₫</span>
                 </div>
-
-                <div class="price-row">
-                    <span>Giảm giá</span>
-                    <span>0₫</span>
-                </div>
+                <div class="price-summary">
+                    <div class="price-row">
+                        <span>Giảm giá</span>
+                        <span id="displayDiscount">@Model.DiscountAmount.ToString("#,##0")₫</span>
+                    </div>
 
                 <div class="price-row">
                     <span>Phí vận chuyển</span>
                     <span>0₫</span>
                 </div>
+                    <div class="price-row total">
+                        <span>Tổng cộng</span>
+                        <span class="total-amount" id="displayTotal">
+                            @((Model.TotalAmount - Model.DiscountAmount).ToString("#,##0"))₫
+                        </span>
+                    </div>
 
-                <div class="price-row total">
-                    <span>Tổng cộng</span>
-                    <span class="total-amount">@Model.TotalAmount.ToString("#,##0")₫</span>
-                </div>
+            
             </div>
-        </div>
+        
     </div>
 </nav>
+@section Scripts {
+    <script>
+        function applyVoucher() {
+            var code = document.getElementById("voucherCode").value;
+            var msg = document.getElementById("voucherMessage");
+
+            if (!code) {
+                msg.className = "text-danger";
+                msg.innerText = "Vui lòng nhập mã giảm giá";
+                return;
+            }
+
+            // Gọi Ajax sang CheckoutController
+            fetch('/Checkout/ApplyVoucher?code=' + code)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // 1. Hiện thông báo xanh
+                        msg.className = "text-success";
+                        msg.innerText = data.message;
+
+                        // 2. Cập nhật UI giá tiền
+                        document.getElementById("displayDiscount").innerText = new Intl.NumberFormat('vi-VN').format(data.discount) + "₫";
+                        document.getElementById("displayTotal").innerText = new Intl.NumberFormat('vi-VN').format(data.newTotal) + "₫";
+
+                        // 3. Cập nhật Input ẩn để submit
+                        document.getElementById("hiddenVoucherId").value = data.voucherId;
+                        document.getElementById("hiddenDiscount").value = data.discount;
+                    } else {
+                        // Hiện lỗi đỏ (Hết hạn, không đủ tiền...)
+                        msg.className = "text-danger";
+                        msg.innerText = data.message;
+
+                        // Reset về 0
+                        resetVoucherUI();
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    msg.innerText = "Có lỗi xảy ra, vui lòng thử lại.";
+                });
+        }
+
+        function resetVoucherUI() {
+            document.getElementById("displayDiscount").innerText = "0₫";
+            document.getElementById("hiddenVoucherId").value = "";
+            document.getElementById("hiddenDiscount").value = "0";
+        }
+    </script>
+}

@@ -25,4 +25,8 @@ public class CheckoutVm
     // Dữ liệu hiển thị (chỉ đọc)
     public Cart? Cart { get; set; }
     public decimal TotalAmount { get; set; }
+    public int? VoucherId { get; set; } // ID của voucher nếu áp dụng thành công
+    public decimal DiscountAmount { get; set; } = 0; // Số tiền giảm
+    public string? AppliedVoucherCode { get; set; } // Mã code để hiển thị lại nếu reload
 }
+

@@ -1,4 +1,5 @@
-﻿using MyThuatShop.Helpers;
+﻿using MyThuatShop.Helpers; 
+using MyThuatShop.Models;
 using MyThuatShop.ViewModels.Checkout;
 
 

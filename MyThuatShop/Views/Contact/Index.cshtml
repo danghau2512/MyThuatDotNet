@@ -1,0 +1,200 @@
+﻿@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Liên hệ";
+
+    var fullName = ViewBag.FullName as string ?? "";
+    var email = ViewBag.Email as string ?? "";
+    var phone = ViewBag.PhoneNumber as string ?? "";
+
+    var successMsg = TempData["SuccessMsg"] as string;
+    var errorMsg = TempData["ErrorMsg"] as string;
+}
+
+@section Styles {
+    <style>
+        #header-trang-chu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+        }
+
+        .hearder-lienhe {
+            background: #DBE8FF;
+            color: #17479d;
+            font-weight: 500;
+            font-size: 16px;
+            padding: 12px 40px;
+            border-bottom: 1px solid #e5e7eb;
+            margin-top: 100px;
+            margin-bottom: 0;
+        }
+
+        .page-contact {
+            padding-top: 24px;
+            padding-bottom: 120px;
+        }
+
+        .container-all {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            gap: 24px;
+            padding: 0 16px;
+            border: 1px solid #e8edf3;
+            border-radius: 12px;
+            background: #fff;
+        }
+
+        .container-left, .container-right {
+            flex: 50%;
+            border: none;
+        }
+
+        .card {
+            padding: 18px;
+            padding-top: 20px;
+        }
+
+        .form-title {
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #0b234d;
+            letter-spacing: .2px;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-control {
+            width: 100%;
+            height: 36px;
+            border: 1px solid #d7dee8;
+            border-radius: 8px;
+            padding: 6px 10px;
+            font-size: 15px;
+            outline: none;
+            background: #fff;
+        }
+
+            .form-control:focus {
+                border-color: #17479d;
+                box-shadow: 0 0 0 3px rgba(23,71,157,.12);
+            }
+
+        textarea.form-control {
+            height: 160px;
+            resize: vertical;
+        }
+
+        .btn-lienhe {
+            background: #17479d;
+            color: #fff;
+            border: none;
+            border-radius: 28px;
+            padding: 12px 20px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+        }
+
+            .btn-lienhe:hover {
+                background: #0c357c;
+            }
+
+        .map-card {
+            padding-top: 50px;
+        }
+
+            .map-card iframe {
+                width: 100%;
+                height: 520px;
+                border: 0;
+                border-radius: 12px;
+            }
+
+        .alert-success {
+            margin-bottom: 12px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            background: #dcfce7;
+            color: #166534;
+            font-weight: 500;
+        }
+
+        .alert-error {
+            margin-bottom: 12px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            background: #fee2e2;
+            color: #991b1b;
+            font-weight: 500;
+        }
+    </style>
+}
+
+<div class="hearder-lienhe">Trang chủ / Thông tin liên hệ</div>
+
+<main class="page-contact">
+    <div class="container-all">
+        <div class="container-left">
+            <div class="card">
+                <h1>Thienlong.com - Tập đoàn Thiên Long</h1>
+
+                <div style="margin:12px 0 16px;color:#273142;line-height:1.6">
+                    <div>
+                        <i class="fa-solid fa-location-dot" style="color:#17479d;margin-right:8px"></i>
+                        Địa chỉ: Tầng 2, Chung cư An Bình, Đường Lê Trọng Tấn, Phường An Bình, TX.Dĩ An, Tỉnh Bình Dương, Việt Nam
+                    </div>
+                    <div><i class="fa-solid fa-phone" style="color:#17479d;margin-right:8px"></i> Số điện thoại: 0369897344</div>
+                    <div>
+                        <i class="fa-solid fa-envelope" style="color:#17479d;margin-right:8px"></i>
+                        Email: <a href="mailto:BaOngNau@gmail.com.vn">BaOngNau@gmail.com.vn</a>
+                    </div>
+                </div>
+
+                <div class="form-title">LIÊN HỆ VỚI CHÚNG TÔI</div>
+
+                @if (!string.IsNullOrWhiteSpace(successMsg))
+                {
+                    <div class="alert-success">@successMsg</div>
+                }
+                @if (!string.IsNullOrWhiteSpace(errorMsg))
+                {
+                    <div class="alert-error">@errorMsg</div>
+                }
+
+                <form asp-controller="Contact" asp-action="Index" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <div class="form-group">
+                        <input class="form-control" type="text" name="fullname" value="@fullName" placeholder="Họ tên" readonly />
+                    </div>
+
+                    <div class="form-group">
+                        <input class="form-control" type="email" name="email" value="@email" placeholder="Email" readonly />
+                    </div>
+
+                    <div class="form-group">
+                        <input class="form-control" type="tel" name="phone" value="@phone" placeholder="Số điện thoại" readonly />
+                    </div>
+
+                    <div class="form-group">
+                        <textarea class="form-control" name="message" placeholder="Nhập nội dung" required></textarea>
+                    </div>
+
+                    <button class="btn-lienhe" type="submit">Gửi liên hệ của bạn</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="container-right">
+            <div class="card map-card">
+                <iframe src="https://www.google.com/maps?q=10%20Mai%20Chi%20Tho,%20Thu%20Thiem,%20Thu%20Duc,%20Ho%20Chi%20Minh&hl=vi&z=16&output=embed"
+                        allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+                </iframe>
+            </div>
+        </div>
+    </div>
+</main>

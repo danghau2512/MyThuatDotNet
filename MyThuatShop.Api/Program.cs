@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MyThuatShop.Api.Data; 
+using MyThuatShop.Api.Data;
+using MyThuatShop.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,7 +14,10 @@ builder.Services.AddDbContext<MyThuatDotNetContext>(options =>
     options.UseMySql(cs, ServerVersion.AutoDetect(cs));
 });
 
-// CORS để MVC gọi API 
+// ✅ BẮT BUỘC: đăng ký DI cho IEmailSender
+builder.Services.AddScoped<IEmailSender, SmtpEmailSender>();
+
+// CORS để MVC gọi API
 builder.Services.AddCors(opt =>
 {
     opt.AddPolicy("AllowAll", p => p.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());

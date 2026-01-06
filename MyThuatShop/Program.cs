@@ -78,6 +78,7 @@ else
     // Không cấu hình Google thì bỏ qua, app vẫn chạy được.
     // (có thể log ra Warning nếu bạn muốn)
 }
+builder.Services.AddHttpClient<ContactApiService>();
 
 var app = builder.Build();
 

@@ -1,0 +1,696 @@
+@model MyThuatShop.ViewModels.Checkout.CheckoutVm
+@{
+    ViewData["Title"] = "Thanh toán";
+    Layout = "_Layout";
+}
+@section Styles {
+    <style>
+  .container {
+  width: 1200px;
+  margin: auto;
+}
+
+
+
+
+  .breadcrumb {
+    background-color: #f0f4f8;
+    padding: 1rem 2.5rem;
+    font-size: 0.95rem;
+    margin-top: 20px; 
+    margin-bottom: 20px;
+    border-radius: 6px;
+    width: fit-content; 
+    margin-left: 2rem; 
+}
+
+.breadcrumb a {
+    color: #17479d;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.breadcrumb a:hover {
+    color: #0d2a5e;
+    text-decoration: underline;
+}
+
+.breadcrumb span {
+    color: #666;
+    margin: 0 0.5rem;
+}
+
+    .checkout-container {
+        max-width: 1200px;
+        margin: 1.5rem auto;
+        padding: 0 1.5rem;
+        display: grid;
+        grid-template-columns: 1fr 400px;
+        gap: 1.5rem;
+        align-items: start;
+    }
+
+    /* infor - Shipping Info Card */
+    .form-infor-checkout {
+        background: #ffffff;
+        border-radius: 8px;
+        padding: 24px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e5e7eb;
+    }
+
+    .form-infor-checkout h4.infor-delivery-label {
+        font-size: 1.25rem;
+        margin: 0 0 20px 0;
+        font-weight: 600;
+        color: #111827;
+    }
+
+    .form-infor-checkout p {
+        color: #6b7280;
+        font-size: 0.9rem;
+    }
+
+    .form-infor-checkout form {
+        margin-top: 0;
+    }
+
+    /* Input groups */
+    .input-group {
+        margin-bottom: 14px;
+    }
+
+    .input-group label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #374151;
+        margin-bottom: 6px;
+    }
+
+    .form-input-item {
+        width: 100%;
+        padding: 10px 14px;
+        border-radius: 6px;
+        border: 1px solid #d1d5db;
+        background: #ffffff;
+        font-size: 0.9rem;
+        color: #1f2937;
+        box-sizing: border-box;
+        transition: all 0.2s ease;
+    }
+
+    .form-input-item:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.08);
+    }
+
+    .form-input-item::placeholder {
+        color: #9ca3af;
+        font-size: 0.875rem;
+    }
+
+/* Error/Success messages */
+#error_email,
+#error_phone {
+    display: none;
+    font-size: 0.875rem;
+    margin-top: 6px;
+    font-weight: 500;
+}
+
+/* Row layout for email and phone */
+.form-infor-checkout .row {
+    display: flex;
+    gap: 16px;
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.form-infor-checkout .col-md-6 {
+    flex: 1;
+    padding: 0;
+}
+
+/* Note section */
+.note {
+    margin-top: 16px;
+    margin-bottom: 16px;
+}
+
+.note label.bold {
+    display: block;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 8px;
+    background: #f3f4f6;
+    padding: 8px 12px;
+    border-radius: 6px;
+}
+
+.form-control {
+    width: 100%;
+    min-height: 120px;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    background: #ffffff;
+    resize: vertical;
+    box-sizing: border-box;
+    font-family: inherit;
+    font-size: 0.95rem;
+}
+
+.form-control::placeholder {
+    color: #9ca3af;
+}
+
+/* Checkbox section */
+.export-bill {
+    margin-top: 16px;
+    margin-bottom: 24px;
+}
+
+.check-export {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.export-bill input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.export-bill .label1 {
+    color: #374151;
+    font-size: 0.95rem;
+    cursor: pointer;
+    margin: 0;
+}
+
+/* Payment Method */
+.payment-method {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.payment-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 12px;
+}
+
+.payment-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.payment-option {
+    display: flex;
+    align-items: center;
+    padding: 14px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.payment-option:hover {
+    border-color: #2659F3;
+    background-color: #f0f9ff;
+}
+
+.payment-option input[type="radio"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    margin-right: 12px;
+    accent-color: #2659F3;
+}
+
+.payment-option input[type="radio"]:checked ~ .payment-content {
+    color: #2659F3;
+}
+
+.payment-option:has(input[type="radio"]:checked) {
+    border-color: #2659F3;
+    background-color: #f0f9ff;
+}
+
+.payment-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+}
+
+.payment-content img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+}
+
+.payment-content span {
+    font-size: 0.95rem;
+    color: #374151;
+    font-weight: 500;
+}
+
+/* Continue button - Orange style */
+.btn-continue,
+button[type="submit"] {
+    display: inline-block;
+    background: #2659F3;
+    color: white;
+    padding: 14px 28px;
+    border-radius: 8px;
+    border: none;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    width: 100%;
+    text-align: center;
+}
+
+.btn-continue:hover,
+button[type="submit"]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px #17479d;
+}
+.total-amount {
+    color: #ef4444;
+    font-size: 25px;
+    font-weight: 700;
+}
+
+    /* Order Summary - Right Column */
+.order-summary {
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+    height: fit-content;
+}
+    .cart-title {
+        font-size: 1.125rem;
+        color: #111827;
+        margin: 0 0 20px 0;
+        font-weight: 600;
+        display: block;
+    }
+
+    /* Cart Items */
+
+.cart-items {
+    margin-bottom: 20px;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 16px;
+}
+
+.cart-item {
+    display: flex;
+    gap: 15px;
+    padding: 15px 0;
+    align-items: center;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.cart-item:last-child {
+    border-bottom: none;
+}
+
+
+.item-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+    flex-shrink: 0;
+    border: 1px solid #e5e7eb;
+}
+
+.item-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+
+.item-quantity {
+    position: absolute;
+    top: -8px;
+    left: -8px;
+    background-color: #fdecec; 
+    color: #ef4444;             
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;         
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    border: 1px solid #fbcaca; 
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+
+.item-details {
+    flex: 1;
+}
+
+.item-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.item-name {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #111827;
+    margin: 0;
+    line-height: 1.3;
+    max-width: 250px;
+    text-align: left;
+}
+
+.item-price {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #ef4444;
+    white-space: nowrap;
+}
+
+
+    /* Discount Section */
+    .discount-section {
+        margin-bottom: 20px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .discount-section label {
+        display: block;
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin-bottom: 8px;
+        font-weight: 500;
+    }
+
+    .discount-input-group {
+        display: flex;
+        gap: 8px;
+    }
+
+    .discount-input-group input {
+        flex: 1;
+        padding: 10px 14px;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        transition: all 0.2s ease;
+    }
+
+    .discount-input-group input:focus {
+        outline: none;
+        border-color: #2659F3;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.08);
+    }
+
+    .discount-input-group input::placeholder {
+        color: #9ca3af;
+    }
+
+    .btn-apply {
+        padding: 10px 20px;
+        background: #2659F3;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+    }
+
+    .btn-apply:hover {
+        background: #2563eb;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+
+    .btn-apply:active {
+        transform: translateY(0);
+    }
+
+    /* Price Summary */
+    .price-summary {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .price-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 1.125rem;
+        color: #6b7280;
+    }
+
+    .price-row.total {
+        padding-top: 12px;
+        border-top: 2px solid #e5e7eb;
+        margin-top: 8px;
+        font-size: 1.125rem;
+        color: #111827;
+        font-weight: 700;
+    }
+
+    .price-row.total .price-value {
+        color: #ef4444;
+        font-size: 1.25rem;
+    }
+
+    .price-value {
+        font-weight: 600;
+        color: #111827;
+        
+    }
+    a{
+        text-decoration: none;
+        width: 100%;
+    }
+
+        .text-danger {
+            color: #dc3545;
+            font-size: 0.875rem;
+            margin-top: 5px;
+            display: block;
+        }
+
+/* Responsive Design */
+@@media (max-width: 992px) {
+    .checkout-container {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .order-summary {
+        position: static;
+    }
+}
+
+@@media (max-width: 576px) {
+    .checkout-container {
+        padding: 0 1rem;
+    }
+
+    .form-infor-checkout,
+    .order-summary {
+        padding: 20px;
+    }
+
+    .item-image {
+        width: 60px;
+        height: 60px;
+    }
+
+    .cart-title {
+        font-size: 18px;
+    }
+}
+
+.des-heading a {
+    color: red;
+}
+
+.breadcrumb {
+    background-color: var(--bg-body-home);
+    padding: 0px;
+}
+
+.breadcrumb-item.active {
+    color: #252222;
+}
+
+.order-summary {
+    border-left: 1px solid #e5e7eb;
+    padding-left: 24px;
+}
+
+/* Responsive */
+@@media (max-width: 992px) {
+    .form-infor-checkout .row {
+        flex-direction: column;
+        gap: 0;
+    }
+    
+    .form-infor-checkout {
+        padding: 20px;
+    }
+}
+
+
+</style>
+}
+<nav>
+    <div class="breadcrumb">
+        <a href="@Url.Action("Index", "Cart")">Giỏ hàng</a>
+        <span>/</span>
+        <span>Thông tin giao hàng</span>
+    </div>
+
+    <div class="checkout-container">
+        <form asp-action="PlaceOrder" method="post" class="checkout-form-wrapper" style="display: contents;">
+
+            <div class="form-infor-checkout">
+                <h4 class="infor-delivery-label">Thông tin giao hàng</h4>
+
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <div class="input-group">
+                    <label asp-for="FullName">Họ và tên</label>
+                    <input asp-for="FullName" class="form-input-item" placeholder="Họ và tên">
+                    <span asp-validation-for="FullName" class="text-danger"></span>
+                </div>
+
+                <div class="row">
+                    <div class="input-group col-md-6">
+                        <label asp-for="Email">Email</label>
+                        <input asp-for="Email" class="form-input-item" placeholder="Email">
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                    <div class="input-group col-md-6">
+                        <label asp-for="PhoneNumber">Số điện thoại</label>
+                        <input asp-for="PhoneNumber" class="form-input-item" placeholder="Số điện thoại">
+                        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label asp-for="Address">Địa chỉ</label>
+                    <input asp-for="Address" class="form-input-item" placeholder="Địa chỉ giao hàng">
+                    <span asp-validation-for="Address" class="text-danger"></span>
+                </div>
+
+                <div class="note">
+                    <label asp-for="Note" class="bold">Ghi chú đơn hàng</label>
+                    <textarea asp-for="Note" class="form-control" rows="5" placeholder="Ghi chú (tùy chọn)..."></textarea>
+                </div>
+
+                <div class="payment-method">
+                    <h4 class="payment-title">Phương thức thanh toán</h4>
+                    <div class="payment-options">
+
+                        <label class="payment-option">
+                            <input type="radio" asp-for="PaymentMethod" value="COD" checked>
+                            <div class="payment-content">
+                                <img src="~/images/logo/cod.svg" alt="COD" onerror="this.src='https://placehold.co/40x40?text=COD'">
+                                <span>Thanh toán khi nhận hàng (COD)</span>
+                            </div>
+                        </label>
+
+                        <label class="payment-option">
+                            <input type="radio" asp-for="PaymentMethod" value="VNPAY">
+                            <div class="payment-content">
+                                <img src="~/images/logo/OIP.webp" alt="VNPay" onerror="this.src='https://placehold.co/40x40?text=VNPAY'">
+                                <span>Thanh toán qua VNPay</span>
+                            </div>
+                        </label>    
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-continue">Thanh toán ngay</button>
+            </div>
+        </form>
+
+        <div class="order-summary">
+            <h4 class="cart-title">Giỏ hàng (@(Model.Cart?.Carts.Count ?? 0) sản phẩm)</h4>
+
+            <div class="cart-items">
+                @if (Model.Cart != null && Model.Cart.Carts.Any())
+                {
+                    foreach (var item in Model.Cart.Carts.Values)
+                    {
+                        <div class="cart-item">
+                            <div class="item-image">
+                                <img src="@item.Thumbnail" alt="@item.Name" onerror="this.src='https://placehold.co/80x80'">
+                                <span class="item-quantity">@item.Quantity</span>
+                            </div>
+                            <div class="item-details">
+                                <h5 class="item-name">@item.Name</h5>
+
+                                <p class="item-price">@item.SubTotal.ToString("#,##0")₫</p>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p>Giỏ hàng trống</p>
+                }
+            </div>
+
+            <div class="discount-section">
+                <div class="discount-input-group">
+                    <input type="text" placeholder="Mã giảm giá">
+                    <button type="button" class="btn-apply">Sử dụng</button>
+                </div>
+            </div>
+
+            <div class="price-summary">
+                <div class="price-row">
+                    <span>Tạm tính</span>
+                    <span>@Model.TotalAmount.ToString("#,##0")₫</span>
+                </div>
+
+                <div class="price-row">
+                    <span>Giảm giá</span>
+                    <span>0₫</span>
+                </div>
+
+                <div class="price-row">
+                    <span>Phí vận chuyển</span>
+                    <span>0₫</span>
+                </div>
+
+                <div class="price-row total">
+                    <span>Tổng cộng</span>
+                    <span class="total-amount">@Model.TotalAmount.ToString("#,##0")₫</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>

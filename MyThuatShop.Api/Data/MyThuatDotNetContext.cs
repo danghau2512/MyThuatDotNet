@@ -416,6 +416,9 @@ public partial class MyThuatDotNetContext : DbContext
                 .HasMaxLength(20)
                 .HasDefaultValueSql("'user'")
                 .HasColumnName("role");
+            entity.Property(e => e.RandomKey)
+                .HasMaxLength(50)
+                .HasColumnName("randomKey");
         });
 
         modelBuilder.Entity<Voucher>(entity =>

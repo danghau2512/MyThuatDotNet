@@ -3,875 +3,170 @@
     ViewData["Title"] = "Đăng nhập";
     Layout = "_Layout";
 }
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đăng Nhập</title>
-
-    <link rel="stylesheet" href="./assets/css/style.css">
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
-          integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
-          crossorigin="anonymous" referrerpolicy="no-referrer" />
-</head>
-
+@section Styles {
     <style>
-    .container {
-        width: 1200px;
-        margin: auto;
-    }
-
-    /* Begin header */
-    #header-trang-chu {
-        background-color: var(--color-main);
-        display: flex;
-        align-items: center;
-        position: fixed;
-        z-index: 999;
-        width: 100%;
-    }
-
-    #header-trang-chu .logo-trang-chu {
-        margin-left: 50px;
-        margin-right: 50px;
-        margin-top: 25px;
-        margin-bottom: 25px;
-    }
-
-    #header-trang-chu .logo-trang-chu img {
-        background-color: transparent;
-        width: 200px;
-        height: 100%;
-    }
-
-    #header-trang-chu .tim-kiem-san-pham {
-        position: relative;
-    }
-
-    #header-trang-chu .tim-kiem-san-pham input {
-        padding: 10px 15px;
-        width: 600px;
-        border-radius: 10px;
-        border: none;
-    }
-
-    #header-trang-chu .tim-kiem-san-pham {
-        display: flex;
-    }
-
-    #header-trang-chu .tim-kiem-san-pham i {
-        position: absolute;
-        right: 0;
-        width: 50px;
-        height: 100%;
-        background-color: #0b234d;
-        line-height: 40px;
-        cursor: pointer;
-        color: white;
-        border-top-right-radius: 10px;
-        border-bottom-right-radius: 10px;
-    }
-
-    #header-trang-chu .header-contact {
-        display: flex;
-        align-items: center;
-    }
-
-    #header-trang-chu .header-contact i {
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        background-color: #0b234d;
-        line-height: 30px;
-        color: white;
-    }
-
-    #header-trang-chu .header-contact {
-        margin-left: 100px;
-        margin-right: 50px;
-        cursor: pointer;
-    }
-
-    #header-trang-chu .header-contact .contact {
-        margin-left: 15px;
-    }
-
-    #header-trang-chu .header-contact .contact .contact-phone-number {
-        color: white;
-        font-weight: 600;
-        font-size: 18px;
-    }
-
-    #header-trang-chu .header-contact .contact .contact-phone-help {
-        color: white;
-        font-size: 16px;
-    }
-
-    #header-trang-chu .header-dangnhap-dangki {
-        display: flex;
-        align-items: center;
-        cursor: pointer;
-    }
-
-    #header-trang-chu .header-dangnhap-dangki i {
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        background-color: #0b234d;
-        line-height: 30px;
-        color: white;
-    }
-
-    #header-trang-chu .header-dangnhap-dangki {
-        margin-right: 50px;
-    }
-
-    #header-trang-chu .header-dangnhap-dangki .dangnhap-dangki {
-        margin-left: 15px;
-    }
-
-    #header-trang-chu .header-dangnhap-dangki .dangnhap-dangki .dangnhap {
-        color: white;
-        font-weight: 600;
-        font-size: 18px;
-    }
-
-    #header-trang-chu .header-dangnhap-dangki .dangnhap-dangki .dangki {
-        color: white;
-        font-size: 16px;
-    }
-
-    #header-trang-chu .header-giohang {
-        font-size: 25px;
-        color: white;
-        position: relative;
-        cursor: pointer;
-    }
-
-    #header-trang-chu .header-giohang::after {
-        display: inline-flex;
-        content: "0";
-        width: 20px;
-        height: 20px;
-        left: 20px;
-        bottom: 15px;
-        justify-content: center;
-        align-items: center;
-        font-size: 15px;
-        background-color: red;
-        position: absolute;
-        border-radius: 50%;
-    }
-
-    /* End header */
-    /* Begin footer */
-    #footer-trang-chu {
-        display: flex;
-        background-color: #17479d;
-        border-top-left-radius: 70px;
-        border-top-right-radius: 70px;
-        gap: 30px;
-        align-items: center;
-        justify-content: space-around;
-        position: relative;
-    }
-
-    #footer-trang-chu .footer-title {
-        text-align: justify;
-        margin-left: 30px;
-    }
-
-    #footer-trang-chu .footer-title .img-main {
-        background-color: transparent;
-        width: 400px;
-    }
-
-    #footer-trang-chu .footer-title .footer-title-header {
-        color: #fbe263;
-    }
-
-    #footer-trang-chu .footer-title .footer-title-description {
-        color: white;
-    }
-
-    #footer-trang-chu .footer-title .footer-title-form {
-        position: relative;
-    }
-
-    #footer-trang-chu .footer-title .footer-title-form input {
-        padding: 10px 15px;
-        border-radius: 10px;
-        width: 300px;
-        border: none;
-    }
-
-    #footer-trang-chu .footer-title .footer-title-form a {
-        position: absolute;
-        display: inline-flex;
-        width: 100px;
-        height: 36px;
-        background-color: #0b234d;
-        border-top-right-radius: 10px;
-        border-bottom-right-radius: 10px;
-        top: 0;
-        right: 69px;
-        justify-content: center;
-        align-items: center;
-        text-decoration: none;
-        color: white;
-    }
-
-    #footer-trang-chu .footer-title .img-footer {
-        width: 250px;
-        margin-top: 15px;
-        cursor: pointer;
-        margin-bottom: 50px;
-    }
-
-    #footer-trang-chu .footer-diachi {
-        width: 25%;
-    }
-
-    #footer-trang-chu .footer-diachi h2 {
-        font-size: 20px;
-        color: #fbe263;
-        margin: 0;
-    }
-
-    #footer-trang-chu .footer-diachi span {
-        color: #fbe263;
-        display: block;
-        padding-top: 15px;
-    }
-
-    #footer-trang-chu .footer-diachi .footer-diachi-header {
-        display: inline;
-        color: white;
-    }
-
-    #footer-trang-chu .footer-diachi .footer-diachi-description {
-        display: inline;
-        color: white;
-    }
-
-    #footer-trang-chu .footer-diachi .img-main {
-        display: block;
-        margin-top: 20px;
-    }
-
-    #footer-trang-chu .footer-help h2 {
-        font-size: 20px;
-        color: #fbe263;
-        margin: 0;
-    }
-
-    #footer-trang-chu .footer-help span {
-        display: block;
-        color: #fbe263;
-        padding-top: 15px;
-    }
-
-    #footer-trang-chu .footer-help .footer-help-header {
-        display: inline;
-        color: white;
-    }
-
-    #footer-trang-chu .footer-help .footer-help-header-list a {
-        display: block;
-        text-decoration: none;
-        color: white;
-        line-height: 1.4;
-    }
-
-    #footer-trang-chu .footer-diachi .img-main {
-        cursor: pointer;
-    }
-
-    #footer-trang-chu .footer-information h2 {
-        font-size: 20px;
-        color: #fbe263;
-        margin: 0;
-    }
-
-    #footer-trang-chu .footer-information .footer-information-header-list a {
-        display: block;
-        color: white;
-        text-decoration: none;
-        line-height: 1.4;
-    }
-
-    #footer-trang-chu .footer-information .footer-information-socials {
-        padding-top: 35px;
-    }
-
-    #footer-trang-chu .footer-information .footer-information-socials i {
-        width: 50px;
-        height: 50px;
-        background: white;
-        border-radius: 50%;
-        line-height: 50px;
-        font-size: 25px;
-        color: #17479d;
-    }
-
-    #footer-trang-chu .footer-information .footer-information-socials i:nth-child(1) {
-        margin-right: 10px;
-    }
-
-    #footer-trang-chu::after {
-        display: block;
-        position: absolute;
-        content: "2025 © Thienlong.vn - Bản quyền thuộc Tập đoàn Thiên Long";
-        bottom: 0;
-        color: white;
-    }
-
-    /* End footer */
-
-    #header-trang-chu {
-        background-color: var(--color-main);
-        display: flex;
-        align-items: center;
-        position: fixed;
-        z-index: 999;
-        top: 0;
-        width: 100%;
-    }
-
-    #header-trang-chu .logo-trang-chu {
-        margin-left: 50px;
-        margin-right: 50px;
-        margin-top: 25px;
-        margin-bottom: 25px;
-    }
-
-    #header-trang-chu .logo-trang-chu img {
-        background-color: transparent;
-        width: 200px;
-        height: 100%;
-
-    }
-
-    #header-trang-chu .tim-kiem-san-pham {
-        position: relative;
-    }
-
-    #header-trang-chu .tim-kiem-san-pham input {
-        padding: 10px 15px;
-        width: 600px;
-        border-radius: 10px;
-        border: none;
-    }
-
-    #header-trang-chu .tim-kiem-san-pham {
-        display: flex;
-
-    }
-
-    #header-trang-chu .tim-kiem-san-pham i {
-        position: absolute;
-        right: 0;
-        width: 50px;
-        height: 100%;
-        background-color: #0B234D;
-        line-height: 40px;
-        cursor: pointer;
-        color: white;
-        border-top-right-radius: 10px;
-        border-bottom-right-radius: 10px;
-    }
-
-    #header-trang-chu .header-contact {
-        display: flex;
-        align-items: center;
-    }
-
-    #header-trang-chu .header-contact i {
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        background-color: #0B234D;
-        line-height: 30px;
-        color: white;
-    }
-
-    #header-trang-chu .header-contact {
-        margin-left: 100px;
-        margin-right: 50px;
-        cursor: pointer;
-    }
-
-    #header-trang-chu .header-contact .contact {
-        margin-left: 15px;
-    }
-
-    #header-trang-chu .header-contact .contact .contact-phone-number {
-        color: white;
-        font-weight: 600;
-        font-size: 18px;
-    }
-
-    #header-trang-chu .header-contact .contact .contact-phone-help {
-        color: white;
-        font-size: 16px;
-    }
-
-    #header-trang-chu .header-dangnhap-dangki {
-        display: flex;
-        align-items: center;
-        cursor: pointer;
-    }
-
-    #header-trang-chu .header-dangnhap-dangki i {
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        background-color: #0B234D;
-        line-height: 30px;
-        color: white;
-    }
-
-    #header-trang-chu .header-dangnhap-dangki {
-        margin-right: 50px;
-    }
-
-    #header-trang-chu .header-dangnhap-dangki .dangnhap-dangki {
-        margin-left: 15px;
-    }
-
-    #header-trang-chu .header-dangnhap-dangki .dangnhap-dangki .dangnhap {
-        color: white;
-        font-weight: 600;
-        font-size: 18px;
-    }
-
-    #header-trang-chu .header-dangnhap-dangki .dangnhap-dangki .dangki {
-        color: white;
-        font-size: 16px;
-    }
-
-    #header-trang-chu .header-giohang {
-        font-size: 25px;
-        color: white;
-        position: relative;
-        cursor: pointer;
-    }
-
-    #header-trang-chu .header-giohang::after {
-        display: inline-flex;
-        content: "0";
-        width: 20px;
-        height: 20px;
-        left: 20px;
-        bottom: 15px;
-        justify-content: center;
-        align-items: center;
-        font-size: 15px;
-        background-color: red;
-        position: absolute;
-        border-radius: 50%;
-    }
-
-    /* login */
-
-    .main {
-        margin: 0;
-        padding: 0;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-        background-color: #1E76EF;
-    }
-
-    .container {
-        /* background-color: #13438F; */
-        background-color: rgba(0, 0, 0, 0.4);
-        padding: 45px 45px;
-        box-sizing: border-box;
-        overflow: hidden;
-        position: relative;
-        transition: 0.5s ease;
-        /* display: flex; */
-        /* justify-content: space-between; */
-        flex-wrap: wrap;
-        border-radius: 10px;
-        width: 460px;
-        height: 480px;
-
-    }
-
-    h4 {
-        color: white;
-        text-align: center;
-        text-transform: uppercase;
-        margin-bottom: 30px;
-        font-weight: 700;
-
-    }
-
-
-    .form-1 label {
-        margin-bottom: 20px;
-        display: block;
-        margin-bottom: 5px;
-        /* font-size: 0.9em; */
-        /* color: #6CA4B9;*/
-        color: white;
-    }
-
-    .form-1:nth-of-type(2) {
-        margin-top: 10px;
-    }
-
-
-    .form-2 label {
-        margin-bottom: 20px;
-        /* margin-top: 20px; */
-        display: block;
-        color: #6CA4B9;
-    }
-
-    .form-1 input {
-        width: 100%;
-        padding: 10px 0;
-        background: transparent;
-        border: none;
-        border-bottom: 1px solid #ffffff;
-        color: white;
-        outline: none;
-        box-sizing: border-box;
-    }
-
-    .form-2 input {
-        width: 100%;
-        padding: 10px 0;
-        background: transparent;
-        border: none;
-        border-bottom: 1px solid #ffffff;
-        color: white;
-        outline: none;
-        box-sizing: border-box;
-    }
-
-    .form-1 input::placeholder {
-        color: #a0a0a0;
-    }
-
-    .form-2 {
-        margin-top: 10px;
-    }
-
-    .forgot-password {
-        text-align: center;
-        margin-bottom: 20px;
-
-    }
-
-    .forgot-password a {
-        color: #ffc107;
-        text-decoration: none;
-
-    }
-
-    .forgot-password a:hover {
-        color: #6C785B;
-    }
-
-    .btn-login {
-        width: 100%;
-        background-color: #F5DF4D;
-        padding: 10px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        margin-bottom: 15px;
-        color: #343A40;
-    }
-
-    .link-dki {
-        color: #FFC107;
-        text-decoration: none;
-    }
-
-    .link-dki:hover {
-        color: #6C785B;
-    }
-
-    .btn-login-gg {
-        display: flex;
-        justify-content: space-between;
-    }
-
-    .btn-gg {
-        background-color: #DE3F32;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        padding: 10px;
-        padding-left: 50px;
-        padding-right: 50px;
-        margin-top: 10px;
-        cursor: pointer;
-        width: 100%;
-    }
-
-    .btn-fb {
-        background-color: #49669C;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        padding: 10px;
-        padding-left: 50px;
-        padding-right: 50px;
-        margin-top: 10px;
-        cursor: pointer;
-
-    }
-
-    .btn-login-gg i {
-        margin-right: 8px;
-    }
-
-    p {
-        color: white;
-    }
-
-    .chuataikhoan {
-        color: white;
-        text-align: center;
-    }
-
-    /* Begin footer */
-    #footer-trang-chu {
-        display: flex;
-        background-color: #17479D;
-        border-top-left-radius: 70px;
-        border-top-right-radius: 70px;
-        gap: 30px;
-        align-items: center;
-        justify-content: space-around;
-        position: relative;
-    }
-
-    #footer-trang-chu .footer-title {
-        text-align: justify;
-        margin-left: 30px;
-    }
-
-    #footer-trang-chu .footer-title .img-main {
-        background-color: transparent;
-        width: 400px;
-    }
-
-    #footer-trang-chu .footer-title .footer-title-header {
-        color: #FBE263;
-    }
-
-    #footer-trang-chu .footer-title .footer-title-description {
-        color: white;
-    }
-
-    #footer-trang-chu .footer-title .footer-title-form {
-        position: relative;
-    }
-
-    #footer-trang-chu .footer-title .footer-title-form input {
-        padding: 10px 15px;
-        border-radius: 10px;
-        width: 300px;
-        border: none;
-
-    }
-
-    #footer-trang-chu .footer-title .footer-title-form a {
-        position: absolute;
-        display: inline-flex;
-        width: 100px;
-        height: 36px;
-        background-color: #0B234D;
-        border-top-right-radius: 10px;
-        border-bottom-right-radius: 10px;
-        top: 0;
-        right: 69px;
-        justify-content: center;
-        align-items: center;
-        text-decoration: none;
-        color: white;
-    }
-
-    #footer-trang-chu .footer-title .img-footer {
-        width: 250px;
-        margin-top: 15px;
-        cursor: pointer;
-        margin-bottom: 50px;
-    }
-
-    #footer-trang-chu .footer-diachi {
-        width: 25%;
-    }
-
-    #footer-trang-chu .footer-diachi h2 {
-        font-size: 20px;
-        color: #FBE263;
-        margin: 0;
-    }
-
-    #footer-trang-chu .footer-diachi span {
-        color: #FBE263;
-        display: block;
-        padding-top: 15px;
-    }
-
-    #footer-trang-chu .footer-diachi .footer-diachi-header {
-        display: inline;
-        color: white;
-    }
-
-    #footer-trang-chu .footer-diachi .footer-diachi-description {
-        display: inline;
-        color: white;
-    }
-
-    #footer-trang-chu .footer-diachi .img-main {
-        display: block;
-        margin-top: 20px;
-    }
-
-    #footer-trang-chu .footer-help {}
-
-    #footer-trang-chu .footer-help h2 {
-        font-size: 20px;
-        color: #FBE263;
-        margin: 0;
-    }
-
-    #footer-trang-chu .footer-help span {
-        display: block;
-        color: #FBE263;
-        padding-top: 15px;
-    }
-
-
-
-    #footer-trang-chu .footer-help .footer-help-header {
-        display: inline;
-        color: white;
-    }
-
-    #footer-trang-chu .footer-help .footer-help-header-list a {
-        display: block;
-        text-decoration: none;
-        color: white;
-        line-height: 1.4;
-    }
-
-    #footer-trang-chu .footer-diachi .img-main {
-        cursor: pointer;
-    }
-
-    #footer-trang-chu .footer-information h2 {
-        font-size: 20px;
-        color: #FBE263;
-        margin: 0;
-    }
-
-    #footer-trang-chu .footer-information .footer-information-header-list {}
-
-    #footer-trang-chu .footer-information .footer-information-header-list a {
-        display: block;
-        color: white;
-        text-decoration: none;
-        line-height: 1.4;
-    }
-
-    #footer-trang-chu .footer-information .footer-information-socials {
-        padding-top: 35px;
-    }
-
-    #footer-trang-chu .footer-information .footer-information-socials i {
-        width: 50px;
-        height: 50px;
-        background: white;
-        border-radius: 50%;
-        line-height: 50px;
-        font-size: 25px;
-        color: #17479D;
-    }
-
-    #footer-trang-chu .footer-information .footer-information-socials i:nth-child(1) {
-        margin-right: 10px;
-    }
-
-    #footer-trang-chu::after {
-        display: block;
-        position: absolute;
-        content: "2025 © Thienlong.vn - Bản quyền thuộc Tập đoàn Thiên Long";
-        bottom: 0;
-        color: white;
-    }
-
-    /* End footer */
-</style>
-
-    <body>
-        <header id="header-trang-chu" class="trang-chu">
-            <div class="logo-trang-chu">
-                <a href="TrangChinhChu.html">
-                    <img src="UI/assets/images/logo/logo.png" alt>
-                </a>
-            </div>
-            <form action class="tim-kiem-san-pham">
-                <input type="text" name placeholder="Tìm kiếm sản phẩm...">
-                <i class="fa-solid fa-magnifying-glass"></i>
-            </form>
-            <div class="header-contact">
-                <i class="fa-solid fa-phone"></i>
-                <div class="contact">
-                    <div class="contact-phone-number">1900 866 819</div>
-                    <div class="contact-phone-help">Hỗ trợ khách hàng</div>
-                </div>
-            </div>
-            <div class="header-dangnhap-dangki">
-                <i class="fa-solid fa-user"></i>
-                <div class="dangnhap-dangki">
-                    <div class="dangnhap">Đăng nhập</div>
-                    <div class="dangki">Đăng kí</div>
-                </div>
-
-            </div>
-            <div class="header-giohang">
-                <i class="fa-solid fa-bag-shopping"></i>
-            </div>
-        </header>
-
-        <div class="main">
-    <div class="container">
-        <h4>Đăng Nhập</h4>
-
-        <form asp-controller="Account" asp-action="Login" method="post" class="form-login">
+        /* ===== giống JSP ===== */
+        .main {
+            margin: 0;
+            padding: 30px 0 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: calc(100vh - 80px);
+            background-color: #1E76EF;
+        }
+
+        .login-box {
+            background-color: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            width: 460px;
+            max-width: 92vw;
+            padding: 45px 45px;
+            box-sizing: border-box;
+            margin-top:0px;
+        }
+
+        .login-title {
+            color: white;
+            text-align: center;
+            text-transform: uppercase;
+            margin-bottom: 30px;
+            font-weight: 700;
+        }
+
+        .form-1 {
+            margin-top: 8px;
+        }
+
+        .form-1 label {
+            display: block;
+            color: white;
+            margin-bottom: 6px;
+        }
+
+        .form-1 input {
+            width: 100%;
+            padding: 10px 0;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid #ffffff;
+            color: #fff;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        .form-1 input::placeholder {
+            color: #a0a0a0;
+        }
+
+        .field-error {
+            display: block;
+            color: #FFD700;
+            font-size: 14px;
+            margin-top: 6px;
+        }
+
+        .server-error {
+            color: red;
+            margin-top: 8px;
+        }
+
+        .forgot-password {
+            text-align: center;
+            margin: 18px 0 14px 0;
+        }
+
+        .forgot-password a {
+            color: #ffc107;
+            text-decoration: none;
+        }
+
+        .forgot-password a:hover {
+            color: #6C785B;
+        }
+
+        .btn-login {
+            width: 100%;
+            background-color: #F5DF4D;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            margin-bottom: 12px;
+            color: #343A40;
+            font-weight: 600;
+        }
+
+        .chuataikhoan {
+            color: white;
+            text-align: center;
+            margin-top: 8px;
+            margin-bottom: 14px;
+        }
+
+        .link-dki {
+            color: #FFC107;
+            text-decoration: none;
+            font-weight: 600;
+            margin-left: 4px;
+        }
+
+        .link-dki:hover {
+            color: #6C785B;
+        }
+
+        .btn-gg {
+            background-color: #DE3F32;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px;
+            cursor: pointer;
+            width: 100%;
+            display: block;
+            text-align: center;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .btn-gg i {
+            margin-right: 10px;
+        }
+    </style>
+}
+
+<div class="main">
+    <div class="login-box">
+        <h4 class="login-title">ĐĂNG NHẬP</h4>
+
+        <form asp-controller="Account" asp-action="Login" method="post">
             @Html.AntiForgeryToken()
 
             <div class="form-1">
                 <label asp-for="Email">Email*</label>
-                <input asp-for="Email" type="email" placeholder="Nhập Email" />
-                <span asp-validation-for="Email" style="color:#FFD700; font-size:14px;"></span>
+                <input asp-for="Email" type="text" id="email" placeholder="Nhập Email" />
+                <span asp-validation-for="Email" id="email-error" class="field-error"></span>
+
+                <!-- lỗi định dạng giống JSP: -->
+                <span id="email-error" class="field-error"></span>
             </div>
 
-            <div class="form-1" style="margin-top:10px;">
+            <div class="form-1">
                 <label asp-for="Password">Mật khẩu*</label>
-                <input asp-for="Password" type="password" placeholder="Nhập mật khẩu" />
-                <span asp-validation-for="Password" style="color:#FFD700; font-size:14px;"></span>
+                <input asp-for="Password" type="password" id="Mk" placeholder="Nhập mật khẩu" />
+                <span asp-validation-for="Password" class="field-error"></span>
             </div>
 
-            <div asp-validation-summary="All" style="color:#FFD700; font-size:14px; margin-top:10px;"></div>
+            <!-- lỗi server giống ${error} -->
+            <div asp-validation-summary="ModelOnly" class="server-error"></div>
 
             <div class="forgot-password">
-                <p style="color:white;">Quên mật khẩu? Nhấn vào <a href="#">đây</a></p>
+                <p style="color:white;margin:0;">
+                    Quên mật khẩu? Nhấn vào <a href="#">đây</a>
+                </p>
             </div>
 
             <button type="submit" class="btn-login">Đăng Nhập</button>
@@ -880,129 +175,55 @@
                 Bạn chưa có tài khoản
                 <a asp-controller="Account" asp-action="Register" class="link-dki">Đăng ký tại đây</a>
             </div>
+
+            <a class="btn-gg" asp-controller="Account" asp-action="GoogleLogin">
+                <i class="fa-brands fa-google"></i> Google
+            </a>
         </form>
     </div>
 </div>
 
-        <footer id="footer-trang-chu">
-            <div class="footer-title">
-                <img src="UI/assets/images/logo/logo.png" alt class="img-main">
-                <p class="footer-title-header">Thienlong.vn - Website thương mại
-                    điện tử thuộc Tập đoàn Thiên Long</p>
-                <p class="footer-title-description">Công ty Cổ Phần Tập Đoàn
-                    Thiên Long
-                    <br>
-                    <br>
-                    GPĐKKD số 0301464830 do Sở KHĐT TP. Hồ Chí Minh cấp ngày
-                    14/03/2005.
-                </p>
-                <form action class="footer-title-form">
-                    <input type="email" placeholder="Nhập địa chỉ email">
-                    <a href>Đăng ký</a>
-                </form>
-                <img
-                    src="UI/assets/images/logo/logo-parker_53d035f3ab7645168e62cd9e3f595090.png"
-                    alt class="img-footer">
-            </div>
-            <div class="footer-diachi">
-                <h2>ĐỊA CHỈ CÔNG TY</h2>
-                <span>
-                    Head Office:
-                    <p class="footer-diachi-header"> Tầng 10, Sofic Tower, Số 10
-                        Đường Mai Chí Thọ, Phường An Khánh,
-                        Thành Phố Hồ Chí Minh, Việt Nam
-                    </span>
-                    <br>
-                    <span>
-                        Miền Bắc:
-                        <p class="footer-diachi-description"> Số 38, đường
-                            Gamuda Gardens 2-5, Khu đô thị mới C2 - Gamuda
-                            Gardens, Phường Trần Phú, Thành phố Hà Nội, Việt
-                            Nam.
-                        </span>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-                        <img src="UI/assets/images/logo/footer_bct.png" alt
-                             class="img-main">
-                    </div>
-                    <div class="footer-help">
-                        <h2>HỖ TRỢ KHÁCH HÀNG</h2>
-                        <span>
-                            Hotline:
-                            <p class="footer-help-header">1900 866 819
-                            </span>
-                            <span>
-                                Thứ 2 - Thứ 6 (8h - 17h)
-                                salesonline@thienlongvn.com
-                                <div class="footer-help-header-list">
-                                    <a href>
-                                        - Hướng dẫn mua hàng
-                                    </a>
-                                    <a href>
-                                        - Hướng dẫn thanh toán
-                                    </a>
-                                    <a href>
-                                        - Chính sách giao hàng
-                                    </a>
-                                    <a href>
-                                        - Chính sách đổi trả & hoàn tiền
-                                    </a>
-                                    <a href>
-                                        - Khách hàng thân thiết
-                                    </a>
-                                    <a href>
-                                        - Khách hàng ưu tiên
-                                    </a>
-                                    <a href>
-                                        - Phản ánh chất lượng sản phẩm
-                                    </a>
-                                </div>
-                            </span>
-                        </div>
-                        <div class="footer-information">
-                            <h2>VỀ THIENLONG.VN</h2>
-                            <div class="footer-information-header-list">
-                                <a href="GioiThieu.html">
-                                    - Giới thiệu
-                                </a>
-                                <a href>
-                                    - Dịch vụ in ấn quảng cáo
-                                </a>
-                                <a href>
-                                    - Chính sách bảo mật chung
-                                </a>
-                                <a href>
-                                    - Chính sách bảo mật thông tin cá nhân
-                                </a>
-                                <a href>
-                                    - Thông tin liên hệ
-                                </a>
-                                <a href>
-                                    - Chương trình Affiliate
-                                </a>
-                            </div>
-                            <div class="footer-information-socials">
-                                <i class="fa-brands fa-facebook"></i>
-                                <i class="fa-brands fa-youtube"></i>
-                            </div>
-                        </div>
-                    </footer>
-    @section Scripts {
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-        @if (ViewBag.SessionExpired == true)
-        {
-            <script>
-                Swal.fire({
-                    icon: 'info',
-                    title: 'Phiên đăng nhập đã hết hạn',
-                    text: 'Vui lòng đăng nhập lại để tiếp tục sử dụng hệ thống.',
-                    confirmButtonText: 'Đóng',
-                    confirmButtonColor: '#f5d64e'
-                });
-            </script>
-        }
+    @* Popup hết session *@
+    @if (ViewBag.SessionExpired == true)
+    {
+        <script>
+            Swal.fire({
+                icon: 'info',
+                title: 'Phiên đăng nhập đã hết hạn',
+                text: 'Vui lòng đăng nhập lại để tiếp tục sử dụng hệ thống.',
+                confirmButtonText: 'Đóng',
+                confirmButtonColor: '#f5d64e'
+            });
+        </script>
     }
 
-                </body>
 
-            </html>
+    <script>
+        // Trigger validate khi gõ
+        document.querySelector('input[name="Email"]')
+            ?.addEventListener('input', function () {
+                $(this).valid();
+            });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    @if (TempData["Success"] != null)
+    {
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Thành công',
+                text: 'Bạn đã đăng ký tài khoản thành công, hãy đăng nhập để tiếp tục mua hàng nhé!',
+                confirmButtonText: 'OK'
+            });
+        </script>
+    }
+
+    <partial name="_ValidationScriptsPartial" />
+
+}

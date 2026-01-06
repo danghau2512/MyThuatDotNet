@@ -33,6 +33,7 @@
             overflow-y:auto;">
             <ul id="suggestList" style="list-style:none; margin:0; padding:0;"></ul>
         </div>
+
     </div>
 
     <div class="header-contact">
@@ -66,9 +67,11 @@
             else
             {
                 <div class="dangnhap">
-                    <a class="dangnhap" asp-controller="Account" asp-action="Login">Đăng nhập</a>
+                    <a class="dangki" href="@Url.Action("Login", "Account")">Đăng nhập</a>
+
                     <br />
-                    <a class="dangki" asp-controller="Account" asp-action="Register">Đăng ký</a>
+                    <a class="dangki" href="@Url.Action("Register", "Account")">Đăng ký</a>
+
                 </div>
             }
         </div>

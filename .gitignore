@@ -8,3 +8,9 @@
 .vs/
 *.user
 *.suo
+
+# local secrets
+**/appsettings.Development.json
+**/appsettings.*.local.json
+**/appsettings_Development.json
+

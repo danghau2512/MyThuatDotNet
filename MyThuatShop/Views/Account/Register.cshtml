@@ -248,6 +248,10 @@
             justify-content: center;
         }
 
+            .btn-dang-nhap-tt a{
+                text-decoration: none;
+            }
+
         .btn-gg {
             background-color: #DE3F32;
             border: none;
@@ -277,34 +281,7 @@
     </style>
 }
 
-<header id="header-trang-chu" class="trang-chu">
-    <div class="logo-trang-chu">
-        <a href="index.html">
-            <img src="UI/assets/images/logo/logo.png" alt />
-        </a>
-    </div>
-    <form class="tim-kiem-san-pham">
-        <input type="text" placeholder="Tìm kiếm sản phẩm..." />
-        <i class="fa-solid fa-magnifying-glass"></i>
-    </form>
-    <div class="header-contact">
-        <i class="fa-solid fa-phone"></i>
-        <div class="contact">
-            <div class="contact-phone-number">1900 866 819</div>
-            <div class="contact-phone-help">Hỗ trợ khách hàng</div>
-        </div>
-    </div>
-    <div class="header-dangnhap-dangki">
-        <i class="fa-solid fa-user"></i>
-        <div class="dangnhap-dangki">
-            <div class="dangnhap">Đăng nhập</div>
-            <div class="dangki">Đăng kí</div>
-        </div>
-    </div>
-    <div class="header-giohang">
-        <i class="fa-solid fa-bag-shopping"></i>
-    </div>
-</header>
+
 
 <div class="main">
     <div class="register-card">
@@ -316,13 +293,13 @@
 
             <div class="tt-chitiet" style="grid-column: span 2;">
                 <label asp-for="FullName">Họ và Tên:</label>
-                <input asp-for="FullName" type="text" placeholder="Họ và Tên" required />
+                <input asp-for="FullName" type="text" placeholder="Họ và Tên" novalidate />
                 <span asp-validation-for="FullName" style="color:#FFD700; font-size:14px;"></span>
             </div>
 
             <div class="tt-chitiet">
                 <label asp-for="Email">Email cá nhân:</label>
-                <input asp-for="Email" type="email" placeholder="Email cá nhân" required />
+                <input asp-for="Email" type="email" placeholder="Email cá nhân" novalidate />
                 <span asp-validation-for="Email" style="color:#FFD700; font-size:14px;"></span>
             </div>
 
@@ -334,7 +311,7 @@
 
             <div class="tt-chitiet" style="grid-column: span 2;">
                 <label asp-for="Password">Mật khẩu:</label>
-                <input asp-for="Password" type="password" placeholder="Mật khẩu" required />
+                <input asp-for="Password" type="password" placeholder="Mật khẩu" novalidate />
                 <span asp-validation-for="Password" style="color:#FFD700; font-size:14px;"></span>
             </div>
             <button type="submit" class="btn-DangKy" style="grid-column: span 2;">
@@ -348,13 +325,31 @@
         </p>
 
         <div class="btn-dang-nhap-tt">
-            <button type="button" class="btn-gg">
-                <i class="fa-brands fa-google"></i>Google
-            </button>
+            <a class="btn-gg" asp-controller="Account" asp-action="GoogleLogin">
+                <i class="fa-brands fa-google"></i> Google
+            </a>
         </div>
+        
     </div>
 </div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    
+
+    <script>
+        $(function () {
+            const $form = $("form.infor");
+
+            // Validate ngay khi gõ
+            $form.find("input").on("input", function () {
+                $(this).valid(); // hiện lỗi nếu sai, đúng thì tự mất
+            });
+
+            // Validate thêm khi rời khỏi ô
+            $form.find("input").on("blur", function () {
+                $(this).valid();
+            });
+        });
+    </script>
 }

@@ -8,3 +8,4 @@
 .vs/
 *.user
 *.suo
+**/appsettings_Development.json

@@ -2,6 +2,10 @@
 using MyThuatShop.Extensions;
 using MyThuatShop.Services;
 using MyThuatShop.ViewModels.Auth;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
+using System.Security.Claims;
 
 namespace MyThuatShop.Controllers;
 
@@ -15,7 +19,7 @@ public class AccountController : Controller
     }
 
     // ===== LOGIN =====
-    [HttpGet]
+    [HttpGet]   
     public IActionResult Login(int? expired)
     {
         if (expired == 1)
@@ -45,8 +49,57 @@ public class AccountController : Controller
 
         return RedirectToAction("Index", "Home");
     }
+    // ===== LOGIN GOOGLE =====
+    [HttpGet]
+    public IActionResult GoogleLogin(string? returnUrl = null)
+    {
+        returnUrl ??= Url.Action("Index", "Home")!;
 
-     //===== REGISTER =====
+        var props = new AuthenticationProperties
+        {
+            RedirectUri = Url.Action("GoogleCallback", "Account", new { returnUrl })
+        };
+
+        return Challenge(props, "Google");
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GoogleCallback(string? returnUrl = null)
+    {
+        returnUrl ??= Url.Action("Index", "Home")!;
+
+        // lấy thông tin Google từ cookie External
+        var external = await HttpContext.AuthenticateAsync("External");
+        if (!external.Succeeded || external.Principal == null)
+            return RedirectToAction("Login");
+
+        var email = external.Principal.FindFirstValue(ClaimTypes.Email);
+        var fullName = external.Principal.FindFirstValue(ClaimTypes.Name) ?? "";
+
+        if (string.IsNullOrWhiteSpace(email))
+            return RedirectToAction("Login");
+
+        // ✅ gọi API để tạo/đăng nhập user theo email Google
+        var res = await _accountApi.GoogleLoginAsync(email, fullName);
+        if (res == null)
+        {
+            TempData["Error"] = "Đăng nhập Google thất bại.";
+            return RedirectToAction("Login");
+        }
+
+        // set session giống login thường
+        HttpContext.Session.SetObject("currentUser", res.User);
+        HttpContext.Session.SetInt32("UserId", res.User.Id);
+        HttpContext.Session.SetString("FullName", res.User.FullName ?? "");
+        HttpContext.Session.SetString("Role", res.User.Role ?? "user");
+
+        // clear External cookie
+        await HttpContext.SignOutAsync("External");
+
+        return LocalRedirect(returnUrl);
+    }
+
+    //===== REGISTER =====
     [HttpGet]
     public IActionResult Register()
     {

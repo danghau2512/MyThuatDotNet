@@ -1,6 +1,7 @@
 ﻿using MyThuatShop.ViewModels.Auth;
 using System.Net;
 using System.Net.Http.Json;
+using MyThuatShop.Dtos.Auth;
 
 namespace MyThuatShop.Services;
 
@@ -14,6 +15,21 @@ public class AccountApiService
     public AccountApiService(HttpClient http)
     {
         _http = http;
+    }
+    // ===== LOGIN GOOGLE =====
+    public async Task<LoginResponseDto?> GoogleLoginAsync(string email, string fullName)
+    {
+        var payload = new
+        {
+            email,
+            fullName
+        };
+
+        // nhớ đúng base url của API bạn đang dùng
+        var res = await _http.PostAsJsonAsync("api/users/google-login", payload);
+
+        if (!res.IsSuccessStatusCode) return null;
+        return await res.Content.ReadFromJsonAsync<LoginResponseDto>();
     }
 
     public async Task<LoginResponseDto?> LoginAsync(string email, string password)

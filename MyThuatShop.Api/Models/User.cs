@@ -25,6 +25,9 @@ public partial class User
 
     public bool? IsActive { get; set; }
 
+    public string? RandomKey { get; set; }
+
+
     public virtual ICollection<Contact> Contacts { get; set; } = new List<Contact>();
 
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();

@@ -17,6 +17,7 @@ builder.Services.AddScoped<ProductAPIService>();
 builder.Services.AddScoped<OrderApiService>();
 builder.Services.AddHttpClient<AccountApiService>();
 builder.Services.AddSingleton<IVnPayService, VnPayService>();
+builder.Services.AddHttpClient<AdminOverviewApiService>();// tongquan admin
 builder.Services.AddHttpClient<AccountApiService>((sp, client) =>
 {
     var config = sp.GetRequiredService<IConfiguration>();

@@ -50,6 +50,15 @@ public class AccountController : Controller
         HttpContext.Session.SetString("Email", res.User.Email ?? "");
 
 
+        // ✅ redirect theo role
+        var role = HttpContext.Session.GetString("Role");
+        if (string.Equals(role, "Admin", StringComparison.OrdinalIgnoreCase))
+        {
+            return Redirect("/admin/overview");
+            // hoặc RedirectToAction("Index","AdminDashboard")
+        }
+
+        // người dùng thường
         return RedirectToAction("Index", "Home");
     }
     // ===== LOGIN GOOGLE =====
@@ -99,7 +108,14 @@ public class AccountController : Controller
         // clear External cookie
         await HttpContext.SignOutAsync("External");
 
-        return LocalRedirect(returnUrl);
+        var role = HttpContext.Session.GetString("Role");
+        if (string.Equals(role, "Admin", StringComparison.OrdinalIgnoreCase))
+        {
+            return Redirect("/admin/overview");
+
+        }
+
+        return RedirectToAction("Index", "Home");
     }
 
     //===== REGISTER =====

@@ -17,25 +17,34 @@ namespace MyThuatShop.Controllers
         public async Task<IActionResult> Index()
         {
             var categories = await _api.GetAllAsync();
-
-            // ✅ trỏ thẳng tới view trong Views/Admin
             return View("~/Views/Admin/Categories.cshtml", categories);
         }
 
         [HttpPost("")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Post([FromForm] string action, [FromForm] int id, [FromForm] int isActive,
-                                              [FromForm] string categoryName, IFormFile? thumbnail)
+        public async Task<IActionResult> Post(
+            [FromForm] string action,
+            [FromForm] int id,
+            [FromForm] int isActive,
+            [FromForm] string categoryName,
+            [FromForm] int removeThumbnail,   // ✅ NEW: nhận cờ xóa ảnh
+            IFormFile? thumbnail)
         {
             bool ok = true;
             action = (action ?? "").Trim();
 
             if (action == "create")
+            {
                 ok = await _api.CreateAsync(categoryName, thumbnail);
+            }
             else if (action == "update")
-                ok = await _api.UpdateAsync(id, categoryName, thumbnail);
+            {
+                ok = await _api.UpdateAsync(id, categoryName, thumbnail, removeThumbnail == 1);
+            }
             else if (action == "toggleActive")
-                ok = await _api.ToggleActiveAsync(id, isActive);
+            {
+                ok = await _api.ToggleActiveAsync(id, isActive); // gửi current
+            }
 
             if (!ok) TempData["ErrorMsg"] = "Gọi API thất bại. Kiểm tra API có chạy và đúng route.";
 

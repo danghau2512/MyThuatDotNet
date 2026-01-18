@@ -3,12 +3,14 @@
 @{
     ViewData["Title"] = "Quản lý danh mục";
     ViewData["ActiveMenu"] = "categories";
-    // Nếu bạn đã có Views/Admin/_ViewStart.cshtml trỏ layout admin thì không cần Layout ở đây.
-    // Layout = "~/Views/Shared/_AdminLayout.cshtml";
+
+    // ✅ base URL của API để load ảnh /uploads/...
+    var ApiBaseUrl = "https://localhost:7090";
 }
 
+
 @section Styles {
-    <!-- DataTables CSS (để chắc chắn chạy) -->
+    
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css" />
 
     <style>
@@ -287,17 +289,19 @@
                 {
                     foreach (var c in Model)
                     {
-                        // ===== normalize thumbnail giống JSP =====
                         var thumb = c.Thumbnail ?? "";
                         var imgUrl = thumb;
 
-                        // nếu DB/API trả "uploads/..." thiếu dấu "/" đầu -> thêm "/"
                         if (!string.IsNullOrWhiteSpace(imgUrl) &&
-                        !imgUrl.StartsWith("http", StringComparison.OrdinalIgnoreCase) &&
-                        !imgUrl.StartsWith("/"))
+                        !imgUrl.StartsWith("http", StringComparison.OrdinalIgnoreCase))
                         {
-                            imgUrl = "/" + imgUrl;
+                            // đảm bảo có dấu "/" đầu
+                            if (!imgUrl.StartsWith("/")) imgUrl = "/" + imgUrl;
+
+                            // ghép domain API -> ảnh load đúng host 7090
+                            imgUrl = ApiBaseUrl + imgUrl;
                         }
+
 
                         <tr>
                             <td></td>
@@ -337,7 +341,7 @@
                                 </button>
 
                                 <!-- LOCK/UNLOCK -->
-                                <form action="/admin/categories" method="post" style="display:inline">
+                                <form asp-controller="AdminCategory" asp-action="Post" method="post" style="display:inline">
                                     @Html.AntiForgeryToken()
                                     <input type="hidden" name="action" value="toggleActive" />
                                     <input type="hidden" name="id" value="@c.Id" />
@@ -379,12 +383,14 @@
         <h2 id="modalTitle">Thêm danh mục</h2>
 
         <form id="categoryForm"
-              action="/admin/categories"
+              asp-controller="AdminCategory"
+              asp-action="Post"
               method="post"
               enctype="multipart/form-data">
 
-            @Html.AntiForgeryToken()
 
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="removeThumbnail" id="removeThumbnail" value="0" />
             <input type="hidden" name="action" id="action" value="create" />
             <input type="hidden" name="id" id="dbId" value="" />
 
@@ -412,6 +418,7 @@
 
     <script>
         // ===== Modal controls =====
+        const removeThumbInput = document.getElementById("removeThumbnail");
         const modal = document.getElementById("modal");
         const btnAdd = document.getElementById("btnAdd");
         const btnClose = document.getElementById("btn-close");
@@ -433,7 +440,7 @@
             actionInput.value = "create";
             dbId.value = "";
             nameInput.value = "";
-
+            removeThumbInput.value = "0";
             thumbnailInput.value = "";
             previewImg.style.display = "none";
             removeImgBtn.style.display = "none";
@@ -445,20 +452,25 @@
         btnClose.addEventListener("click", closeModal);
         window.addEventListener("click", (e) => { if(e.target === modal) closeModal(); });
 
-        thumbnailInput.addEventListener("change", function(){
+                thumbnailInput.addEventListener("change", function () {
             const file = this.files && this.files[0];
-            if(file){
+            if (file) {
                 previewImg.src = URL.createObjectURL(file);
                 previewImg.style.display = "block";
                 removeImgBtn.style.display = "inline-block";
+
+                
+                removeThumbInput.value = "0";
             }
         });
 
-        removeImgBtn.addEventListener("click", function(){
+
+                removeImgBtn.addEventListener("click", function(){
             thumbnailInput.value = "";
             previewImg.src = "";
             previewImg.style.display = "none";
             removeImgBtn.style.display = "none";
+            removeThumbInput.value = "1";
         });
 
         // ===== Edit button fill =====
@@ -466,7 +478,7 @@
             btn.addEventListener("click", () => {
                 modalTitle.innerText = "Cập nhật danh mục";
                 actionInput.value = "update";
-
+                removeThumbInput.value = "0";
                 dbId.value = btn.getAttribute("data-id") || "";
                 nameInput.value = btn.getAttribute("data-name") || "";
 

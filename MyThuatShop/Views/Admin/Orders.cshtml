@@ -1,0 +1,421 @@
+﻿@model List<MyThuatShop.Dtos.Admin.AdminOrderRowDto>
+
+@{
+    ViewData["Title"] = "Quản lý đơn hàng";
+    ViewData["ActiveMenu"] = "orders";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@section Styles {
+    <style>
+        #main .right .container {
+            width: calc(100% - 100px);
+            margin: 20px auto;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 10px;
+            padding: 18px 18px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .product-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+            .product-table th {
+                background: #2659F5;
+                color: white;
+                padding: 12px;
+                font-size: 14px;
+            }
+
+            .product-table td {
+                padding: 12px;
+                background: #fafafa;
+                vertical-align: top;
+            }
+
+            .product-table tr:nth-child(even) td {
+                background: #f0f0f0;
+            }
+
+            .product-table td, .product-table th {
+                border-bottom: 1px solid #ddd;
+                text-align: left;
+                border-left: 1px solid #ddd;
+                border-right: 1px solid #ddd;
+            }
+
+        .dataTables_wrapper .dataTables_filter input,
+        .dataTables_wrapper .dataTables_length select {
+            border: 1px solid #d0d7de !important;
+            border-radius: 6px !important;
+            padding: 6px 10px !important;
+            outline: none !important;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .prod-list {
+            margin: 0;
+            padding-left: 18px;
+        }
+
+        .prod-item {
+            margin: 2px 0;
+            line-height: 1.35;
+        }
+
+        .prod-meta {
+            color: #666;
+            font-size: 12px;
+            margin-left: 6px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-icon {
+            width: 36px;
+            height: 32px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-view {
+            background: #16a34a;
+            color: #fff;
+        }
+
+        .btn-edit {
+            background: #f59e0b;
+            color: #111;
+        }
+
+        .btn-cancel {
+            background: #ef4444;
+            color: #fff;
+        }
+
+        /* modal */
+        .modal-mask {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.35);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .modal {
+            width: 520px;
+            max-width: calc(100% - 24px);
+            background: #fff;
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+            .modal h3 {
+                margin: 0 0 12px 0;
+            }
+
+            .modal .row {
+                display: flex;
+                gap: 12px;
+                align-items: center;
+                margin: 10px 0;
+            }
+
+            .modal select {
+                flex: 1;
+                padding: 10px 12px;
+                border: 1px solid #d0d7de;
+                border-radius: 8px;
+            }
+
+            .modal .footer {
+                display: flex;
+                justify-content: flex-end;
+                gap: 10px;
+                margin-top: 14px;
+            }
+
+        .btn {
+            border: none;
+            border-radius: 8px;
+            padding: 10px 14px;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: #2659F5;
+            color: #fff;
+        }
+
+        .btn-light {
+            background: #e5e7eb;
+            color: #111;
+        }
+
+        .msg {
+            padding: 10px 12px;
+            border-radius: 8px;
+        }
+
+        .msg-error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .msg-ok {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .prod-list {
+            list-style: none;
+            padding-left: 0;
+            margin: 0;
+        }
+
+        .prod-item {
+            margin: 2px 0;
+        }
+    </style>
+}
+
+<div class="container">
+    @if (TempData["ErrorMsg"] != null)
+    {
+        <div class="card msg msg-error">@TempData["ErrorMsg"]</div>
+    }
+    @if (TempData["SuccessMsg"] != null)
+    {
+        <div class="card msg msg-ok">@TempData["SuccessMsg"]</div>
+    }
+
+    <div class="card">
+        <h2 style="margin:0 0 10px 0;">Quản lý đơn hàng</h2>
+
+        <table id="tblOrders" class="product-table display">
+            <thead>
+                <tr>
+                    <th>STT</th>
+                    <th>Mã đơn</th>
+                    <th>Khách hàng</th>
+                    <th>Số điện thoại</th>
+                    <th>Ngày đặt</th>
+                    <th>Địa chỉ giao</th>
+                    <th>Sản phẩm</th>
+                    <th>Thành tiền</th>
+                    <th>Trạng thái</th>
+                    <th>Tùy chọn</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Count > 0) {
+                    foreach (var o in Model)
+                    {
+                        var status = (o.StatusName ?? "").Trim();
+                        var badgeClass =
+                        status.Equals("Hoàn thành", StringComparison.OrdinalIgnoreCase) ? "badge-success"
+                        : status.Equals("Đã hủy", StringComparison.OrdinalIgnoreCase) ? "badge-danger"
+                        : "badge-warning";
+
+                        var dateIso = o.CreateAt?.ToString("yyyy-MM-ddTHH:mm:ss") ?? "";
+                        var dateShow = o.CreateAt?.ToString("dd-MM-yyyy") ?? "-";
+
+                        <tr>
+                            <td></td>
+                            <td>@($"DH{o.Id}")</td>
+                            <td>@(o.FullName ?? "-")</td>
+                            <td>@(o.PhoneNumber ?? "-")</td>
+                            <td data-order="@dateIso">@dateShow</td>
+                            <td style="max-width:220px;white-space:normal;">@(o.Address ?? "-")</td>
+
+                            <td style="max-width:360px;white-space:normal;">
+                                @if (o.Items != null && o.Items.Count > 0)
+                                {
+                                    <ul class="prod-list">
+                                        @foreach (var it in o.Items)
+                                        {
+                                            <li class="prod-item">
+                                                <span>@(it.ProductName ?? "Sản phẩm")</span>
+                                               
+                                            </li>
+                                        }
+                                    </ul>
+                                }
+                                else
+                                {
+                                    @(o.ProductNames ?? "-")
+                                }
+                            </td>
+
+                            <td style="white-space:nowrap;">@o.TotalPrice.ToString("N0") VNĐ</td>
+
+                            <td>
+                                <span class="badge @badgeClass">@((o.StatusName ?? "Đang xử lý"))</span>
+                            </td>
+
+                            <td>
+                                <div class="actions">
+                                    <button type="button"
+                                            class="btn-icon btn-view"
+                                            title="Xem"
+                                            onclick="alert('Bạn có thể làm trang chi tiết /admin/orders/@o.Id sau');">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </button>
+
+                                    <button type="button"
+                                            class="btn-icon btn-edit"
+                                            title="Cập nhật trạng thái"
+                                            data-order-id="@o.Id"
+                                            data-current-status="@(o.StatusName ?? "Đang xử lý")"
+                                            onclick="openStatusModal(this)">
+                                        <i class="fa-solid fa-pen-to-square"></i>
+                                    </button>
+
+                                    <button type="button"
+                                            class="btn-icon btn-cancel"
+                                            title="Hủy đơn"
+                                            data-order-id="@o.Id"
+                                            onclick="cancelOrder(this)">
+                                        <i class="fa-solid fa-ban"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal cập nhật trạng thái -->
+<div id="statusMask" class="modal-mask" onclick="closeStatusModal(event)">
+    <div class="modal" onclick="event.stopPropagation()">
+        <h3>Cập nhật trạng thái đơn hàng</h3>
+
+        <form method="post" action="/admin/orders/update-status" id="frmStatus">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="orderId" id="statusOrderId" />
+
+            <div class="row">
+                <label style="width:140px;font-weight:700;">Trạng thái</label>
+                <select name="statusName" id="statusSelect">
+                    <option>Đang xử lý</option>
+                    <option>Hoàn thành</option>
+                    <option>Đã hủy</option>
+                </select>
+            </div>
+
+            <div class="footer">
+                <button type="button" class="btn btn-light" onclick="hideStatus()">Đóng</button>
+                <button type="submit" class="btn btn-primary">Lưu</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // ===== DATATABLES INIT (copy logic từ Statistic) =====
+        $(function () {
+            const viLang = {
+                emptyTable: "Không có dữ liệu",
+                info: "Hiển thị _START_ đến _END_ của _TOTAL_ dòng",
+                infoEmpty: "Hiển thị 0 đến 0 của 0 dòng",
+                lengthMenu: "Hiển thị _MENU_ dòng",
+                loadingRecords: "Đang tải...",
+                processing: "Đang xử lý...",
+                search: "Tìm:",
+                zeroRecords: "Không tìm thấy dữ liệu phù hợp",
+                paginate: { first: "Đầu", last: "Cuối", next: "Sau", previous: "Trước" }
+            };
+
+            const dt = $('#tblOrders').DataTable({
+                pageLength: 8,
+                lengthMenu: [5, 8, 10, 25, 50, 100],
+                language: viLang,
+                // STT + Tùy chọn không sort
+                columnDefs: [
+                    { orderable: false, targets: [0, 9] }
+                ],
+                order: [[4, "desc"]] // Ngày đặt
+            });
+
+            dt.on('order.dt search.dt draw.dt', function () {
+                dt.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+                    cell.innerHTML = i + 1;
+                });
+            }).draw();
+        });
+
+        // ===== Modal status =====
+        function openStatusModal(btn) {
+            const id = btn.getAttribute('data-order-id');
+            const cur = btn.getAttribute('data-current-status') || 'Đang xử lý';
+
+            document.getElementById('statusOrderId').value = id;
+            document.getElementById('statusSelect').value = cur;
+
+            document.getElementById('statusMask').style.display = 'flex';
+        }
+
+        function hideStatus() {
+            document.getElementById('statusMask').style.display = 'none';
+        }
+
+        function closeStatusModal(e) {
+            if (e.target && e.target.id === 'statusMask') hideStatus();
+        }
+
+        // ===== Hủy đơn nhanh =====
+        function cancelOrder(btn) {
+            const id = btn.getAttribute('data-order-id');
+            if (!confirm('Bạn chắc chắn muốn hủy đơn DH' + id + ' ?')) return;
+
+            // submit form cập nhật status = Đã hủy
+            document.getElementById('statusOrderId').value = id;
+            document.getElementById('statusSelect').value = 'Đã hủy';
+            document.getElementById('frmStatus').submit();
+        }
+    </script>
+}

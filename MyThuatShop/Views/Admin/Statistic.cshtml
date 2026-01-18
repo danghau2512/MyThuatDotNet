@@ -1,0 +1,381 @@
+﻿@model MyThuatShop.Dtos.Admin.AdminStatisticsDto
+@using System.Text.Json
+
+@{
+    ViewData["Title"] = "Thống kê";
+    ViewData["ActiveMenu"] = "statistics";
+    // Nếu bạn đã có Views/Admin/_ViewStart.cshtml thì KHÔNG cần dòng Layout này.
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@section Styles {
+    <style>
+        /* Chỉ CSS nội dung trang, sidebar nằm trong _AdminLayout rồi */
+        #main .right .container {
+            display: flex;
+            flex-direction: column;
+            width: calc(100% - 100px);
+            margin-top: 20px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        #main .right {
+            flex: 1;
+            background-color: #F9F9F9;
+        }
+
+            #main .right .container .thongke-doanhthu {
+                display: flex;
+                justify-content: space-between;
+                flex-wrap: wrap;
+                padding: 20px 10px;
+                background-color: white;
+                border-radius: 5px;
+                align-items: stretch;
+            }
+
+                #main .right .container .thongke-doanhthu h1 {
+                    width: 100%;
+                }
+
+                #main .right .container .thongke-doanhthu .tong-doanhthu {
+                    width: 50%;
+                    border-right: 2px solid #ddd;
+                    background-color: #17479D;
+                    color: white;
+                    text-align: center;
+                    border-radius: 10px;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    align-items: center;
+                    min-height: 320px;
+                }
+
+                    #main .right .container .thongke-doanhthu .tong-doanhthu hr {
+                        border: 1px solid #ffffff33;
+                        width: 80%;
+                        margin-left: auto;
+                        margin-right: auto;
+                    }
+
+                #main .right .container .thongke-doanhthu .bieudo-doanhthu {
+                    width: 45%;
+                    min-height: 320px;
+                    background: white;
+                    border-radius: 10px;
+                    padding: 20px;
+                    box-shadow: 0 1px 5px rgba(0,0,0,0.1);
+                }
+
+        .product-container {
+            width: 95%;
+            margin: 30px auto;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .product-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+            .product-table th {
+                background: #2659F5;
+                color: white;
+                padding: 12px;
+                font-size: 14px;
+            }
+
+            .product-table td {
+                padding: 12px;
+                background: #fafafa;
+            }
+
+            .product-table tr:nth-child(even) td {
+                background: #f0f0f0;
+            }
+
+            .product-table td, .product-table th {
+                border-bottom: 1px solid #ddd;
+                text-align: left;
+                border-left: 1px solid #ddd;
+                border-right: 1px solid #ddd;
+            }
+
+        .product-container .thoigian {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 20px 0;
+            padding: 15px 0;
+        }
+
+            .product-container .thoigian label {
+                font-size: 15px;
+                font-weight: 600;
+                color: #2659F5
+            }
+
+            .product-container .thoigian .sothang input {
+                padding: 10px 12px;
+                width: 100px;
+                border: 1px solid #d0d7de;
+                border-radius: 6px;
+                font-size: 14px;
+                color: #333;
+                transition: 0.25s;
+                background: #fff;
+            }
+
+        .dataTables_wrapper .dataTables_filter input,
+        .dataTables_wrapper .dataTables_length select {
+            border: 1px solid #d0d7de !important;
+            border-radius: 6px !important;
+            padding: 6px 10px !important;
+            outline: none !important;
+        }
+    </style>
+}
+
+<div class="container">
+
+    <!-- DOANH THU -->
+    <div class="thongke-doanhthu">
+        <h1>Thống kê doanh thu</h1>
+
+        <div class="tong-doanhthu">
+            <h2>Tổng doanh thu</h2>
+            <hr />
+            <h3>@Model.TotalYear.ToString("N0") VNĐ</h3>
+        </div>
+
+        <div class="bieudo-doanhthu">
+            <canvas id="chartDoanhThu"></canvas>
+        </div>
+    </div>
+
+    <!-- BEST SELLER (ALL TIME) -->
+    <div class="product-container">
+        <h1>Thống kê sản phẩm bán chạy theo số lượng bán</h1>
+
+        <table id="tblBest" class="product-table display">
+            <thead>
+                <tr>
+                    <th>STT</th>
+                    <th>Mã sản phẩm</th>
+                    <th>Tên sản phẩm</th>
+                    <th>Danh mục</th>
+                    <th>Giá</th>
+                    <th>Ngày tạo</th>
+                    <th>Đã bán</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.BestTable == null || Model.BestTable.Count == 0)
+                {
+                    <tr>
+                        <td colspan="7" style="text-align:center;padding:16px;">
+                            Không có dữ liệu sản phẩm bán chạy
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var p in Model.BestTable)
+                    {
+                        <tr>
+                            <td></td>
+                            <td>SP@(p.ProductId)</td>
+                            <td>@(p.ProductName ?? "-")</td>
+                            <td>@(p.CategoryName ?? "-")</td>
+                            <td>@p.Price.ToString("N0")</td>
+                            <td>@(p.CreateAt?.ToString("dd-MM-yyyy") ?? "-")</td>
+                            <td>@p.SoldQty</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+
+        <div class="product-chart-container" style="width:95%;margin:30px auto;background:white;padding:25px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+            <h1>Biểu đồ sản phẩm bán chạy</h1>
+            <canvas id="chartBestSeller"></canvas>
+        </div>
+    </div>
+
+    <!-- NO SALE -->
+    <div class="product-container">
+        <h1>Thống kê sản phẩm không bán được</h1>
+
+        <form method="get" action="/admin/statistics" class="thoigian">
+            <div class="sothang">
+                <label for="noSaleMonths">Nhập số tháng</label>
+                <input type="number" id="noSaleMonths" name="noSaleMonths" min="1" max="12"
+                       value="@Model.NoSaleMonths">
+            </div>
+            <button type="submit"
+                    style="padding:10px 16px;border:none;border-radius:6px;background:#2659F5;color:#fff;cursor:pointer;">
+                Lọc
+            </button>
+        </form>
+
+        <table id="tblNoSale" class="product-table display">
+            <thead>
+                <tr>
+                    <th>STT</th>
+                    <th>Mã sản phẩm</th>
+                    <th>Tên sản phẩm</th>
+                    <th>Danh mục</th>
+                    <th>Giá</th>
+                    <th>Ngày tạo</th>
+                    <th>Đã bán</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @if (Model.NoSaleTable == null || Model.NoSaleTable.Count == 0)
+                {
+                    <tr>
+                        <td colspan="7" style="text-align:center;padding:16px;">
+                            Không có sản phẩm nào không bán trong @Model.NoSaleMonths tháng gần đây
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var p in Model.NoSaleTable)
+                    {
+                        <tr>
+                            <td></td>
+                            <td>SP@(p.ProductId)</td>
+                            <td>@(p.ProductName ?? "-")</td>
+                            <td>@(p.CategoryName ?? "-")</td>
+                            <td>@p.Price.ToString("N0")</td>
+                            <td>@(p.CreateAt?.ToString("dd-MM-yyyy") ?? "-")</td>
+                            <td>@p.SoldQuantity</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        // ===== CHART DOANH THU =====
+        const revenueLabels = [
+          'Tháng 1','Tháng 2','Tháng 3','Tháng 4','Tháng 5','Tháng 6',
+          'Tháng 7','Tháng 8','Tháng 9','Tháng 10','Tháng 11','Tháng 12'
+        ];
+
+        const revenueData = @Html.Raw(JsonSerializer.Serialize(
+                    (Model.RevYear ?? new()).Select(x => x.Revenue).ToList()
+            ));
+
+    new Chart(document.getElementById('chartDoanhThu'), {
+      type: 'line',
+      data: {
+        labels: revenueLabels,
+        datasets: [{
+          label: 'Doanh thu (VNĐ)',
+          data: revenueData,
+          fill: true,
+          tension: 0.4
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: { callback: (value) => Number(value).toLocaleString('vi-VN') + 'đ' }
+          }
+        }
+      }
+    });
+
+        // ===== CHART BEST SELLER TOP 5 =====
+        let bestLabels = @Html.Raw(JsonSerializer.Serialize(
+                (Model.BestChart ?? new()).Select(x => $"SP{x.ProductId}").ToList()
+        ));
+
+    let bestData = @Html.Raw(JsonSerializer.Serialize(
+                (Model.BestChart ?? new()).Select(x => x.SoldQty).ToList()
+        ));
+
+    if (bestLabels.length === 0) {
+      bestLabels.push("Chưa có dữ liệu");
+      bestData.push(0);
+    }
+
+        new Chart(document.getElementById('chartBestSeller'), {
+          type: 'bar',
+          data: {
+            labels: bestLabels,
+            datasets: [{
+              label: 'Số lượng bán',
+              data: bestData,
+              borderRadius: 6,
+              maxBarThickness: 70
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true } }
+          }
+        });
+
+        // ===== DATATABLES INIT =====
+        $(function () {
+          const viLang = {
+            emptyTable: "Không có dữ liệu",
+            info: "Hiển thị _START_ đến _END_ của _TOTAL_ dòng",
+            infoEmpty: "Hiển thị 0 đến 0 của 0 dòng",
+            lengthMenu: "Hiển thị _MENU_ dòng",
+            loadingRecords: "Đang tải...",
+            processing: "Đang xử lý...",
+            search: "Tìm:",
+            zeroRecords: "Không tìm thấy dữ liệu phù hợp",
+            paginate: { first: "Đầu", last: "Cuối", next: "Sau", previous: "Trước" }
+          };
+
+          function initTable(id) {
+            const dt = $(id).DataTable({
+              pageLength: 10,
+              lengthMenu: [5, 10, 25, 50, 100],
+              language: viLang,
+              columnDefs: [{ orderable: false, targets: 0 }]
+            });
+
+            dt.on('order.dt search.dt draw.dt', function () {
+              dt.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+                cell.innerHTML = i + 1;
+              });
+            }).draw();
+
+            return dt;
+          }
+
+          initTable('#tblBest');
+          initTable('#tblNoSale');
+
+          $('#noSaleMonths').on('input', function () {
+            let v = parseInt(this.value || "1");
+            if (v < 1) v = 1;
+            if (v > 12) v = 12;
+            this.value = v;
+          });
+        });
+    </script>
+}

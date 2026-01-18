@@ -7,9 +7,6 @@ namespace MyThuatShop.Services
     {
         private readonly HttpClient _http;
 
-        // Nếu bạn muốn, có thể chuyển sang đọc từ appsettings.
-        private const string BaseUrl = "https://localhost:7090";
-
         public ContactApiService(HttpClient http)
         {
             _http = http;
@@ -44,12 +41,11 @@ namespace MyThuatShop.Services
         }
 
         // ===== API calls =====
-
         public async Task<(bool ok, string? err)> CreateAsync(ContactCreateRequestDto req)
         {
             try
             {
-                var resp = await _http.PostAsJsonAsync($"{BaseUrl}/api/contacts", req);
+                var resp = await _http.PostAsJsonAsync("/api/contacts", req);
                 if (resp.IsSuccessStatusCode) return (true, null);
 
                 var body = await resp.Content.ReadAsStringAsync();
@@ -65,7 +61,7 @@ namespace MyThuatShop.Services
         {
             try
             {
-                var resp = await _http.GetAsync($"{BaseUrl}/api/contacts");
+                var resp = await _http.GetAsync("/api/contacts");
                 if (!resp.IsSuccessStatusCode)
                 {
                     var body = await resp.Content.ReadAsStringAsync();
@@ -86,7 +82,7 @@ namespace MyThuatShop.Services
         {
             try
             {
-                var resp = await _http.DeleteAsync($"{BaseUrl}/api/contacts/{id}");
+                var resp = await _http.DeleteAsync($"/api/contacts/{id}");
                 if (resp.IsSuccessStatusCode) return (true, null);
 
                 var body = await resp.Content.ReadAsStringAsync();
@@ -98,7 +94,6 @@ namespace MyThuatShop.Services
             }
         }
 
-        // FIX: gọi đúng route API: /api/contacts/{id}/reply
         public async Task<(bool ok, string? err)> ReplyAsync(int id, string subject, string replyMessage)
         {
             try
@@ -109,7 +104,7 @@ namespace MyThuatShop.Services
                     ReplyMessage = replyMessage ?? ""
                 };
 
-                var resp = await _http.PostAsJsonAsync($"{BaseUrl}/api/contacts/{id}/reply", payload);
+                var resp = await _http.PostAsJsonAsync($"/api/contacts/{id}/reply", payload);
                 if (resp.IsSuccessStatusCode) return (true, null);
 
                 var body = await resp.Content.ReadAsStringAsync();

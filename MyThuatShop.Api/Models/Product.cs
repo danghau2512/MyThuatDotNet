@@ -7,8 +7,9 @@ public partial class Product
 {
     public int Id { get; set; }
 
-    public string Name { get; set; } = null!;
+    public string Name { get; set; } = string.Empty;
 
+    // ✅ Price nên nullable nếu DB cho null, còn nếu DB NOT NULL thì để decimal
     public decimal Price { get; set; }
 
     public int? DiscountDefault { get; set; }
@@ -27,8 +28,9 @@ public partial class Product
 
     public string? Brand { get; set; }
 
-    public bool? IsActive { get; set; }
+    public bool IsActive { get; set; } = true;
 
+    // ✅ Navigation: nếu CategoryId NOT NULL thì Category không null
     public virtual Category Category { get; set; } = null!;
 
     public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();

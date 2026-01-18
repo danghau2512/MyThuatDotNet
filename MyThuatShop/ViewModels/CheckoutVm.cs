@@ -19,10 +19,14 @@ public class CheckoutVm
     public string Address { get; set; } = "";
     public string? Note { get; set; }
 
-    // Thêm trường này để hứng Radio button từ View
     public string PaymentMethod { get; set; } = "COD";
 
-    // Dữ liệu hiển thị (chỉ đọc)
     public Cart? Cart { get; set; }
     public decimal TotalAmount { get; set; }
+    public int? VoucherId { get; set; } 
+    public decimal DiscountAmount { get; set; } = 0; 
+    public string? AppliedVoucherCode { get; set; } // Mã code để hiển thị lại nếu reload
+
+    public decimal ShippingFee { get; set; } = 0;
 }
+

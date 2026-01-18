@@ -71,7 +71,8 @@ namespace MyThuatShop.Api.Controllers
             }
 
             var query = _context.Products.AsNoTracking()
-                .Where(p => (p.IsActive ?? true) && p.Name.Contains(q));
+    .Where(p => p.IsActive && p.Name.Contains(q));
+
 
             query = sort switch
             {

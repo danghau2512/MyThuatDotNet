@@ -11,6 +11,7 @@ builder.Services.AddHttpContextAccessor();
 
 // HttpClientFactory
 builder.Services.AddHttpClient();
+builder.Services.AddScoped<AdminOrdersApiService>();
 
 // ===== Session =====
 builder.Services.AddDistributedMemoryCache();
@@ -73,6 +74,12 @@ builder.Services.AddHttpClient<AccountApiService>((sp, client) =>
     }
 
     return handler;
+});
+builder.Services.AddHttpClient<AdminOrdersApiService>((sp, http) =>
+{
+    var cfg = sp.GetRequiredService<IConfiguration>();
+    var baseUrl = cfg["ApiBaseUrl"];
+    http.BaseAddress = new Uri(baseUrl!);
 });
 
 // GHN Service

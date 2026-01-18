@@ -13,6 +13,16 @@ builder.Services.AddDbContext<MyThuatDotNetContext>(options =>
     var cs = builder.Configuration.GetConnectionString("Dbtest");
     options.UseMySql(cs, ServerVersion.AutoDetect(cs));
 });
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowMvc", p =>
+        p.WithOrigins("https://localhost:7288") // port của UI
+         .AllowAnyHeader()
+         .AllowAnyMethod()
+         .AllowCredentials());
+});
+
+
 
 // DI email sender
 builder.Services.AddScoped<IEmailSender, SmtpEmailSender>();
@@ -22,6 +32,7 @@ builder.Services.AddCors(opt =>
 {
     opt.AddPolicy("AllowAll", p => p.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
 });
+
 
 var app = builder.Build();
 
@@ -33,6 +44,7 @@ app.UseHttpsRedirection();
 // ✅ PHẢI CÓ để serve ảnh /uploads/...
 app.UseStaticFiles();
 
+app.UseCors("AllowMvc");
 app.UseCors("AllowAll");
 
 app.MapControllers();

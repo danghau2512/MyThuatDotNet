@@ -40,13 +40,20 @@ HttpMessageHandler CreateHandler()
 }
 
 // ===== Services dùng tự tạo HttpClient trong hàm -> AddScoped =====
-builder.Services.AddScoped<HomeApiService>();
+builder.Services.AddHttpClient<HomeApiService>(client =>
+{
+    client.BaseAddress = new Uri(apiBaseUrl!);
+}).ConfigurePrimaryHttpMessageHandler(CreateHandler);
+
 builder.Services.AddScoped<ProductAPIService>();
 builder.Services.AddScoped<OrderApiService>();
-builder.Services.AddScoped<SearchApiService>();
-builder.Services.AddScoped<ContactApiService>();
 
 builder.Services.AddSingleton<IVnPayService, VnPayService>();
+
+builder.Services.AddHttpClient<SearchApiService>(client =>
+{
+    client.BaseAddress = new Uri(apiBaseUrl!);
+}).ConfigurePrimaryHttpMessageHandler(CreateHandler);
 
 // Dùng 1 typed client duy nhất cho AccountApiService
 builder.Services.AddHttpClient<AccountApiService>((sp, client) =>
@@ -103,26 +110,8 @@ builder.Services.AddHttpClient<AdminCategoryApiService>(client =>
     client.BaseAddress = new Uri(apiBaseUrl);
 }).ConfigurePrimaryHttpMessageHandler(CreateHandler);
 
-// VNPAY
-builder.Services.AddSingleton<IVnPayService, VnPayService>();
-    options.Cookie.Name = ".MyThuatShop.Session";
-    options.IdleTimeout = TimeSpan.FromMinutes(30);
-    options.Cookie.HttpOnly = true;
-    options.Cookie.IsEssential = true;
-});
-// ✅ đọc config Google và kiểm tra
-var googleClientId = builder.Configuration["Authentication:Google:ClientId"];
-var googleClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
 
-// ✅ AUTH: Cookies + External + Google
-builder.Services
-    .AddAuthentication(options =>
-    {
-        options.DefaultScheme = "Cookies";
-        options.DefaultChallengeScheme = "Google";
-    })
-    .AddCookie("Cookies")
-    .AddCookie("External");
+
 
 // ===== AUTH =====
 var googleClientId = builder.Configuration["Authentication:Google:ClientId"];
@@ -159,20 +148,11 @@ if (hasGoogle)
         options.Scope.Add("profile");
     });
 }
-    builder.Services.AddAuthentication()
-        .AddGoogle("Google", options =>
-        {
-            options.ClientId = googleClientId;
-            options.ClientSecret = googleClientSecret;
-            options.SignInScheme = "External";
-            options.SaveTokens = true;
-            options.Scope.Add("email");
-            options.Scope.Add("profile");
-        });
-}
 
-builder.Services.AddHttpClient<ContactApiService>();
-
+builder.Services.AddHttpClient<ContactApiService>(client =>
+{
+    client.BaseAddress = new Uri(apiBaseUrl!);
+}).ConfigurePrimaryHttpMessageHandler(CreateHandler);
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())

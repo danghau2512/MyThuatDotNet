@@ -27,7 +27,7 @@ namespace MyThuatShop.Api.Controllers
                     id = x.Id,
                     categoryName = x.CategoryName,
                     thumbnail = x.Thumbnail,
-                    // ✅ FIX bool? -> int
+                    // trả int 1/0 như JSP
                     isActive = (x.IsActive == true) ? 1 : 0
                 })
                 .ToListAsync();
@@ -38,19 +38,22 @@ namespace MyThuatShop.Api.Controllers
         [HttpPost]
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> Post(
-            [FromForm] string action,
+            [FromForm] string? action,
             [FromForm] int id,
-            [FromForm] int isActive,
-            [FromForm] string categoryName,
+            [FromForm] int? isActive,
+            [FromForm] string? categoryName,
+            [FromForm] int? removeThumbnail,        // ✅ NEW: cờ xóa ảnh
             IFormFile? thumbnail)
         {
             action = (action ?? "").Trim();
 
             if (action == "create")
             {
+                if (string.IsNullOrWhiteSpace(categoryName))
+                    return BadRequest(new { ok = false, message = "categoryName is required" });
+
                 var imgUrl = await SaveUpload(thumbnail, "uploads/categories");
 
-                // ✅ FIX CS0246: không dùng new Category nữa
                 var entityType = _db.Categories.EntityType.ClrType;
                 dynamic c = Activator.CreateInstance(entityType)!;
 
@@ -60,19 +63,32 @@ namespace MyThuatShop.Api.Controllers
 
                 _db.Add(c);
                 await _db.SaveChangesAsync();
-
-
                 return Ok(new { ok = true });
             }
 
             if (action == "update")
             {
+                if (id <= 0) return BadRequest(new { ok = false, message = "id is required" });
+                if (string.IsNullOrWhiteSpace(categoryName))
+                    return BadRequest(new { ok = false, message = "categoryName is required" });
+
                 var old = await _db.Categories.FirstOrDefaultAsync(x => x.Id == id);
                 if (old == null) return NotFound(new { ok = false, message = "Category not found" });
 
                 old.CategoryName = categoryName;
 
-                if (thumbnail != null && thumbnail.Length > 0)
+                // ✅ Logic y như JSP:
+                // - Nếu removeThumbnail=1 và không có file mới -> set null
+                // - Nếu có file mới -> upload và ghi đè
+                var wantRemove = (removeThumbnail ?? 0) == 1;
+                var hasNewFile = thumbnail != null && thumbnail.Length > 0;
+
+                if (wantRemove && !hasNewFile)
+                {
+                    old.Thumbnail = null;
+                }
+
+                if (hasNewFile)
                 {
                     var imgUrl = await SaveUpload(thumbnail, "uploads/categories");
                     old.Thumbnail = imgUrl;
@@ -84,11 +100,16 @@ namespace MyThuatShop.Api.Controllers
 
             if (action == "toggleActive")
             {
+                if (id <= 0) return BadRequest(new { ok = false, message = "id is required" });
+
                 var old = await _db.Categories.FirstOrDefaultAsync(x => x.Id == id);
                 if (old == null) return NotFound(new { ok = false, message = "Category not found" });
 
-                // đảo bool? an toàn
-                old.IsActive = !(old.IsActive == true);
+                
+                if (isActive.HasValue)
+                    old.IsActive = isActive.Value == 1 ? false : true;
+                else
+                    old.IsActive = !(old.IsActive == true);
 
                 await _db.SaveChangesAsync();
                 return Ok(new { ok = true });

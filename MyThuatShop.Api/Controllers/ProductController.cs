@@ -168,18 +168,19 @@ namespace MyThuatShop.Api.Controllers
         public async Task<IActionResult> GetForCart(int id)
         {
             var p = await _db.Products
-                .Where(x => x.Id == id)
-                .Select(x => new CartProductDto
-                {
-                    Id = x.Id,
-                    Name = x.Name,
-                    Price = x.Price,
-                    DiscountDefault = x.DiscountDefault ?? 0,
-                    Thumbnail = x.Thumbnail,
-                    QuantityStock = x.QuantityStock ?? 0,
-                    IsActive = x.IsActive ?? false
-                })
-                .FirstOrDefaultAsync();
+     .Where(x => x.Id == id)
+     .Select(x => new CartProductDto
+     {
+         Id = x.Id,
+         Name = x.Name,
+         Price = x.Price,
+         DiscountDefault = x.DiscountDefault ?? 0,
+         Thumbnail = x.Thumbnail,
+         QuantityStock = x.QuantityStock ?? 0,
+         IsActive = x.IsActive
+     })
+     .FirstOrDefaultAsync();
+
 
             if (p == null) return NotFound();
             return Ok(p);

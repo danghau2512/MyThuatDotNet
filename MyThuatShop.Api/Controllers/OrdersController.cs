@@ -57,8 +57,9 @@ public class OrdersController : ControllerBase
         {
             var p = products.First(x => x.Id == it.ProductId);
 
-            if (!(p.IsActive ?? false))
+            if (!p.IsActive)
                 return Conflict($"Sản phẩm '{p.Name}' đã ngừng bán.");
+
 
             var stock = p.QuantityStock ?? 0;
 

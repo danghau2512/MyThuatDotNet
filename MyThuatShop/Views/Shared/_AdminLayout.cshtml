@@ -1,0 +1,136 @@
+﻿@using System
+
+@{
+    var title = (ViewData["Title"] as string) ?? "Admin";
+    var active = (ViewData["ActiveMenu"] as string) ?? "";
+    string IsActive(string key) => string.Equals(active, key, StringComparison.OrdinalIgnoreCase) ? "active" : "";
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@title</title>
+
+    <!-- CSS chung -->
+    <link rel="stylesheet" href="~/assets/css/reset.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/assets/css/style.css" asp-append-version="true" />
+
+    <!-- FontAwesome + DataTables -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+          crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css" />
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+
+    <!-- ✅ CSS SIDEBAR FIX 100% (giống JSP) -->
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+        }
+        #main {
+            display: flex;
+            align-items: stretch;
+            min-height: 100vh;
+        }
+
+            #main .left {
+                background: #17479D;
+                width: 17%;
+                min-width: 240px;
+            }
+
+            #main .right {
+                flex: 1;
+                background: #F9F9F9;
+            }
+
+            #main .left .list-admin {
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+            }
+
+                #main .left .list-admin a {
+                    display: block;
+                    text-decoration: none;
+                    color: #fff;
+                    padding: 10px 20px;
+                }
+
+                    #main .left .list-admin a i {
+                        margin-right: 20px;
+                    }
+
+                    #main .left .list-admin a:hover {
+                        background: #203247;
+                        border-left: 2px solid #3B7DDD;
+                    }
+
+                    #main .left .list-admin a.active {
+                        background: #203247;
+                        border-left: 4px solid #FFD700;
+                        font-weight: 700;
+                    }
+
+                    #main .left .list-admin a.logo {
+                        padding: 0;
+                    }
+
+                        #main .left .list-admin a.logo:hover {
+                            background: #203247;
+                            border-left: none;
+                        }
+
+                #main .left .list-admin .logo img {
+                    width: 100%;
+                    height: auto;
+                    margin: 10px 0 20px 0;
+                }
+    </style>
+
+    @RenderSection("Styles", required: false)
+</head>
+
+<body>
+    <div id="main">
+        <div class="left">
+            <div class="list-admin">
+                <a href="/admin/overview" class="logo">
+                    
+                    <img src="/images/logo/logo.png" alt="Alternate Text" />
+                </a>
+
+                <a href="/admin/overview" class="@IsActive("overview")"><i class="fa-solid fa-house"></i> Tổng quan</a>
+                <a href="/admin/statistics" class="@IsActive("statistics")"><i class="fa-solid fa-chart-line"></i> Thống kê</a>
+                <a href="/admin/categories" class="@IsActive("categories")"><i class="fa-solid fa-list"></i> Quản lý danh mục</a>
+                <a href="/admin/products" class="@IsActive("products")"><i class="fa-solid fa-palette"></i> Quản lý sản phẩm</a>
+                <a href="/admin/users" class="@IsActive("users")"><i class="fa-solid fa-person"></i> Quản lý người dùng</a>
+                <a href="/admin/orders" class="@IsActive("orders")"><i class="fa-solid fa-box-open"></i> Quản lý đơn hàng</a>
+                <a href="/admin/vouchers" class="@IsActive("vouchers")"><i class="fa-solid fa-gift"></i> Quản lý khuyến mãi</a>
+                <a href="/admin/sliders" class="@IsActive("sliders")"><i class="fa-solid fa-sliders"></i> Quản lý Slider Show</a>
+                <a href="/admin/contacts" class="@IsActive("contacts")"><i class="fa-solid fa-address-book"></i> Quản lý liên hệ</a>
+
+                <form method="post" action="/Account/Logout" style="margin:0;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" style="all:unset;cursor:pointer;width:100%;">
+                        <span style="display:block;color:white;padding:10px 20px;">
+                            <i class="fa-solid fa-right-from-bracket"></i> Đăng xuất
+                        </span>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="right">
+            @RenderBody()
+        </div>
+    </div>
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

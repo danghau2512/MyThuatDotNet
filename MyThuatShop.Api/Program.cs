@@ -14,10 +14,10 @@ builder.Services.AddDbContext<MyThuatDotNetContext>(options =>
     options.UseMySql(cs, ServerVersion.AutoDetect(cs));
 });
 
-// ✅ BẮT BUỘC: đăng ký DI cho IEmailSender
+// DI email sender
 builder.Services.AddScoped<IEmailSender, SmtpEmailSender>();
 
-// CORS để MVC gọi API
+// CORS cho MVC gọi API
 builder.Services.AddCors(opt =>
 {
     opt.AddPolicy("AllowAll", p => p.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
@@ -30,7 +30,11 @@ app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
+// ✅ PHẢI CÓ để serve ảnh /uploads/...
+app.UseStaticFiles();
+
 app.UseCors("AllowAll");
 
 app.MapControllers();
+
 app.Run();

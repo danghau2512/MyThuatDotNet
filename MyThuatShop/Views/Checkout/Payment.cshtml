@@ -573,7 +573,7 @@ button[type="submit"]:hover {
     </div>
 
     <div class="checkout-container">
-        <form asp-action="PlaceOrder" method="post" class="checkout-form-wrapper" style="display: contents;">
+        <form asp-action="PlaceOrder" method="post" id="checkoutForm" class="checkout-form-wrapper" style="display: contents;">
 
             <div class="form-infor-checkout">
                 <h4 class="infor-delivery-label">Thông tin giao hàng</h4>
@@ -598,12 +598,42 @@ button[type="submit"]:hover {
                         <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                     </div>
                 </div>
+                <div class="input-group">
+                    <label>Tỉnh/Thành phố</label>
+                    <select id="province" class="form-input-item" onchange="loadDistricts()">
+                        <option value="">-- Chọn Tỉnh --</option>
+                    </select>
+                </div>
 
                 <div class="input-group">
+                    <label>Quận/Huyện</label>
+                    <select id="district" class="form-input-item" onchange="loadWards()">
+                        <option value="">-- Chọn Quận --</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label>Phường/Xã</label>
+                    <select id="ward" class="form-input-item" onchange="calculateShipping()">
+                        <option value="">-- Chọn Phường --</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label>Số nhà, tên đường</label>
+                    <input type="text" id="houseNumber" class="form-input-item" placeholder="Ví dụ: 123 Đường Nguyễn Huệ">
+                </div>
+
+                <input type="hidden" asp-for="Address" id="fullAddressCombined" />
+                <input type="hidden" asp-for="ShippingFee" id="hiddenShippingFee" value="0" />
+
+
+
+                @* <div class="input-group">
                     <label asp-for="Address">Địa chỉ</label>
                     <input asp-for="Address" class="form-input-item" placeholder="Địa chỉ giao hàng">
                     <span asp-validation-for="Address" class="text-danger"></span>
-                </div>
+                </div> *@
 
                 <div class="note">
                     <label asp-for="Note" class="bold">Ghi chú đơn hàng</label>
@@ -665,13 +695,13 @@ button[type="submit"]:hover {
 
             <div class="discount-section">
                 <div class="discount-input-group">
-                    <input type="text" id="voucherCode" name="AppliedVoucherCode" placeholder="Mã giảm giá" value="@Model.AppliedVoucherCode">
+                    <input type="text" id="voucherCode" form="checkoutForm" name="AppliedVoucherCode" placeholder="Mã giảm giá" value="@Model.AppliedVoucherCode">
                     <button type="button" class="btn-apply" onclick="applyVoucher()">Sử dụng</button>
                 </div>
                 <small id="voucherMessage" class="text-danger" style="display:block; margin-top:5px;"></small>
 
-                <input type="hidden" id="hiddenVoucherId" name="VoucherId" value="@Model.VoucherId" />
-                <input type="hidden" id="hiddenDiscount" name="DiscountAmount" value="@Model.DiscountAmount" />
+                <input type="hidden" id="hiddenVoucherId" form="checkoutForm" name="VoucherId" value="@Model.VoucherId" />
+                <input type="hidden" id="hiddenDiscount" form="checkoutForm" name="DiscountAmount" value="@Model.DiscountAmount" />
             </div>
             <div class="price-summary">
                 <div class="price-row">
@@ -684,10 +714,10 @@ button[type="submit"]:hover {
                         <span id="displayDiscount">@Model.DiscountAmount.ToString("#,##0")₫</span>
                     </div>
 
-                <div class="price-row">
-                    <span>Phí vận chuyển</span>
-                    <span>0₫</span>
-                </div>
+                    <div class="price-row">
+                        <span>Phí vận chuyển</span>
+                        <span id="displayShipping">0₫</span>
+                    </div>
                     <div class="price-row total">
                         <span>Tổng cộng</span>
                         <span class="total-amount" id="displayTotal">
@@ -715,28 +745,27 @@ button[type="submit"]:hover {
             // Gọi Ajax sang CheckoutController
             fetch('/Checkout/ApplyVoucher?code=' + code)
                 .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // 1. Hiện thông báo xanh
-                        msg.className = "text-success";
-                        msg.innerText = data.message;
+                        .then(data => {
+            if (data.success) {
+                msg.className = "text-success";
+                msg.innerText = data.message;
 
-                        // 2. Cập nhật UI giá tiền
-                        document.getElementById("displayDiscount").innerText = new Intl.NumberFormat('vi-VN').format(data.discount) + "₫";
-                        document.getElementById("displayTotal").innerText = new Intl.NumberFormat('vi-VN').format(data.newTotal) + "₫";
+                // Cập nhật discount UI + hidden
+                document.getElementById("displayDiscount").innerText =
+                    new Intl.NumberFormat('vi-VN').format(data.discount) + "₫";
 
-                        // 3. Cập nhật Input ẩn để submit
-                        document.getElementById("hiddenVoucherId").value = data.voucherId;
-                        document.getElementById("hiddenDiscount").value = data.discount;
-                    } else {
-                        // Hiện lỗi đỏ (Hết hạn, không đủ tiền...)
-                        msg.className = "text-danger";
-                        msg.innerText = data.message;
+                document.getElementById("hiddenVoucherId").value = data.voucherId;
+                document.getElementById("hiddenDiscount").value = data.discount;
 
-                        // Reset về 0
-                        resetVoucherUI();
-                    }
-                })
+                // ✅ Tính lại tổng: (hàng + ship - discount)
+                updateTotalCart(); // tự lấy ship từ hiddenShippingFee
+            } else {
+                msg.className = "text-danger";
+                msg.innerText = data.message;
+                resetVoucherUI();
+            }
+        })
+
                 .catch(err => {
                     console.error(err);
                     msg.innerText = "Có lỗi xảy ra, vui lòng thử lại.";
@@ -747,6 +776,204 @@ button[type="submit"]:hover {
             document.getElementById("displayDiscount").innerText = "0₫";
             document.getElementById("hiddenVoucherId").value = "";
             document.getElementById("hiddenDiscount").value = "0";
+
+             updateTotalCart();
+        }
+
+        // 1. Load Tỉnh khi vào trang
+        document.addEventListener("DOMContentLoaded", function() {
+            console.log('Loading provinces...');
+            fetch('/api/location/provinces')
+                .then(res => {
+                    console.log('Province response status:', res.status);
+                    return res.json();
+                })
+                .then(data => {
+                    console.log('Province data:', data);
+                    
+                    // Kiểm tra nếu có lỗi
+                    if (data.success === false) {
+                        console.error('Error from server:', data.message, data.error);
+                        alert('Lỗi: ' + data.message + '\nChi tiết: ' + (data.error || 'Không có thông tin'));
+                        return;
+                    }
+                    
+                    let html = '<option value="">-- Chọn Tỉnh --</option>';
+                    if(data.data) {
+                        data.data.forEach(p => {
+                            html += `<option value="${p.ProvinceID}">${p.ProvinceName}</option>`;
+                        });
+                    }
+                    document.getElementById('province').innerHTML = html;
+                })
+                .catch(err => {
+                    console.error('Error loading provinces:', err);
+                    alert('Không thể tải danh sách tỉnh/thành phố. Vui lòng kiểm tra console để xem chi tiết.');
+                });
+        });
+
+        // 2. Load Quận
+        function loadDistricts() {
+            let provinceId = document.getElementById('province').value;
+            if(!provinceId) return;
+
+            console.log('Loading districts for province:', provinceId);
+            fetch('/api/location/districts/' + provinceId)
+                .then(res => {
+                    console.log('District response status:', res.status);
+                    return res.json();
+                })
+                .then(data => {
+                    console.log('District data:', data);
+                    
+                    if (data.success === false) {
+                        console.error('Error from server:', data.message, data.error);
+                        alert('Lỗi: ' + data.message);
+                        return;
+                    }
+                    
+                    let html = '<option value="">-- Chọn Quận --</option>';
+                    if(data.data) {
+                        data.data.forEach(d => {
+                            html += `<option value="${d.DistrictID}">${d.DistrictName}</option>`;
+                        });
+                    }
+                    document.getElementById('district').innerHTML = html;
+                    document.getElementById('ward').innerHTML = '<option value="">-- Chọn Phường --</option>';
+                })
+                .catch(err => {
+                    console.error('Error loading districts:', err);
+                    alert('Không thể tải danh sách quận/huyện');
+                });
+            updateFullAddressString();
+        }
+
+        // 3. Load Phường
+        function loadWards() {
+            let districtId = document.getElementById('district').value;
+            if(!districtId) return;
+
+            console.log('Loading wards for district:', districtId);
+            fetch('/api/location/wards/' + districtId)
+                .then(res => {
+                    console.log('Ward response status:', res.status);
+                    return res.json();
+                })
+                .then(data => {
+                    console.log('Ward data:', data);
+                    
+                    if (data.success === false) {
+                        console.error('Error from server:', data.message, data.error);
+                        alert('Lỗi: ' + data.message);
+                        return;
+                    }
+                    
+                    let html = '<option value="">-- Chọn Phường --</option>';
+                    if(data.data) {
+                        data.data.forEach(w => {
+                            html += `<option value="${w.WardCode}">${w.WardName}</option>`;
+                        });
+                    }
+                    document.getElementById('ward').innerHTML = html;
+                })
+                .catch(err => {
+                    console.error('Error loading wards:', err);
+                    alert('Không thể tải danh sách phường/xã');
+                });
+            updateFullAddressString();
+        }
+
+        // 4. Tính Phí Ship
+        function calculateShipping() {
+            let districtId = document.getElementById('district').value;
+            let wardCode = document.getElementById('ward').value;
+            // Lấy tổng tiền hàng (để tính bảo hiểm) - Lấy từ Model server render ra
+            let totalAmount = @Model.TotalAmount;
+
+            updateFullAddressString();
+
+            if(!districtId || !wardCode) return;
+
+            console.log('Calculating shipping fee...', { districtId, wardCode, totalAmount });
+            fetch('/api/location/get-fee', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    districtId: parseInt(districtId),
+                    wardCode: wardCode,
+                    insuranceValue: parseInt(totalAmount)
+                })
+            })
+            .then(res => {
+                console.log('Fee response status:', res.status);
+                return res.json();
+            })
+            .then(data => {
+                console.log('Fee data:', data);
+                
+                if (data.success === false) {
+                    console.error('Error from server:', data.message, data.error);
+                    alert('Lỗi: ' + data.message);
+                    return;
+                }
+                
+                let fee = data.fee;
+
+                // Cập nhật UI
+                document.getElementById('displayShipping').innerText = new Intl.NumberFormat('vi-VN').format(fee) + "₫";
+                document.getElementById('hiddenShippingFee').value = fee;
+
+                // Tính lại Tổng cộng (Hàng + Ship - Voucher)
+                updateTotalCart(fee);
+            })
+            .catch(err => {
+                console.error('Error calculating fee:', err);
+                alert('Không thể tính phí vận chuyển');
+            });
+        }
+
+        // 5. Cập nhật chuỗi địa chỉ đầy đủ để lưu vào DB
+        function updateFullAddressString() {
+            // Lấy thẻ select
+            let p = document.getElementById('province');
+            let d = document.getElementById('district');
+            let w = document.getElementById('ward');
+            let house = document.getElementById('houseNumber').value;
+
+            // Lấy text hiển thị (VD: "Hồ Chí Minh") chứ không lấy value (ID)
+            let pText = p.options[p.selectedIndex]?.text || "";
+            let dText = d.options[d.selectedIndex]?.text || "";
+            let wText = w.options[w.selectedIndex]?.text || "";
+
+            // Kiểm tra xem đã chọn đủ chưa
+            if (p.value && d.value && w.value && house) {
+                // Ghép chuỗi
+                let finalAddress = `${house}, ${wText}, ${dText}, ${pText}`;
+
+                // Gán vào input ẩn để submit form
+                document.getElementById('fullAddressCombined').value = finalAddress;
+            }
+        }
+
+        // Gắn sự kiện cho ô nhập số nhà
+        document.getElementById('houseNumber').addEventListener('input', updateFullAddressString);
+
+        // Hàm cập nhật tổng tiền cuối cùng
+                function updateTotalCart(shippingFee) {
+            let subTotal = @Model.TotalAmount;
+
+            // discount đang nằm trong hiddenDiscount
+            let discount = parseFloat(document.getElementById('hiddenDiscount')?.value || 0);
+
+            // ship: nếu không truyền vào thì lấy từ hiddenShippingFee
+            let ship = (shippingFee !== undefined && shippingFee !== null)
+                ? parseFloat(shippingFee || 0)
+                : parseFloat(document.getElementById('hiddenShippingFee')?.value || 0);
+
+            let total = subTotal - discount + ship;
+
+            document.getElementById('displayTotal').innerText =
+                new Intl.NumberFormat('vi-VN').format(total) + "₫";
         }
     </script>
 }

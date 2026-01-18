@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using MyThuatShop.Services;
+using System.Net.Http;
 
 
 
@@ -22,7 +23,22 @@ builder.Services.AddHttpClient<AccountApiService>((sp, client) =>
     var config = sp.GetRequiredService<IConfiguration>();
     client.BaseAddress = new Uri(config["ApiBaseUrl"]!);
 });
-
+// GHN Service - cấu hình HttpClient để bypass SSL validation (chỉ dùng cho dev)
+builder.Services.AddHttpClient<GhnService>((sp, client) =>
+{
+    // HttpClient sẽ được inject vào GhnService
+})
+.ConfigurePrimaryHttpMessageHandler(() =>
+{
+    var handler = new HttpClientHandler();
+    // CHỈ dùng trong Development để test
+    if (builder.Environment.IsDevelopment())
+    {
+        handler.ServerCertificateCustomValidationCallback = 
+            HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
+    }
+    return handler;
+});
 
 builder.Services.AddHttpClient<SearchApiService>((sp, client) =>
 {
@@ -37,7 +53,7 @@ builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
     options.Cookie.Name = ".MyThuatShop.Session";
-    options.IdleTimeout = TimeSpan.FromMinutes(30); // giống JSP: đủ lâu để test
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
@@ -45,10 +61,6 @@ builder.Services.AddSession(options =>
 var googleClientId = builder.Configuration["Authentication:Google:ClientId"];
 var googleClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
 
-//if (string.IsNullOrWhiteSpace(googleClientId) || string.IsNullOrWhiteSpace(googleClientSecret))
-//{
-//    throw new Exception("Thiếu cấu hình Google OAuth. Kiểm tra appsettings.json: Authentication:Google:ClientId và ClientSecret");
-//}
 // ✅ AUTH: Cookies + External + Google
 builder.Services
     .AddAuthentication(options =>
@@ -73,11 +85,7 @@ if (!string.IsNullOrWhiteSpace(googleClientId) && !string.IsNullOrWhiteSpace(goo
             options.Scope.Add("profile");
         });
 }
-else
-{
-    // Không cấu hình Google thì bỏ qua, app vẫn chạy được.
-    // (có thể log ra Warning nếu bạn muốn)
-}
+
 builder.Services.AddHttpClient<ContactApiService>();
 
 var app = builder.Build();

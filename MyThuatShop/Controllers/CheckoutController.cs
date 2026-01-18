@@ -65,9 +65,9 @@ public class CheckoutController : Controller
             address = vm.Address,
             note = vm.Note,
             paymentName = vm.PaymentMethod, // "COD" hoặc "VNPAY" lấy từ radio button
-            shippingFee = 0,
+            shippingFee = vm.ShippingFee,
             discount = vm.DiscountAmount,
-            voucherId = vm.DiscountAmount,
+            voucherId = vm.VoucherId,
             items = cart.Carts.Values.Select(i => new { productId = i.ProductId, quantity = i.Quantity }).ToList()
         };
 

@@ -65,9 +65,9 @@ public class CheckoutController : Controller
             address = vm.Address,
             note = vm.Note,
             paymentName = vm.PaymentMethod, // "COD" hoặc "VNPAY" lấy từ radio button
-            shippingFee = 0,
-            discount = 0,
-            voucherId = (int?)null,
+            shippingFee = vm.ShippingFee,
+            discount = vm.DiscountAmount,
+            voucherId = vm.VoucherId,
             items = cart.Carts.Values.Select(i => new { productId = i.ProductId, quantity = i.Quantity }).ToList()
         };
 
@@ -134,6 +134,24 @@ public class CheckoutController : Controller
         if (order == null) return RedirectToAction("Index", "Home");
 
         return View(order); // Views/Checkout/Success.cshtml
+    }
+    [HttpGet]
+    public async Task<IActionResult> ApplyVoucher(string code)
+    {
+        var cart = HttpContext.Session.GetObject<Cart>("cart");
+        if (cart == null) return Json(new { success = false, message = "Giỏ hàng trống" });
+
+        decimal totalOrder = cart.TotalAmount(); // Tổng tiền hàng
+        var result = await _orderApi.CheckVoucherAsync(code, totalOrder);
+
+        return Json(new
+        {
+            success = result.success,
+            message = result.message,
+            discount = result.discount,
+            voucherId = result.voucherId,
+            newTotal = totalOrder - result.discount // Trả về tổng tiền mới để JS update
+        });
     }
 
     private bool IsLoggedIn()

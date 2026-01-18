@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using MyThuatShop.Services;
+using System.Net.Http;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -45,11 +46,46 @@ builder.Services.AddScoped<OrderApiService>();
 builder.Services.AddScoped<SearchApiService>();
 builder.Services.AddScoped<ContactApiService>();
 
-// ===== Services cần HttpClient inject (typed client) =====
-builder.Services.AddHttpClient<AccountApiService>(client =>
+builder.Services.AddSingleton<IVnPayService, VnPayService>();
+
+// Dùng 1 typed client duy nhất cho AccountApiService
+builder.Services.AddHttpClient<AccountApiService>((sp, client) =>
 {
-    client.BaseAddress = new Uri(apiBaseUrl);
-}).ConfigurePrimaryHttpMessageHandler(CreateHandler);
+    var config = sp.GetRequiredService<IConfiguration>();
+    client.BaseAddress = new Uri(config["ApiBaseUrl"]!);
+})
+.ConfigurePrimaryHttpMessageHandler(sp =>
+{
+    var env = sp.GetRequiredService<IHostEnvironment>();
+    var handler = new HttpClientHandler();
+
+    if (env.IsDevelopment())
+    {
+        handler.ServerCertificateCustomValidationCallback =
+            HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
+    }
+
+    return handler;
+});
+
+// GHN Service
+builder.Services.AddHttpClient<GhnService>((sp, client) =>
+{
+    // TODO: set BaseAddress/headers nếu cần
+})
+.ConfigurePrimaryHttpMessageHandler(sp =>
+{
+    var env = sp.GetRequiredService<IHostEnvironment>();
+    var handler = new HttpClientHandler();
+
+    if (env.IsDevelopment())
+    {
+        handler.ServerCertificateCustomValidationCallback =
+            HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
+    }
+
+    return handler;
+});
 
 builder.Services.AddHttpClient<AdminOverviewApiService>(client =>
 {
@@ -69,6 +105,24 @@ builder.Services.AddHttpClient<AdminCategoryApiService>(client =>
 
 // VNPAY
 builder.Services.AddSingleton<IVnPayService, VnPayService>();
+    options.Cookie.Name = ".MyThuatShop.Session";
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+// ✅ đọc config Google và kiểm tra
+var googleClientId = builder.Configuration["Authentication:Google:ClientId"];
+var googleClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+
+// ✅ AUTH: Cookies + External + Google
+builder.Services
+    .AddAuthentication(options =>
+    {
+        options.DefaultScheme = "Cookies";
+        options.DefaultChallengeScheme = "Google";
+    })
+    .AddCookie("Cookies")
+    .AddCookie("External");
 
 // ===== AUTH =====
 var googleClientId = builder.Configuration["Authentication:Google:ClientId"];
@@ -105,6 +159,19 @@ if (hasGoogle)
         options.Scope.Add("profile");
     });
 }
+    builder.Services.AddAuthentication()
+        .AddGoogle("Google", options =>
+        {
+            options.ClientId = googleClientId;
+            options.ClientSecret = googleClientSecret;
+            options.SignInScheme = "External";
+            options.SaveTokens = true;
+            options.Scope.Add("email");
+            options.Scope.Add("profile");
+        });
+}
+
+builder.Services.AddHttpClient<ContactApiService>();
 
 var app = builder.Build();
 

@@ -1,4 +1,6 @@
-﻿body {
+﻿
+
+body {
   padding: 0;
   margin: 0;
   box-sizing: border-box;
@@ -8,6 +10,24 @@
   --color-main: #17479d;
   --font-family: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", Arial,
     sans-serif;
+}
+/* ===== GLOBAL RESET (ALL PAGES) ===== */
+html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100%;
+    height: 100%;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+img {
+    max-width: 100%;
+    display: block;
 }
 
 /* Begin header */

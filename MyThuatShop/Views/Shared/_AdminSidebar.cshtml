@@ -1,0 +1,16 @@
+﻿@model string
+@{
+    var active = Model ?? "";
+    string IsActive(string key) => string.Equals(active, key, StringComparison.OrdinalIgnoreCase) ? "active" : "";
+}
+<div class="nav">
+    <a class="@IsActive("overview")" href="/admin/overview">Tổng quan</a>
+    <a class="@IsActive("users")" href="/admin/users">Người dùng</a>
+    <a class="@IsActive("categories")" href="/admin/categories">Danh mục</a>
+    <a class="@IsActive("products")" href="/admin/products">Sản phẩm</a>
+    <a class="@IsActive("orders")" href="/admin/orders">Đơn hàng</a>
+    <a class="@IsActive("contacts")" href="/admin/contacts">Liên hệ</a>
+    <a class="@IsActive("sliders")" href="/admin/sliders">Slider</a>
+    <a class="@IsActive("vouchers")" href="/admin/vouchers">Voucher</a>
+    <a class="@IsActive("statistics")" href="/admin/statistics">Thống kê</a>
+</div>

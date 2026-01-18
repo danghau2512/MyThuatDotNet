@@ -3,55 +3,108 @@ using Microsoft.AspNetCore.Authentication.Google;
 using MyThuatShop.Services;
 using System.Net.Http;
 
-
-
 var builder = WebApplication.CreateBuilder(args);
 
+// MVC
 builder.Services.AddControllersWithViews();
+builder.Services.AddHttpContextAccessor();
 
-// HttpClient
+// HttpClientFactory
 builder.Services.AddHttpClient();
 
-// DI services
+// ===== Session =====
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.Cookie.Name = ".MyThuatShop.Session";
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
+// ===== API BaseUrl =====
+var apiBaseUrl = builder.Configuration["ApiBaseUrl"];
+if (string.IsNullOrWhiteSpace(apiBaseUrl))
+    apiBaseUrl = "https://localhost:7090";
+
+// handler bỏ qua SSL (dev)
+HttpMessageHandler CreateHandler()
+{
+    var h = new HttpClientHandler();
+    if (builder.Environment.IsDevelopment())
+    {
+        h.ServerCertificateCustomValidationCallback =
+            HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
+    }
+    return h;
+}
+
+// ===== Services dùng tự tạo HttpClient trong hàm -> AddScoped =====
 builder.Services.AddScoped<HomeApiService>();
 builder.Services.AddScoped<ProductAPIService>();
 builder.Services.AddScoped<OrderApiService>();
-builder.Services.AddHttpClient<AccountApiService>();
+builder.Services.AddScoped<SearchApiService>();
+builder.Services.AddScoped<ContactApiService>();
+
 builder.Services.AddSingleton<IVnPayService, VnPayService>();
+
+// Dùng 1 typed client duy nhất cho AccountApiService
 builder.Services.AddHttpClient<AccountApiService>((sp, client) =>
 {
     var config = sp.GetRequiredService<IConfiguration>();
     client.BaseAddress = new Uri(config["ApiBaseUrl"]!);
-});
-// GHN Service - cấu hình HttpClient để bypass SSL validation (chỉ dùng cho dev)
-builder.Services.AddHttpClient<GhnService>((sp, client) =>
-{
-    // HttpClient sẽ được inject vào GhnService
 })
-.ConfigurePrimaryHttpMessageHandler(() =>
+.ConfigurePrimaryHttpMessageHandler(sp =>
 {
+    var env = sp.GetRequiredService<IHostEnvironment>();
     var handler = new HttpClientHandler();
-    // CHỈ dùng trong Development để test
-    if (builder.Environment.IsDevelopment())
+
+    if (env.IsDevelopment())
     {
-        handler.ServerCertificateCustomValidationCallback = 
+        handler.ServerCertificateCustomValidationCallback =
             HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
     }
+
     return handler;
 });
 
-builder.Services.AddHttpClient<SearchApiService>((sp, client) =>
+// GHN Service
+builder.Services.AddHttpClient<GhnService>((sp, client) =>
 {
-    var config = sp.GetRequiredService<IConfiguration>();
-    client.BaseAddress = new Uri(config["ApiBaseUrl"]!);
+    // TODO: set BaseAddress/headers nếu cần
+})
+.ConfigurePrimaryHttpMessageHandler(sp =>
+{
+    var env = sp.GetRequiredService<IHostEnvironment>();
+    var handler = new HttpClientHandler();
+
+    if (env.IsDevelopment())
+    {
+        handler.ServerCertificateCustomValidationCallback =
+            HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
+    }
+
+    return handler;
 });
 
-builder.Services.AddHttpContextAccessor();
-
-// ✅ Session (CHỈ 1 LẦN)
-builder.Services.AddDistributedMemoryCache();
-builder.Services.AddSession(options =>
+builder.Services.AddHttpClient<AdminOverviewApiService>(client =>
 {
+    client.BaseAddress = new Uri(apiBaseUrl);
+}).ConfigurePrimaryHttpMessageHandler(CreateHandler);
+
+builder.Services.AddHttpClient<AdminStatisticsApiService>(client =>
+{
+    client.BaseAddress = new Uri(apiBaseUrl);
+}).ConfigurePrimaryHttpMessageHandler(CreateHandler);
+
+// ✅ THÊM Category typed client (bắt buộc)
+builder.Services.AddHttpClient<AdminCategoryApiService>(client =>
+{
+    client.BaseAddress = new Uri(apiBaseUrl);
+}).ConfigurePrimaryHttpMessageHandler(CreateHandler);
+
+// VNPAY
+builder.Services.AddSingleton<IVnPayService, VnPayService>();
     options.Cookie.Name = ".MyThuatShop.Session";
     options.IdleTimeout = TimeSpan.FromMinutes(30);
     options.Cookie.HttpOnly = true;
@@ -71,9 +124,41 @@ builder.Services
     .AddCookie("Cookies")
     .AddCookie("External");
 
+// ===== AUTH =====
+var googleClientId = builder.Configuration["Authentication:Google:ClientId"];
+var googleClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+bool hasGoogle = !string.IsNullOrWhiteSpace(googleClientId) &&
+                 !string.IsNullOrWhiteSpace(googleClientSecret);
 
-if (!string.IsNullOrWhiteSpace(googleClientId) && !string.IsNullOrWhiteSpace(googleClientSecret))
+var authBuilder = builder.Services.AddAuthentication(options =>
 {
+    options.DefaultScheme = "Cookies";
+    options.DefaultChallengeScheme = hasGoogle ? "Google" : "Cookies";
+})
+.AddCookie("Cookies", options =>
+{
+    options.LoginPath = "/Account/Login";
+    options.AccessDeniedPath = "/Account/AccessDenied";
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+    options.SlidingExpiration = true;
+})
+.AddCookie("External", options =>
+{
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(10);
+});
+
+if (hasGoogle)
+{
+    authBuilder.AddGoogle("Google", options =>
+    {
+        options.ClientId = googleClientId!;
+        options.ClientSecret = googleClientSecret!;
+        options.SignInScheme = "External";
+        options.SaveTokens = true;
+        options.Scope.Add("email");
+        options.Scope.Add("profile");
+    });
+}
     builder.Services.AddAuthentication()
         .AddGoogle("Google", options =>
         {
@@ -101,13 +186,14 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-// ✅ Session middleware phải đặt SAU UseRouting và TRƯỚC MapControllerRoute
+// ✅ Session trước Auth để đọc session trong layout/admin
 app.UseSession();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}"); 
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();

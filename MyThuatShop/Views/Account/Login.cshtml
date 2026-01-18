@@ -6,7 +6,6 @@
 
 @section Styles {
     <style>
-        /* ===== giống JSP ===== */
         .main {
             margin: 0;
             padding: 30px 0 0;
@@ -24,7 +23,7 @@
             max-width: 92vw;
             padding: 45px 45px;
             box-sizing: border-box;
-            margin-top:0px;
+            margin-top: 0px;
         }
 
         .login-title {
@@ -39,26 +38,26 @@
             margin-top: 8px;
         }
 
-        .form-1 label {
-            display: block;
-            color: white;
-            margin-bottom: 6px;
-        }
+            .form-1 label {
+                display: block;
+                color: white;
+                margin-bottom: 6px;
+            }
 
-        .form-1 input {
-            width: 100%;
-            padding: 10px 0;
-            background: transparent;
-            border: none;
-            border-bottom: 1px solid #ffffff;
-            color: #fff;
-            outline: none;
-            box-sizing: border-box;
-        }
+            .form-1 input {
+                width: 100%;
+                padding: 10px 0;
+                background: transparent;
+                border: none;
+                border-bottom: 1px solid #ffffff;
+                color: #fff;
+                outline: none;
+                box-sizing: border-box;
+            }
 
-        .form-1 input::placeholder {
-            color: #a0a0a0;
-        }
+                .form-1 input::placeholder {
+                    color: #a0a0a0;
+                }
 
         .field-error {
             display: block;
@@ -77,14 +76,14 @@
             margin: 18px 0 14px 0;
         }
 
-        .forgot-password a {
-            color: #ffc107;
-            text-decoration: none;
-        }
+            .forgot-password a {
+                color: #ffc107;
+                text-decoration: none;
+            }
 
-        .forgot-password a:hover {
-            color: #6C785B;
-        }
+                .forgot-password a:hover {
+                    color: #6C785B;
+                }
 
         .btn-login {
             width: 100%;
@@ -113,9 +112,9 @@
             margin-left: 4px;
         }
 
-        .link-dki:hover {
-            color: #6C785B;
-        }
+            .link-dki:hover {
+                color: #6C785B;
+            }
 
         .btn-gg {
             background-color: #DE3F32;
@@ -132,9 +131,9 @@
             margin-top: 10px;
         }
 
-        .btn-gg i {
-            margin-right: 10px;
-        }
+            .btn-gg i {
+                margin-right: 10px;
+            }
     </style>
 }
 
@@ -144,14 +143,14 @@
 
         <form asp-controller="Account" asp-action="Login" method="post">
             @Html.AntiForgeryToken()
+            <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
+
+            <input type="hidden" asp-for="ReturnUrl" />
 
             <div class="form-1">
                 <label asp-for="Email">Email*</label>
                 <input asp-for="Email" type="text" id="email" placeholder="Nhập Email" />
-                <span asp-validation-for="Email" id="email-error" class="field-error"></span>
-
-                <!-- lỗi định dạng giống JSP: -->
-                <span id="email-error" class="field-error"></span>
+                <span asp-validation-for="Email" class="field-error"></span>
             </div>
 
             <div class="form-1">
@@ -176,7 +175,11 @@
                 <a asp-controller="Account" asp-action="Register" class="link-dki">Đăng ký tại đây</a>
             </div>
 
-            <a class="btn-gg" asp-controller="Account" asp-action="GoogleLogin">
+            <!-- ✅ Google login cũng giữ returnUrl -->
+            <a class="btn-gg"
+               asp-controller="Account"
+               asp-action="GoogleLogin"
+               asp-route-returnUrl="@Model.ReturnUrl">
                 <i class="fa-brands fa-google"></i> Google
             </a>
         </form>
@@ -201,17 +204,6 @@
         </script>
     }
 
-
-    <script>
-        // Trigger validate khi gõ
-        document.querySelector('input[name="Email"]')
-            ?.addEventListener('input', function () {
-                $(this).valid();
-            });
-    </script>
-
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
     @if (TempData["Success"] != null)
     {
         <script>
@@ -224,6 +216,11 @@
         </script>
     }
 
-    <partial name="_ValidationScriptsPartial" />
-
+    <script>
+        
+        document.querySelector('input[name="Email"]')
+            ?.addEventListener('input', function () {
+                if (window.$ && $(this).valid) $(this).valid();
+            });
+    </script>
 }

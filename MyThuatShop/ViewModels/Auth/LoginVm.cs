@@ -10,4 +10,5 @@ public class LoginVm
 
     [Required(ErrorMessage = "Vui lòng nhập mật khẩu.")]
     public string Password { get; set; } = "";
+    public string? ReturnUrl { get; set; }
 }

@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using MyThuatShop.Extensions;
-using MyThuatShop.Services;
 
 namespace MyThuatShop.Filters;
 
@@ -9,10 +7,16 @@ public class RequireLoginAttribute : ActionFilterAttribute
 {
     public override void OnActionExecuting(ActionExecutingContext context)
     {
-        var user = context.HttpContext.Session.GetObject<AccountApiService.UserDto>("currentUser");
-        if (user == null)
+        var http = context.HttpContext;
+        var userId = http.Session.GetInt32("UserId");
+
+        if (userId == null)
         {
-            context.Result = new RedirectToActionResult("Login", "Account", null);
+            var returnUrl = http.Request.Path + http.Request.QueryString;
+            context.Result = new RedirectToActionResult("Login", "Account", new { returnUrl });
+            return;
         }
+
+        base.OnActionExecuting(context);
     }
 }

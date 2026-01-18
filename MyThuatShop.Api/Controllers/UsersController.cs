@@ -6,6 +6,12 @@ using MyThuatShop.Api.Models;
 using System.Security.Cryptography;
 using System.Text;
 using MyThuatShop.Api.Utils;
+using MyThuatShop.Api.Dtos.Users;
+using MyThuatShop.Api.Dtos.Users;
+using MyThuatShop.Api.Utils;
+using Microsoft.EntityFrameworkCore;
+
+
 
 namespace MyThuatShop.Api.Controllers;
 
@@ -165,5 +171,70 @@ public class UsersController : ControllerBase
             }
         });
     }
+    // profile
+    // GET: api/users/{id}
+    [HttpGet("{id:int}")]
+    public async Task<ActionResult<UserProfileDto>> GetById(int id)
+    {
+        var user = await _db.Users.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+        if (user == null) return NotFound("Không tìm thấy user.");
+
+        return Ok(new UserProfileDto
+        {
+            Id = user.Id,
+            FullName = user.FullName,
+            Email = user.Email,
+            PhoneNumber = user.PhoneNumber,
+            Dob = user.Dob,
+            Address = user.Address,
+            Role = user.Role ?? "user"
+        });
+    }
+
+    // PUT: api/users/{id}
+    [HttpPut("{id:int}")]
+    public async Task<IActionResult> UpdateProfile(int id, [FromBody] UpdateProfileRequestDto req)
+    {
+        if (req == null) return BadRequest("Body rỗng.");
+        if (string.IsNullOrWhiteSpace(req.FullName)) return BadRequest("FullName là bắt buộc.");
+
+        var user = await _db.Users.FirstOrDefaultAsync(x => x.Id == id);
+        if (user == null) return NotFound("Không tìm thấy user.");
+
+        user.FullName = req.FullName.Trim();
+        user.PhoneNumber = string.IsNullOrWhiteSpace(req.PhoneNumber) ? null : req.PhoneNumber.Trim();
+        user.Dob = req.Dob;
+        user.Address = string.IsNullOrWhiteSpace(req.Address) ? null : req.Address.Trim();
+
+        await _db.SaveChangesAsync();
+        return NoContent();
+    }
+    // đổi mk
+    // PUT: api/users/{id}/change-password
+    [HttpPut("{id:int}/change-password")]
+    public async Task<IActionResult> ChangePassword(int id, [FromBody] ChangePasswordRequestDto req)
+    {
+        if (req == null) return BadRequest("Body rỗng.");
+        if (string.IsNullOrWhiteSpace(req.CurrentPassword)) return BadRequest("Mật khẩu hiện tại không được để trống.");
+        if (string.IsNullOrWhiteSpace(req.NewPassword)) return BadRequest("Mật khẩu mới không được để trống.");
+        if (req.NewPassword.Length < 6) return BadRequest("Mật khẩu mới tối thiểu 6 ký tự.");
+        if (req.NewPassword != req.ConfirmNewPassword) return BadRequest("Xác nhận mật khẩu mới không khớp.");
+
+        var user = await _db.Users.FirstOrDefaultAsync(x => x.Id == id);
+        if (user == null) return NotFound("Không tìm thấy user.");
+
+        // ✅ so MD5 + randomKey đúng y như login
+        var currentHashed = MyUtils.ToMd5Hash(req.CurrentPassword, user.RandomKey);
+        if (!string.Equals(user.Password, currentHashed, StringComparison.OrdinalIgnoreCase))
+            return BadRequest("Mật khẩu hiện tại không đúng.");
+
+        // ✅ đổi randomKey mới (khuyên dùng)
+        user.RandomKey = MyUtils.keyGenerator(10);
+        user.Password = MyUtils.ToMd5Hash(req.NewPassword, user.RandomKey);
+
+        await _db.SaveChangesAsync();
+        return NoContent();
+    }
+
 
 }

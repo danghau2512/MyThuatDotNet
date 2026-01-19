@@ -118,7 +118,12 @@ builder.Services.AddHttpClient<AdminCategoryApiService>(client =>
 }).ConfigurePrimaryHttpMessageHandler(CreateHandler);
 
 
-
+builder.Services.AddHttpClient<AdminContactsApiService>((sp, http) =>
+{
+    var cfg = sp.GetRequiredService<IConfiguration>();
+    var baseUrl = cfg["ApiBaseUrl"];
+    http.BaseAddress = new Uri(baseUrl!);
+});
 
 // ===== AUTH =====
 var googleClientId = builder.Configuration["Authentication:Google:ClientId"];
@@ -167,6 +172,9 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
+
+
+
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();

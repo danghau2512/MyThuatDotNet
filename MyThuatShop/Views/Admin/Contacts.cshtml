@@ -1,0 +1,361 @@
+﻿@model List<MyThuatShop.Dtos.Admin.AdminContactRowDto>
+@{
+    ViewData["Title"] = "Quản lý liên hệ";
+    ViewData["ActiveMenu"] = "contacts";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@section Styles {
+    <style>
+        .product-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+            .product-table th {
+                background: #2659F5;
+                color: #fff;
+                padding: 12px;
+            }
+
+            .product-table td {
+                padding: 12px;
+                background: #fafafa;
+                vertical-align: top;
+            }
+
+            .product-table tr:nth-child(even) td {
+                background: #f0f0f0;
+            }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        .badge-pending {
+            background: #FFF3CD;
+            color: #555;
+        }
+
+        .badge-done {
+            background: #D1FAE5;
+            color: #0f5132;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-icon {
+            width: 38px;
+            height: 34px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-reply {
+            background: #0D6EFD;
+            color: #fff;
+        }
+
+        .btn-del {
+            background: #DC3545;
+            color: #fff;
+        }
+
+        .btn-reply:hover {
+            filter: brightness(.95);
+        }
+
+        .btn-del:hover {
+            filter: brightness(.95);
+        }
+
+        .modal-mask {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .modal {
+            width: 520px;
+            max-width: calc(100% - 24px);
+            background: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            padding: 16px 18px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-body {
+            padding: 16px 18px;
+        }
+
+            .modal-body textarea {
+                width: 100%;
+                padding: 10px;
+                border: 1px solid #ddd;
+                border-radius: 6px;
+            }
+
+        .modal-footer {
+            padding: 14px 18px;
+            border-top: 1px solid #ddd;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 6px;
+            padding: 8px 14px;
+            cursor: pointer;
+        }
+
+        .btn-light {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+        }
+
+        .btn-primary {
+            background: #2659F3;
+            color: #fff;
+        }
+    </style>
+}
+
+<div class="container">
+    @if (TempData["ErrorMsg"] != null)
+    {
+        <div class="card msg msg-error">@TempData["ErrorMsg"]</div>
+    }
+    @if (TempData["SuccessMsg"] != null)
+    {
+        <div class="card msg msg-ok">@TempData["SuccessMsg"]</div>
+    }
+
+    <div class="card">
+        <h2 style="margin:0 0 10px 0;">Quản lý liên hệ</h2>
+
+        <table id="tblContacts" class="product-table display">
+            <thead>
+                <tr>
+                    <th>STT</th>
+                    <th>Họ Tên</th>
+                    <th>Số Điện Thoại</th>
+                    <th>Email</th>
+                    <th>Ngày Gửi</th>
+                    <th>Nội Dung</th>
+                    <th>Trạng Thái</th>
+                    <th>Tùy Chọn</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var c in Model)
+                {
+                    var isDone = string.Equals((c.Status ?? "").Trim(), "Đã phản hồi", StringComparison.OrdinalIgnoreCase);
+                    var badgeClass = isDone ? "badge-done" : "badge-pending";
+                    var dateIso = c.CreateAt.ToString("yyyy-MM-ddTHH:mm:ss");
+                    var dateShow = c.CreateAt.ToString("dd-MM-yyyy");
+
+                    <tr data-contact-id="@c.Id">
+                        <td></td>
+                        <td id="name-@c.Id">@c.FullName</td>
+                        <td>@(c.PhoneNumber ?? "-")</td>
+                        <td id="email-@c.Id">@(c.Email ?? "-")</td>
+                        <td data-order="@dateIso">@dateShow</td>
+                        <td style="max-width:420px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                            @(c.Message ?? "-")
+                        </td>
+                        <td>
+                            <span id="badge-@c.Id" class="badge @badgeClass">
+                                @(isDone ? "Đã phản hồi" : "Chờ phản hồi")
+                            </span>
+                        </td>
+                        <td>
+                            <div class="actions" id="actions-@c.Id">
+                                @if (!isDone)
+                                {
+                                    <button type="button" class="btn-icon btn-reply"
+                                            title="Phản hồi"
+                                            data-id="@c.Id"
+                                            data-email="@(c.Email ?? "")"
+                                            onclick="openReplyModal(this)">
+                                        <i class="fa-solid fa-reply"></i>
+                                    </button>
+                                }
+                                <button type="button" class="btn-icon btn-del"
+                                        title="Xóa"
+                                        onclick="deleteContact(@c.Id)">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal reply -->
+<div id="replyMask" class="modal-mask" onclick="closeReplyModal(event)">
+    <div class="modal" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h3 style="margin:0;">Phản hồi khách hàng</h3>
+            <span style="font-size:22px;cursor:pointer;color:#999;" onclick="hideReply()">&times;</span>
+        </div>
+
+        <form id="frmReply" method="post" action="/admin/contacts/reply">
+            @Html.AntiForgeryToken()
+            <div class="modal-body">
+                <input type="hidden" name="contactId" id="replyContactId" />
+
+                <p style="margin:0 0 10px 0;"><b>Email:</b> <span id="replyEmailText"></span></p>
+
+                <label style="display:block;margin:8px 0 6px 0;font-weight:700;">Tiêu đề</label>
+                <input name="subject" id="replySubject"
+                       style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;"
+                       value="Phản hồi liên hệ" />
+
+                <label style="display:block;margin:12px 0 6px 0;font-weight:700;">Nội dung phản hồi</label>
+                <textarea name="replyMessage" id="replyMessage" rows="6"
+                          placeholder="Nhập nội dung phản hồi..."></textarea>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" onclick="hideReply()">Hủy</button>
+                <button type="submit" class="btn btn-primary">Gửi phản hồi</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Form delete hidden để lấy AntiForgery -->
+<form id="frmDelete" method="post" action="/admin/contacts/delete" style="display:none;">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="contactId" id="delContactId" />
+</form>
+
+@section Scripts {
+    <script>
+        $(function(){
+          const viLang = {
+            emptyTable: "Không có dữ liệu",
+            info: "Hiển thị _START_ đến _END_ của _TOTAL_ dòng",
+            infoEmpty: "Hiển thị 0 đến 0 của 0 dòng",
+            lengthMenu: "Hiển thị _MENU_ dòng",
+            loadingRecords: "Đang tải...",
+            processing: "Đang xử lý...",
+            search: "Tìm:",
+            zeroRecords: "Không tìm thấy dữ liệu phù hợp",
+            paginate: { first: "Đầu", last: "Cuối", next: "Sau", previous: "Trước" }
+          };
+
+          const dt = $('#tblContacts').DataTable({
+            pageLength: 8,
+            lengthMenu: [5,8,10,25,50,100],
+            language: viLang,
+            columnDefs: [{ orderable:false, targets:[0,7] }],
+            order: [[4,"desc"]]
+          });
+
+          dt.on('order.dt search.dt draw.dt', function () {
+            dt.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+              cell.innerHTML = i + 1;
+            });
+          }).draw();
+
+          // AJAX submit reply
+          document.getElementById('frmReply').addEventListener('submit', async (e)=>{
+            e.preventDefault();
+            const frm = e.target;
+            const fd = new FormData(frm);
+
+            const res = await fetch(frm.action, {
+              method:'POST',
+              headers:{ 'X-Requested-With':'XMLHttpRequest' },
+              body: fd
+            });
+
+            const data = await res.json();
+            if(!data.ok){
+              alert(data.err || 'Gửi phản hồi thất bại');
+              return;
+            }
+
+            const id = fd.get('contactId');
+
+            // Update badge + remove reply button
+            const badge = document.getElementById(`badge-${id}`);
+            badge.className = 'badge badge-done';
+            badge.innerText = 'Đã phản hồi';
+
+            const actions = document.getElementById(`actions-${id}`);
+            // giữ lại nút delete, bỏ nút reply
+            actions.querySelectorAll('.btn-reply').forEach(x => x.remove());
+
+            hideReply();
+            alert('Đã gửi phản hồi thành công!');
+          });
+        });
+
+        function openReplyModal(btn){
+          const id = btn.getAttribute('data-id');
+          const email = btn.getAttribute('data-email') || '';
+
+          document.getElementById('replyContactId').value = id;
+          document.getElementById('replyEmailText').innerText = email || '(không có email)';
+          document.getElementById('replyMessage').value = '';
+          document.getElementById('replyMask').style.display = 'flex';
+        }
+        function hideReply(){ document.getElementById('replyMask').style.display='none'; }
+        function closeReplyModal(e){ if(e.target && e.target.id==='replyMask') hideReply(); }
+
+        async function deleteContact(id){
+          if(!confirm('Bạn chắc chắn muốn xóa liên hệ này?')) return;
+
+          const frm = document.getElementById('frmDelete');
+          document.getElementById('delContactId').value = id;
+          const fd = new FormData(frm);
+
+          const res = await fetch(frm.action, {
+            method:'POST',
+            headers:{ 'X-Requested-With':'XMLHttpRequest' },
+            body: fd
+          });
+
+          const data = await res.json();
+          if(!data.ok){
+            alert(data.err || 'Xóa thất bại');
+            return;
+          }
+
+          // remove row (DataTables)
+          const table = $('#tblContacts').DataTable();
+          const tr = document.querySelector(`tr[data-contact-id="${id}"]`);
+          table.row(tr).remove().draw(false);
+          alert('Đã xóa!');
+        }
+    </script>
+}

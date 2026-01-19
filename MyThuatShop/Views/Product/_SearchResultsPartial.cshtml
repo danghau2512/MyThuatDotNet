@@ -1,4 +1,9 @@
 ﻿@model MyThuatShop.ViewModels.SearchPageVm
+@using MyThuatShop.Helpers
+
+@{
+    var ApiBaseUrl = "https://localhost:7090";
+}
 
 @if (Model.Products == null || !Model.Products.Any())
 {
@@ -7,6 +12,11 @@
 else
 {
     <div class="list-product" id="productList">
+        @* Nếu _ProductList render ảnh trực tiếp thì phải sửa ở _ProductList.
+           Mình sẽ xử lý luôn ở đây bằng cách pass ApiBaseUrl qua ViewBag *@
+        @{
+            ViewBag.ApiBaseUrl = ApiBaseUrl;
+        }
         @await Html.PartialAsync("_ProductList", Model.Products)
     </div>
 
@@ -28,7 +38,6 @@ else
                 &laquo;
             </a>
 
-            @* Trang đầu *@
             @if (start > 1)
             {
                 <a class="page-link" data-page="1" href="@UrlPage(1)">1</a>
@@ -38,7 +47,6 @@ else
                 }
             }
 
-            @* Các trang quanh current *@
             @for (var i = start; i <= end; i++)
             {
                 <a class="page-link @(i == current ? "active" : "")"
@@ -46,7 +54,6 @@ else
                    href="@UrlPage(i)">@i</a>
             }
 
-            @* Trang cuối *@
             @if (end < total)
             {
                 if (end < total - 1)

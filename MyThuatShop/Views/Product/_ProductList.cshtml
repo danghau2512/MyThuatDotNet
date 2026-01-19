@@ -1,12 +1,25 @@
 ﻿@model List<MyThuatShop.ViewModels.ProductCardVm>
+@using MyThuatShop.Helpers
+
+@{
+    // Lấy baseUrl từ ViewBag (được set trong _SearchResultsPartial), nếu không có thì fallback
+    var ApiBaseUrl = (ViewBag.ApiBaseUrl as string) ?? "https://localhost:7090";
+}
 
 @foreach (var p in Model)
 {
     var finalPrice = p.Price * (100 - p.DiscountDefault) / 100m;
 
+    // ✅ Chuẩn hóa URL ảnh (fix 404 host 7288)
+    var thumb = ImageUrlHelper.ToAbsolute(p.Thumbnail, ApiBaseUrl);
+    if (string.IsNullOrWhiteSpace(thumb))
+    {
+        thumb = "/assets/images/logo/list1-1.jpg";
+    }
+
     <div class="list-product-list1">
         <a asp-controller="Product" asp-action="Detail" asp-route-id="@p.Id">
-            <img src="@p.Thumbnail" alt="@p.Name" />
+            <img src="@thumb" alt="@p.Name" />
 
             <div class="list-product-list1-content">
                 <div class="list-product-list1-content-socials">
@@ -24,10 +37,8 @@
 
                     <h2 class="price-product-after">@finalPrice.ToString("N0")₫</h2>
 
-                    
-                        <p class="price-product-before">@p.Price.ToString("N0")₫</p>
-                        <span class="price-product-discount">-@p.DiscountDefault%</span>
-                    
+                    <p class="price-product-before">@p.Price.ToString("N0")₫</p>
+                    <span class="price-product-discount">-@p.DiscountDefault%</span>
 
                     <div class="button">
                         <button type="button" class="btn-xemchitiet">

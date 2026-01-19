@@ -1,0 +1,760 @@
+﻿@model List<MyThuatShop.Services.ProductDto>
+
+@{
+    ViewData["Title"] = "Quản lý sản phẩm";
+    ViewData["ActiveMenu"] = "products";
+
+    // ✅ base URL của API để load ảnh /uploads/...
+    var ApiBaseUrl = "https://localhost:7090";
+
+    // categories từ ViewBag
+    var categories = ViewBag.Categories as List<MyThuatShop.Dtos.Admin.AdminCategoryDto> ?? new();
+}
+
+@section Styles {
+
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css" />
+
+    <style>
+        /* ===== Layout right ===== */
+        #main .right .container {
+            display: flex;
+            flex-direction: column;
+            width: calc(100% - 100px);
+            margin: 20px auto 0 auto;
+        }
+
+        .list-container {
+            width: 95%;
+            margin: 30px auto;
+            background: #fff;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,.1);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .btn-add {
+            background: #2659F5;
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+            .btn-add:hover {
+                background: #17479D;
+            }
+
+        /* ===== Table ===== */
+        table.product-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+            table.product-table th {
+                background: #2659F5;
+                color: #fff;
+                padding: 12px;
+                font-size: 14px;
+            }
+
+            table.product-table td {
+                padding: 12px;
+                background: #fafafa;
+                border-bottom: 1px solid #ddd;
+                border-left: 1px solid #ddd;
+                border-right: 1px solid #ddd;
+                vertical-align: middle;
+            }
+
+            table.product-table tr:nth-child(even) td {
+                background: #f0f0f0;
+            }
+
+        .thumb {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+
+        .col-thumb {
+            text-align: center;
+            width: 90px;
+        }
+
+        /* ===== Buttons ===== */
+        .btn-icon {
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 5px;
+            border: none;
+        }
+
+        .btn-edit {
+            background: #FFC107;
+            color: #000;
+        }
+
+        .btn-lock {
+            background: #DC3545;
+        }
+
+        .btn-unlock {
+            background: #FFC107;
+            color: #000;
+        }
+
+        .btn-icon:hover {
+            opacity: .85;
+        }
+
+        /* ===== Badge ===== */
+        .badge-active {
+            color: #28a745;
+            font-weight: 600;
+        }
+
+        .badge-inactive {
+            color: #dc3545;
+            font-weight: 600;
+        }
+
+        /* ===== DataTables ===== */
+        .dataTables_wrapper {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .dataTables_filter input,
+        .dataTables_length select {
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            outline: none;
+        }
+
+        .dataTables_filter {
+            margin-bottom: 10px;
+        }
+
+        .dataTables_paginate .paginate_button {
+            padding: 6px 10px !important;
+            border-radius: 6px !important;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+            background: #17479D !important;
+            color: #fff !important;
+            border: 1px solid #17479D !important;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+            background: #17479D !important;
+            color: #fff !important;
+            border: 1px solid #17479D !important;
+        }
+
+        /* ===== Modal ===== */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background: #fff;
+            padding: 25px;
+            width: 900px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,.2);
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: fadeIn .2s ease;
+        }
+
+        @@keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .modal-content label {
+            display: block;
+            margin-top: 10px;
+            font-size: 14px;
+            color: #444;
+        }
+
+        .modal-content input,
+        .modal-content select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 4px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+            gap: 10px;
+        }
+
+        #btn-save {
+            background: #2659F5;
+            color: #fff;
+            padding: 8px 14px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #btn-close {
+            background: #ccc;
+            padding: 8px 14px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #removeMainBtn {
+            margin-top: 10px;
+            padding: 6px 10px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            background: #eee;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 24px;
+        }
+
+        .form-col {
+            flex: 1;
+        }
+
+        /* subimages preview */
+        .sub-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .sub-box {
+            position: relative;
+            display: inline-block;
+        }
+
+            .sub-box img {
+                width: 100px;
+                height: 100px;
+                object-fit: cover;
+                border-radius: 8px;
+                border: 1px solid #ddd;
+            }
+
+            .sub-box button {
+                position: absolute;
+                top: -5px;
+                right: -5px;
+                width: 22px;
+                height: 22px;
+                border-radius: 50%;
+                border: none;
+                cursor: pointer;
+                background: #DC3545;
+                color: #fff;
+                font-size: 12px;
+            }
+    </style>
+}
+
+<div class="container">
+    <div class="list-container">
+        <div class="header">
+            <h1>Danh sách sản phẩm</h1>
+            <button class="btn-add" id="btnAdd" type="button">Thêm sản phẩm</button>
+        </div>
+
+        @if (TempData["ErrorMsg"] != null)
+        {
+            <div style="margin-bottom:12px;padding:10px;border:1px solid #f5c2c7;background:#f8d7da;color:#842029;border-radius:8px;">
+                @TempData["ErrorMsg"]
+            </div>
+        }
+
+        <table id="productTable" class="product-table display">
+            <thead>
+                <tr>
+                    <th>STT</th>
+                    <th>ID</th>
+                    <th>Tên sản phẩm</th>
+                    <th>Hình ảnh</th>
+                    <th>Danh mục</th>
+                    <th>Giá</th>
+                    <th>Ngày tạo</th>
+                    <th>Số lượng tồn</th>
+                    <th>Trạng thái</th>
+                    <th>Tùy chọn</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @* ✅ KHÔNG render "Không có sản phẩm" bằng colspan để tránh lỗi DataTables *@
+                @if (Model != null && Model.Count > 0)
+                {
+                    foreach (var p in Model)
+                    {
+                        // main thumb url
+                        var thumb = p.Thumbnail ?? "";
+                        var imgUrl = thumb;
+
+                        if (!string.IsNullOrWhiteSpace(imgUrl) &&
+                        !imgUrl.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+                        {
+                            if (!imgUrl.StartsWith("/")) imgUrl = "/" + imgUrl;
+                            imgUrl = ApiBaseUrl + imgUrl;
+                        }
+
+                        // category name
+                        var catName = categories.FirstOrDefault(x => x.Id == p.CategoryId)?.CategoryName ?? "-";
+
+                        // spec (lấy record đầu tiên)
+                        var spec = (p.Specifications != null && p.Specifications.Count > 0) ? p.Specifications[0] : null;
+
+                        // subimages list => csv full-url để edit preview
+                        var subCsv = "";
+                        if (p.Subimages != null && p.Subimages.Count > 0)
+                        {
+                            var urls = p.Subimages.Select(s =>
+                            {
+                                var u = s.Image ?? "";
+                                if (!string.IsNullOrWhiteSpace(u) && !u.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    if (!u.StartsWith("/")) u = "/" + u;
+                                    u = ApiBaseUrl + u;
+                                }
+                                return u;
+                            });
+                            subCsv = string.Join(",", urls);
+                        }
+
+                        <tr>
+                            <td></td>
+                            <td>@p.Id</td>
+                            <td>@p.Name</td>
+
+                            <td class="col-thumb">
+                                @if (!string.IsNullOrWhiteSpace(p.Thumbnail))
+                                {
+                                    <img class="thumb" src="@imgUrl" alt="product" />
+                                }
+                                else
+                                {
+
+                                    <span>-</span>
+                                }
+                            </td>
+
+                            <td>@catName</td>
+                            <td>@p.Price</td>
+                            <td>@(p.CreateAt?.ToString("yyyy-MM-dd HH:mm") ?? "-")</td>
+                            <td>@(p.QuantityStock ?? 0)</td>
+
+                            <td>
+                                @if (p.IsActive)
+                                {
+                                    <span class="badge-active">Đang bán</span>
+                                }
+                                else
+                                {
+                                    <span class="badge-inactive">Ngừng bán</span>
+                                }
+                            </td>
+
+                            <td>
+                                <!-- EDIT -->
+                                <button type="button"
+                                        class="btn-icon btn-edit btnEdit"
+                                        data-id="@p.Id"
+                                        data-name="@p.Name"
+                                        data-categoryid="@p.CategoryId"
+                                        data-price="@p.Price"
+                                        data-discount="@(p.DiscountDefault ?? 0)"
+                                        data-quantity="@(p.QuantityStock ?? 0)"
+                                        data-brand="@(p.Brand ?? "")"
+                                        data-thumbnail="@imgUrl"
+                                        data-subimages="@subCsv"
+                                        data-size="@(spec?.Size ?? "")"
+                                        data-standard="@(spec?.Standard ?? "")"
+                                        data-madein="@(spec?.MadeIn ?? "")"
+                                        data-warning="@(spec?.Warning ?? "")">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                </button>
+
+                                
+                                <form asp-controller="AdminProduct" asp-action="Post" method="post" style="display:inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="action" value="toggleActive" />
+                                    <input type="hidden" name="id" value="@p.Id" />
+
+                                    @if (p.IsActive)
+                                    {
+                                        <input type="hidden" name="newIsActive" value="0" />
+                                        <button class="btn-icon btn-lock" type="submit"
+                                                onclick="return confirm('Khóa (ngừng bán) sản phẩm này?')"
+                                                title="Khóa sản phẩm">
+                                            <i class="fa-solid fa-lock"></i>
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <input type="hidden" name="newIsActive" value="1" />
+                                        <button class="btn-icon btn-unlock" type="submit"
+                                                onclick="return confirm('Mở khóa (bán lại) sản phẩm này?')"
+                                                title="Mở khóa sản phẩm">
+                                            <i class="fa-solid fa-lock-open"></i>
+                                        </button>
+                                    }
+                                </form>
+
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- ===== MODAL ADD/EDIT ===== -->
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <h2 id="modalTitle">Thêm sản phẩm</h2>
+
+        <form id="productForm"
+              asp-controller="AdminProduct"
+              asp-action="Post"
+              method="post"
+              enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+
+            <!-- hidden -->
+            <input type="hidden" name="action" id="action" value="create" />
+            <input type="hidden" name="id" id="dbId" value="" />
+
+            <!-- ✅ remove main thumbnail giống categories -->
+            <input type="hidden" name="removeThumbnail" id="removeThumbnail" value="0" />
+
+            <div class="form-row">
+                <div class="form-col">
+                    <label>Danh mục</label>
+                    <select id="categoryId" name="categoryId">
+                        @foreach (var c in categories)
+                        {
+                            <option value="@c.Id">@c.CategoryName</option>
+                        }
+                    </select>
+
+                    <label>Tên sản phẩm</label>
+                    <input type="text" id="name" name="name" required />
+
+                    <label>Ảnh chính</label>
+                    <input type="file" id="thumbnailMain" name="thumbnailMain" accept="image/*" />
+                    <img id="previewMain" style="width:120px; display:none; margin-top:10px;" />
+                    <button type="button" id="removeMainBtn" style="display:none;">Xóa ảnh</button>
+
+                    <label>Ảnh phụ</label>
+                    <input type="file" id="thumbnailSubs" name="thumbnailSubs" multiple accept="image/*" />
+                    <div id="subPreview" class="sub-preview"></div>
+
+                    <label>Giảm giá (%)</label>
+                    <input type="number" id="discountDefault" name="discountDefault" value="0" min="0" max="100" />
+
+                    <label>Giá bán</label>
+                    <input type="number" id="price" name="price" required min="0" step="0.01" />
+
+                    <label>Số lượng sản phẩm</label>
+                    <input type="number" id="quantityStock" name="quantityStock" required min="0" />
+                </div>
+
+                <div class="form-col">
+                    <label>Thương hiệu</label>
+                    <input type="text" id="brand" name="brand" />
+
+                    <label>Kích thước</label>
+                    <input type="text" id="size" name="size" />
+
+                    <label>Tiêu chuẩn</label>
+                    <input type="text" id="standard" name="standard" />
+
+                    <label>Xuất xứ</label>
+                    <input type="text" id="madeIn" name="madeIn" />
+
+                    <label>Cảnh báo an toàn</label>
+                    <input type="text" id="warning" name="warning" />
+                </div>
+            </div>
+
+            <div class="modal-buttons">
+                <button id="btn-save" type="submit">Lưu</button>
+                <button id="btn-close" type="button">Hủy</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+
+    <script>
+        // ===== Modal controls =====
+        const modal = document.getElementById("modal");
+        const btnAdd = document.getElementById("btnAdd");
+        const btnClose = document.getElementById("btn-close");
+        const modalTitle = document.getElementById("modalTitle");
+
+        const actionInput = document.getElementById("action");
+        const dbId = document.getElementById("dbId");
+
+        const categoryId = document.getElementById("categoryId");
+        const nameInput = document.getElementById("name");
+        const discountInput = document.getElementById("discountDefault");
+        const priceInput = document.getElementById("price");
+        const qtyInput = document.getElementById("quantityStock");
+        const brandInput = document.getElementById("brand");
+
+        const sizeInput = document.getElementById("size");
+        const standardInput = document.getElementById("standard");
+        const madeInInput = document.getElementById("madeIn");
+        const warningInput = document.getElementById("warning");
+
+        // main preview + remove
+        const removeThumbnailInput = document.getElementById("removeThumbnail");
+        const thumbMainInput = document.getElementById("thumbnailMain");
+        const previewMain = document.getElementById("previewMain");
+        const removeMainBtn = document.getElementById("removeMainBtn");
+
+        // sub preview
+        const thumbSubsInput = document.getElementById("thumbnailSubs");
+        const subPreview = document.getElementById("subPreview");
+
+        let subUrlsFromDb = [];
+        let subLocalFiles = [];
+
+        function openModal(){ modal.style.display = "flex"; }
+        function closeModal(){ modal.style.display = "none"; }
+
+        btnAdd.addEventListener("click", () => {
+            modalTitle.innerText = "Thêm sản phẩm";
+            actionInput.value = "create";
+            dbId.value = "";
+
+            categoryId.selectedIndex = 0;
+            nameInput.value = "";
+            discountInput.value = 0;
+            priceInput.value = "";
+            qtyInput.value = 0;
+            brandInput.value = "";
+
+            sizeInput.value = "";
+            standardInput.value = "";
+            madeInInput.value = "";
+            warningInput.value = "";
+
+            // reset main
+            removeThumbnailInput.value = "0";
+            thumbMainInput.value = "";
+            previewMain.src = "";
+            previewMain.style.display = "none";
+            removeMainBtn.style.display = "none";
+
+            // reset subs
+            thumbSubsInput.value = "";
+            subUrlsFromDb = [];
+            subLocalFiles = [];
+            subPreview.innerHTML = "";
+
+            openModal();
+        });
+
+        btnClose.addEventListener("click", closeModal);
+        window.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
+
+        // ===== MAIN PREVIEW =====
+        thumbMainInput.addEventListener("change", function(){
+            const file = this.files && this.files[0];
+            if (file) {
+                previewMain.src = URL.createObjectURL(file);
+                previewMain.style.display = "block";
+                removeMainBtn.style.display = "inline-block";
+                removeThumbnailInput.value = "0";
+            }
+        });
+
+        removeMainBtn.addEventListener("click", function(){
+            thumbMainInput.value = "";
+            previewMain.src = "";
+            previewMain.style.display = "none";
+            removeMainBtn.style.display = "none";
+            // ✅ giống categories
+            removeThumbnailInput.value = "1";
+        });
+
+        // ===== SUB PREVIEW (local upload) =====
+        thumbSubsInput.addEventListener("change", function(){
+            subLocalFiles = Array.from(this.files || []).map(f => ({ file: f, url: URL.createObjectURL(f) }));
+            renderSub();
+        });
+
+        function renderSub() {
+            subPreview.innerHTML = "";
+
+            subUrlsFromDb.forEach((u, idx) => {
+                const box = document.createElement("div");
+                box.className = "sub-box";
+
+                const img = document.createElement("img");
+                img.src = u;
+
+                const btn = document.createElement("button");
+                btn.type = "button";
+                btn.innerHTML = "×";
+                btn.onclick = () => {
+                    subUrlsFromDb.splice(idx, 1);
+                    renderSub();
+                };
+
+                box.appendChild(img);
+                box.appendChild(btn);
+                subPreview.appendChild(box);
+            });
+
+            subLocalFiles.forEach((obj, idx) => {
+                const box = document.createElement("div");
+                box.className = "sub-box";
+
+                const img = document.createElement("img");
+                img.src = obj.url;
+
+                const btn = document.createElement("button");
+                btn.type = "button";
+                btn.innerHTML = "×";
+                btn.onclick = () => {
+                    subLocalFiles.splice(idx, 1);
+                    renderSub();
+                };
+
+                box.appendChild(img);
+                box.appendChild(btn);
+                subPreview.appendChild(box);
+            });
+        }
+
+        // ===== EDIT fill =====
+        document.querySelectorAll(".btnEdit").forEach(btn => {
+            btn.addEventListener("click", () => {
+                modalTitle.innerText = "Cập nhật sản phẩm";
+                actionInput.value = "update";
+
+                removeThumbnailInput.value = "0";
+
+                dbId.value = btn.getAttribute("data-id") || "";
+                nameInput.value = btn.getAttribute("data-name") || "";
+                categoryId.value = btn.getAttribute("data-categoryid") || "";
+                priceInput.value = btn.getAttribute("data-price") || 0;
+                discountInput.value = btn.getAttribute("data-discount") || 0;
+                qtyInput.value = btn.getAttribute("data-quantity") || 0;
+                brandInput.value = btn.getAttribute("data-brand") || "";
+
+                sizeInput.value = btn.getAttribute("data-size") || "";
+                standardInput.value = btn.getAttribute("data-standard") || "";
+                madeInInput.value = btn.getAttribute("data-madein") || "";
+                warningInput.value = btn.getAttribute("data-warning") || "";
+
+                // main thumb from DB
+                const thumb = btn.getAttribute("data-thumbnail") || "";
+                if (thumb.trim() !== "" && !thumb.endsWith("/")) {
+                    previewMain.src = thumb;
+                    previewMain.style.display = "block";
+                    removeMainBtn.style.display = "inline-block";
+                } else {
+                    previewMain.src = "";
+                    previewMain.style.display = "none";
+                    removeMainBtn.style.display = "none";
+                }
+
+                // reset file inputs
+                thumbMainInput.value = "";
+                thumbSubsInput.value = "";
+
+                // subimages urls from DB
+                const csv = btn.getAttribute("data-subimages") || "";
+                subUrlsFromDb = csv.trim() ? csv.split(",").map(x => x.trim()).filter(x => x) : [];
+                subLocalFiles = [];
+                renderSub();
+
+                openModal();
+            });
+        });
+
+        // ===== DataTables + Auto STT =====
+        $(function () {
+            const viUrl = "https://cdn.datatables.net/plug-ins/1.13.8/i18n/vi.json";
+
+            const table = $("#productTable").DataTable({
+                pageLength: 5,
+                lengthChange: false,
+                ordering: true,
+                searching: true,
+                info: false,
+                language: { url: viUrl },
+                columnDefs: [
+                    { orderable: false, targets: [0, 3, 9] }
+                ],
+                order: [[1, "asc"]]
+            });
+
+            table.on("order.dt search.dt draw.dt", function () {
+                const pageInfo = table.page.info();
+                table.column(0, { search: "applied", order: "applied" }).nodes()
+                    .each(function (cell, i) {
+                        cell.innerHTML = pageInfo.start + i + 1;
+                    });
+            }).draw();
+        });
+    </script>
+}

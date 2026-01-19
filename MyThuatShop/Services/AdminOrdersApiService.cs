@@ -18,7 +18,7 @@ public class AdminOrdersApiService
         _http = http;
     }
     public record UpdateOrderInfoRequest(int OrderId, string FullName, string PhoneNumber, string Address);
-    public record UpdateOrderStatusRequest(int OrderId, int StatusId);
+    public record ChangeOrderStatusRequest(int OrderId, int StatusId);
 
     public async Task<(List<AdminOrderRowDto>? data, string? err)> GetOrdersAsync(string? status = null)
     {
@@ -66,7 +66,7 @@ public class AdminOrdersApiService
         try
         {
             var resp = await _http.PostAsJsonAsync("/api/admin/orders/change-status",
-                new UpdateOrderStatusRequest(orderId, statusId));
+                new ChangeOrderStatusRequest(orderId, statusId));
 
             if (!resp.IsSuccessStatusCode)
             {

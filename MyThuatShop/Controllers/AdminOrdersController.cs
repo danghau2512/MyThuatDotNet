@@ -32,14 +32,38 @@ public class AdminOrdersController : Controller
         return View("~/Views/Admin/Orders.cshtml", data ?? new());
     }
 
+    private static bool IsAjax(HttpRequest req)
+    => req.Headers["X-Requested-With"] == "XMLHttpRequest";
+
+    private static string StatusNameFromId(int id) => id switch
+    {
+        1 => "Đang xử lý",
+        2 => "Đang vận chuyển",
+        3 => "Hoàn thành",
+        4 => "Đã hủy",
+        _ => "Đang xử lý"
+    };
+
     [HttpPost("/admin/orders/update-info")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> UpdateInfo([FromForm] int orderId,
-    [FromForm] string fullName, [FromForm] string phoneNumber, [FromForm] string address)
+        [FromForm] string fullName, [FromForm] string phoneNumber, [FromForm] string address)
     {
-        var result = await _api.UpdateInfoAsync(orderId, fullName, phoneNumber, address);
-        var ok = result.ok;
-        var err = result.err;
+        var (ok, err) = await _api.UpdateInfoAsync(orderId, fullName, phoneNumber, address);
+
+        if (IsAjax(Request))
+        {
+            return Json(new
+            {
+                ok,
+                err,
+                orderId,
+                fullName,
+                phoneNumber,
+                address
+            });
+        }
+
         TempData[ok ? "SuccessMsg" : "ErrorMsg"] = ok ? "Cập nhật thông tin thành công!" : ("Cập nhật thất bại: " + err);
         return RedirectToAction(nameof(Index));
     }
@@ -48,9 +72,20 @@ public class AdminOrdersController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> ChangeStatus([FromForm] int orderId, [FromForm] int statusId)
     {
-        var result = await _api.ChangeStatusAsync(orderId, statusId);
-        var ok = result.ok;
-        var err = result.err;
+        var (ok, err) = await _api.ChangeStatusAsync(orderId, statusId);
+
+        if (IsAjax(Request))
+        {
+            return Json(new
+            {
+                ok,
+                err,
+                orderId,
+                statusId,
+                statusName = StatusNameFromId(statusId)
+            });
+        }
+
         TempData[ok ? "SuccessMsg" : "ErrorMsg"] = ok ? "Đổi trạng thái thành công!" : ("Đổi trạng thái thất bại: " + err);
         return RedirectToAction(nameof(Index));
     }

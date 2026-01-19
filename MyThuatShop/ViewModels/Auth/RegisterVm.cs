@@ -11,7 +11,6 @@ public class RegisterVm
     [EmailAddress(ErrorMessage = "Email không hợp lệ (vd: ten@gmail.com)")]
     public string Email { get; set; } = "";
 
-    // Không bắt buộc nhập, nhưng nếu nhập thì phải đúng định dạng 10 số bắt đầu bằng 0
     [RegularExpression(@"^0\d{9}$", ErrorMessage = "SĐT không hợp lệ (vd: 0912345678)")]
     public string? PhoneNumber { get; set; }
 
@@ -22,4 +21,9 @@ public class RegisterVm
     )]
     [DataType(DataType.Password)]
     public string Password { get; set; } = "";
+
+    [Required(ErrorMessage = "Vui lòng nhập lại mật khẩu.")]
+    [Compare("Password", ErrorMessage = "Nhập lại mật khẩu không khớp.")]
+    [DataType(DataType.Password)]
+    public string ConfirmPassword { get; set; } = "";
 }

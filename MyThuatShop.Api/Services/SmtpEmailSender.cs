@@ -10,7 +10,6 @@ public class SmtpEmailSender : IEmailSender
 
     public async Task SendHtmlAsync(string toEmail, string subject, string htmlBody)
     {
-        // appsettings.json: Smtp:Host, Port, User, Pass, From
         var host = _config["Smtp:Host"];
         var user = _config["Smtp:User"];
         var pass = _config["Smtp:Pass"];
@@ -22,15 +21,19 @@ public class SmtpEmailSender : IEmailSender
         if (string.IsNullOrWhiteSpace(host) || string.IsNullOrWhiteSpace(from))
             throw new InvalidOperationException("SMTP chưa cấu hình (Smtp:Host / Smtp:From).");
 
+        if (string.IsNullOrWhiteSpace(user) || string.IsNullOrWhiteSpace(pass))
+            throw new InvalidOperationException("SMTP thiếu Smtp:User hoặc Smtp:Pass (App Password).");
+
         using var smtp = new SmtpClient(host, port)
         {
-            EnableSsl = true
+            EnableSsl = true,
+            UseDefaultCredentials = false,
+            DeliveryMethod = SmtpDeliveryMethod.Network
         };
 
-        if (!string.IsNullOrWhiteSpace(user))
-            smtp.Credentials = new NetworkCredential(user, pass);
+        smtp.Credentials = new NetworkCredential(user, pass);
 
-        var mail = new MailMessage(from, toEmail, subject, htmlBody)
+        using var mail = new MailMessage(from, toEmail, subject, htmlBody)
         {
             IsBodyHtml = true
         };

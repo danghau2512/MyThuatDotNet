@@ -13,26 +13,18 @@ builder.Services.AddDbContext<MyThuatDotNetContext>(options =>
     var cs = builder.Configuration.GetConnectionString("Dbtest");
     options.UseMySql(cs, ServerVersion.AutoDetect(cs));
 });
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowMvc", p =>
-        p.WithOrigins("https://localhost:7288") // port của UI
-         .AllowAnyHeader()
-         .AllowAnyMethod()
-         .AllowCredentials());
-});
-
-
 
 // DI email sender
 builder.Services.AddScoped<IEmailSender, SmtpEmailSender>();
 
-// CORS cho MVC gọi API
-builder.Services.AddCors(opt =>
+// CORS: cho MVC (7288) gọi API (7090)
+builder.Services.AddCors(options =>
 {
-    opt.AddPolicy("AllowAll", p => p.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
+    options.AddPolicy("AllowMvc", p =>
+        p.WithOrigins("https://localhost:7288")
+         .AllowAnyHeader()
+         .AllowAnyMethod());
 });
-
 
 var app = builder.Build();
 
@@ -41,11 +33,10 @@ app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
-// ✅ PHẢI CÓ để serve ảnh /uploads/...
+// ✅ phải có để truy cập /uploads/...
 app.UseStaticFiles();
 
 app.UseCors("AllowMvc");
-app.UseCors("AllowAll");
 
 app.MapControllers();
 

@@ -17,6 +17,8 @@ public class AdminOrdersApiService
     {
         _http = http;
     }
+    public record UpdateOrderInfoRequest(int OrderId, string FullName, string PhoneNumber, string Address);
+    public record ChangeOrderStatusRequest(int OrderId, int StatusId);
 
     public async Task<(List<AdminOrderRowDto>? data, string? err)> GetOrdersAsync(string? status = null)
     {
@@ -42,28 +44,39 @@ public class AdminOrdersApiService
         }
     }
 
-    public record UpdateOrderStatusRequest(int OrderId, string StatusName);
-
-    public async Task<(bool ok, string? err)> UpdateStatusAsync(int orderId, string statusName)
+    public async Task<(bool ok, string? err)> UpdateInfoAsync(int orderId, string fullName, string phone, string address)
     {
         try
         {
-            var resp = await _http.PostAsJsonAsync(
-                "/api/admin/orders/status",
-                new UpdateOrderStatusRequest(orderId, statusName ?? "")
-            );
+            var resp = await _http.PostAsJsonAsync("/api/admin/orders/update-info",
+                new UpdateOrderInfoRequest(orderId, fullName ?? "", phone ?? "", address ?? ""));
 
             if (!resp.IsSuccessStatusCode)
             {
                 var body = await resp.Content.ReadAsStringAsync();
                 return (false, string.IsNullOrWhiteSpace(body) ? resp.ReasonPhrase : body);
             }
-
             return (true, null);
         }
-        catch (Exception ex)
-        {
-            return (false, ex.Message);
-        }
+        catch (Exception ex) { return (false, ex.Message); }
     }
+
+    public async Task<(bool ok, string? err)> ChangeStatusAsync(int orderId, int statusId)
+    {
+        try
+        {
+            var resp = await _http.PostAsJsonAsync("/api/admin/orders/change-status",
+                new ChangeOrderStatusRequest(orderId, statusId));
+
+            if (!resp.IsSuccessStatusCode)
+            {
+                var body = await resp.Content.ReadAsStringAsync();
+                return (false, string.IsNullOrWhiteSpace(body) ? resp.ReasonPhrase : body);
+            }
+            return (true, null);
+        }
+        catch (Exception ex) { return (false, ex.Message); }
+    }
+
+
 }

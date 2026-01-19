@@ -13,14 +13,12 @@ namespace MyThuatShop.Services
             _http = http;
         }
 
-        // GET: /api/admin/categories
         public async Task<List<AdminCategoryDto>> GetAllAsync()
         {
             var data = await _http.GetFromJsonAsync<List<AdminCategoryDto>>("/api/admin/categories");
             return data ?? new List<AdminCategoryDto>();
         }
 
-        // POST: /api/admin/categories (create)
         public async Task<bool> CreateAsync(string categoryName, IFormFile? thumbnail)
         {
             using var form = new MultipartFormDataContent();
@@ -33,13 +31,14 @@ namespace MyThuatShop.Services
             return res.IsSuccessStatusCode;
         }
 
-        // POST: /api/admin/categories (update)
-        public async Task<bool> UpdateAsync(int id, string categoryName, IFormFile? thumbnail)
+        // ✅ NEW: thêm removeThumbnail
+        public async Task<bool> UpdateAsync(int id, string categoryName, IFormFile? thumbnail, bool removeThumbnail)
         {
             using var form = new MultipartFormDataContent();
             form.Add(new StringContent("update"), "action");
             form.Add(new StringContent(id.ToString()), "id");
             form.Add(new StringContent(categoryName ?? ""), "categoryName");
+            form.Add(new StringContent(removeThumbnail ? "1" : "0"), "removeThumbnail");
 
             await AddFileIfAnyAsync(form, "thumbnail", thumbnail);
 
@@ -47,24 +46,21 @@ namespace MyThuatShop.Services
             return res.IsSuccessStatusCode;
         }
 
-        // POST: /api/admin/categories (toggleActive)
         public async Task<bool> ToggleActiveAsync(int id, int isActive)
         {
             using var form = new MultipartFormDataContent();
             form.Add(new StringContent("toggleActive"), "action");
             form.Add(new StringContent(id.ToString()), "id");
-            form.Add(new StringContent(isActive.ToString()), "isActive");
+            form.Add(new StringContent(isActive.ToString()), "isActive"); // current state gửi lên
 
             var res = await _http.PostAsync("/api/admin/categories", form);
             return res.IsSuccessStatusCode;
         }
 
-        // ========= helper upload =========
         private static async Task AddFileIfAnyAsync(MultipartFormDataContent form, string fieldName, IFormFile? file)
         {
             if (file == null || file.Length <= 0) return;
 
-            // copy vào memory để đảm bảo stream không bị dispose sớm
             var ms = new MemoryStream();
             await file.CopyToAsync(ms);
             ms.Position = 0;

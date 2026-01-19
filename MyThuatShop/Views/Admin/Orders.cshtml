@@ -216,6 +216,27 @@
         .prod-item {
             margin: 2px 0;
         }
+        .badge-info { background:#dbeafe; color:#1e40af; }
+
+        .btn-view {
+            background: #0F766E !important; /* teal đậm */
+            color: #FFFFFF !important;
+            border: 1px solid #0B5F59 !important;
+        }
+
+            .btn-view i {
+                color: #FFFFFF !important;
+            }
+
+            .btn-view:hover {
+                filter: brightness(0.95);
+            }
+
+        .badge-info {
+            background: #E0F2FE !important; 
+            color: #075985 !important; 
+            border: 1px solid #7DD3FC !important;
+        }
     </style>
 }
 
@@ -251,22 +272,24 @@
                 @if (Model != null && Model.Count > 0) {
                     foreach (var o in Model)
                     {
+
                         var status = (o.StatusName ?? "").Trim();
                         var badgeClass =
                         status.Equals("Hoàn thành", StringComparison.OrdinalIgnoreCase) ? "badge-success"
                         : status.Equals("Đã hủy", StringComparison.OrdinalIgnoreCase) ? "badge-danger"
+                        : status.Equals("Đang vận chuyển", StringComparison.OrdinalIgnoreCase) ? "badge-info"
                         : "badge-warning";
 
                         var dateIso = o.CreateAt?.ToString("yyyy-MM-ddTHH:mm:ss") ?? "";
                         var dateShow = o.CreateAt?.ToString("dd-MM-yyyy") ?? "-";
 
-                        <tr>
-                            <td></td>
-                            <td>@($"DH{o.Id}")</td>
-                            <td>@(o.FullName ?? "-")</td>
-                            <td>@(o.PhoneNumber ?? "-")</td>
+                        <tr  data-order-id="@o.Id" data-status-id="@o.StatusId">
+                            <td ></td>
+                            <td id="code-@o.Id">@($"DH{o.Id:D2}")</td>
+                            <td id="name-@o.Id">@(o.FullName ?? "-")</td>
+                            <td id="phone-@o.Id">@(o.PhoneNumber ?? "-")</td>
                             <td data-order="@dateIso">@dateShow</td>
-                            <td style="max-width:220px;white-space:normal;">@(o.Address ?? "-")</td>
+                            <td id="addr-@o.Id" style="max-width:220px;white-space:normal;">@(o.Address ?? "-")</td>
 
                             <td style="max-width:360px;white-space:normal;">
                                 @if (o.Items != null && o.Items.Count > 0)
@@ -290,36 +313,58 @@
                             <td style="white-space:nowrap;">@o.TotalPrice.ToString("N0") VNĐ</td>
 
                             <td>
-                                <span class="badge @badgeClass">@((o.StatusName ?? "Đang xử lý"))</span>
+                                <span id="badge-@o.Id" class="badge @badgeClass">@((o.StatusName ?? "Đang xử lý"))</span>
                             </td>
 
                             <td>
-                                <div class="actions">
-                                    <button type="button"
-                                            class="btn-icon btn-view"
-                                            title="Xem"
-                                            onclick="alert('Bạn có thể làm trang chi tiết /admin/orders/@o.Id sau');">
+                                <div class="actions" id="actions-@o.Id">
+                                    <!-- Eye: luôn có -->
+                                    <a class="btn-icon btn-view" title="Xem chi tiết" href="/admin/orders/@o.Id">
                                         <i class="fa-solid fa-eye"></i>
-                                    </button>
+                                    </a>
 
-                                    <button type="button"
-                                            class="btn-icon btn-edit"
-                                            title="Cập nhật trạng thái"
-                                            data-order-id="@o.Id"
-                                            data-current-status="@(o.StatusName ?? "Đang xử lý")"
-                                            onclick="openStatusModal(this)">
-                                        <i class="fa-solid fa-pen-to-square"></i>
-                                    </button>
+                                    @* StatusId: 1 Đang xử lý *@
+                                    @if (o.StatusId == 1)
+                                    {
+                                        <!-- Truck: chuyển sang 2 -->
+                                        <button type="button" class="btn-icon" title="Chuyển sang đang vận chuyển"
+                                                style="background:#2563eb;color:#fff;"
+                                                onclick="changeStatusAjax(@o.Id, 2, 'Chuyển đơn @($"DH{o.Id}") sang Đang vận chuyển?')">
+                                            <i class="fa-solid fa-truck"></i>
+                                        </button>
 
-                                    <button type="button"
-                                            class="btn-icon btn-cancel"
-                                            title="Hủy đơn"
-                                            data-order-id="@o.Id"
-                                            onclick="cancelOrder(this)">
-                                        <i class="fa-solid fa-ban"></i>
-                                    </button>
+                                        <!-- Edit info -->
+                                        <button type="button" class="btn-icon btn-edit" title="Cập nhật thông tin"
+                                                data-order-id="@o.Id"
+                                                data-fullname="@(o.FullName ?? "")"
+                                                data-phone="@(o.PhoneNumber ?? "")"
+                                                data-address="@(o.Address ?? "")"
+                                                onclick="openEditModal(this)">
+                                            <i class="fa-solid fa-pen-to-square"></i>
+                                        </button>
+
+                                        <!-- Cancel: chuyển sang 4 -->
+                                        <button type="button" class="btn-icon btn-cancel" title="Hủy đơn"
+                                                onclick="changeStatusAjax(@o.Id, 4, 'Bạn chắc chắn muốn hủy đơn @($"DH{o.Id}")')">
+                                            <i class="fa-solid fa-ban"></i>
+                                        </button>
+                                    }
+
+                                    @* StatusId: 2 Đang vận chuyển *@
+                                    @if (o.StatusId == 2)
+                                    {
+                                        <!-- Check: chuyển sang 3 -->
+                                        <button type="button" class="btn-icon" title="Hoàn thành"
+                                                style="background:#16a34a;color:#fff;"
+                                                onclick="changeStatusAjax(@o.Id, 3, 'Xác nhận đơn @($"DH{o.Id}") đã Hoàn thành?')">
+                                            <i class="fa-solid fa-check"></i>
+                                        </button>
+                                    }
+
+                                    @* StatusId: 3 Hoàn thành & 4 Đã hủy -> chỉ xem chi tiết *@
                                 </div>
                             </td>
+
                         </tr>
                     }
                 }
@@ -329,34 +374,52 @@
 </div>
 
 <!-- Modal cập nhật trạng thái -->
-<div id="statusMask" class="modal-mask" onclick="closeStatusModal(event)">
+<div id="editMask" class="modal-mask" onclick="closeEditModal(event)">
     <div class="modal" onclick="event.stopPropagation()">
-        <h3>Cập nhật trạng thái đơn hàng</h3>
+        <h3>Cập nhật thông tin đơn hàng</h3>
 
-        <form method="post" action="/admin/orders/update-status" id="frmStatus">
+        <form method="post" action="/admin/orders/update-info" id="frmEdit">
             @Html.AntiForgeryToken()
-            <input type="hidden" name="orderId" id="statusOrderId" />
 
             <div class="row">
-                <label style="width:140px;font-weight:700;">Trạng thái</label>
-                <select name="statusName" id="statusSelect">
-                    <option>Đang xử lý</option>
-                    <option>Hoàn thành</option>
-                    <option>Đã hủy</option>
-                </select>
+                <label style="width:140px;font-weight:700;">OrderId</label>
+                <input id="editOrderIdDisplay" disabled
+                       style="flex:1;padding:10px 12px;border:1px solid #d0d7de;border-radius:8px;" />
+                <input type="hidden" name="orderId" id="editOrderId" />
+            </div>
+
+            <div class="row">
+                <label style="width:140px;font-weight:700;">Họ tên</label>
+                <input name="fullName" id="editFullName"
+                       style="flex:1;padding:10px 12px;border:1px solid #d0d7de;border-radius:8px;" />
+            </div>
+
+            <div class="row">
+                <label style="width:140px;font-weight:700;">SĐT</label>
+                <input name="phoneNumber" id="editPhone"
+                       style="flex:1;padding:10px 12px;border:1px solid #d0d7de;border-radius:8px;" />
+            </div>
+
+            <div class="row">
+                <label style="width:140px;font-weight:700;">Địa chỉ</label>
+                <input name="address" id="editAddress"
+                       style="flex:1;padding:10px 12px;border:1px solid #d0d7de;border-radius:8px;" />
             </div>
 
             <div class="footer">
-                <button type="button" class="btn btn-light" onclick="hideStatus()">Đóng</button>
+                <button type="button" class="btn btn-light" onclick="hideEdit()">Đóng</button>
                 <button type="submit" class="btn btn-primary">Lưu</button>
             </div>
         </form>
     </div>
 </div>
-
+<form id="frmChangeStatus" method="post" action="/admin/orders/change-status" style="display:none;">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="orderId" id="csOrderId" />
+    <input type="hidden" name="statusId" id="csStatusId" />
+</form>
 @section Scripts {
     <script>
-        // ===== DATATABLES INIT (copy logic từ Statistic) =====
         $(function () {
             const viLang = {
                 emptyTable: "Không có dữ liệu",
@@ -374,11 +437,10 @@
                 pageLength: 8,
                 lengthMenu: [5, 8, 10, 25, 50, 100],
                 language: viLang,
-                // STT + Tùy chọn không sort
                 columnDefs: [
                     { orderable: false, targets: [0, 9] }
                 ],
-                order: [[4, "desc"]] // Ngày đặt
+                order: [[4, "desc"]]
             });
 
             dt.on('order.dt search.dt draw.dt', function () {
@@ -386,36 +448,216 @@
                     cell.innerHTML = i + 1;
                 });
             }).draw();
+
+            // Hook AJAX submit cho form sửa thông tin
+            hookEditFormAjax();
         });
 
-        // ===== Modal status =====
-        function openStatusModal(btn) {
+        // ===== Helpers =====
+        function notify(msg) {
+            alert(msg); 
+        }
+
+        function escapeAttr(s) {
+            return (s ?? "")
+                .replaceAll("&", "&amp;")
+                .replaceAll('"', "&quot;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;");
+        }
+
+        function badgeClassByStatusId(statusId) {
+            switch (Number(statusId)) {
+                case 1: return "badge-warning";
+                case 2: return "badge-info";   
+                case 3: return "badge-success";
+                case 4: return "badge-danger";
+                default: return "badge-warning";
+            }
+        }
+
+        // ===== Modal Sửa thông tin =====
+        function openEditModal(btn) {
             const id = btn.getAttribute('data-order-id');
-            const cur = btn.getAttribute('data-current-status') || 'Đang xử lý';
+            const fullName = btn.getAttribute('data-fullname') || '';
+            const phone = btn.getAttribute('data-phone') || '';
+            const address = btn.getAttribute('data-address') || '';
 
-            document.getElementById('statusOrderId').value = id;
-            document.getElementById('statusSelect').value = cur;
+            document.getElementById('editOrderId').value = id;
+            document.getElementById('editOrderIdDisplay').value = 'DH' + String(id).padStart(2, '0');
+            document.getElementById('editFullName').value = fullName;
+            document.getElementById('editPhone').value = phone;
+            document.getElementById('editAddress').value = address;
 
-            document.getElementById('statusMask').style.display = 'flex';
+            document.getElementById('editMask').style.display = 'flex';
+        }
+        function hideEdit() { document.getElementById('editMask').style.display = 'none'; }
+        function closeEditModal(e) { if (e.target && e.target.id === 'editMask') hideEdit(); }
+
+        // ===== AJAX: submit form sửa thông tin (không reload) =====
+        function hookEditFormAjax() {
+            const frmEdit = document.getElementById('frmEdit');
+            if (!frmEdit) return;
+
+            frmEdit.addEventListener('submit', async function (e) {
+                e.preventDefault();
+
+                const fd = new FormData(frmEdit);
+
+                try {
+                    const res = await fetch(frmEdit.action, {
+                        method: 'POST',
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                        body: fd
+                    });
+
+                    if (!res.ok) {
+                        notify("Cập nhật thất bại (HTTP " + res.status + ")");
+                        return;
+                    }
+
+                    const data = await res.json();
+                    if (!data.ok) {
+                        notify(data.err || "Cập nhật thất bại");
+                        return;
+                    }
+
+                    const id = data.orderId;
+                    const elName = document.getElementById(`name-${id}`);
+                    const elPhone = document.getElementById(`phone-${id}`);
+                    const elAddr = document.getElementById(`addr-${id}`);
+
+                    if (elName) elName.innerText = data.fullName || "-";
+                    if (elPhone) elPhone.innerText = data.phoneNumber || "-";
+                    if (elAddr) elAddr.innerText = data.address || "-";
+
+                    // Nếu đang ở trạng thái 1 và có nút sửa trong actions, rebuild actions để data-* mới ăn theo
+                    const tr = document.querySelector(`tr[data-order-id="${id}"]`);
+                    const statusId = tr ? Number(tr.getAttribute("data-status-id") || "1") : 1;
+                    const actions = document.getElementById(`actions-${id}`);
+                    if (actions) {
+                        actions.innerHTML = rebuildActions(id, statusId);
+                    }
+
+                    hideEdit();
+                    notify("Cập nhật thông tin thành công!");
+                } catch (err) {
+                    notify("Cập nhật thất bại: " + err);
+                }
+            });
         }
 
-        function hideStatus() {
-            document.getElementById('statusMask').style.display = 'none';
+        // ===== AJAX: đổi trạng thái bằng icon (không reload) =====
+        async function changeStatusAjax(orderId, statusId, message) {
+            if (message && !confirm(message)) return;
+
+            const frm = document.getElementById('frmChangeStatus');
+            if (!frm) {
+                notify("Thiếu form frmChangeStatus");
+                return;
+            }
+
+            const fd = new FormData(frm);
+            fd.set('orderId', orderId);
+            fd.set('statusId', statusId);
+
+            try {
+                const res = await fetch(frm.action, {
+                    method: 'POST',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    body: fd
+                });
+
+                if (!res.ok) {
+                    notify("Đổi trạng thái thất bại (HTTP " + res.status + ")");
+                    return;
+                }
+
+                const data = await res.json();
+                if (!data.ok) {
+                    notify(data.err || "Đổi trạng thái thất bại");
+                    return;
+                }
+
+                // Update badge
+                const badge = document.getElementById(`badge-${orderId}`);
+                if (badge) {
+                    badge.className = `badge ${badgeClassByStatusId(data.statusId)}`;
+                    badge.innerText = data.statusName || badge.innerText;
+                }
+
+                // Update statusId trên <tr>
+                const tr = document.querySelector(`tr[data-order-id="${orderId}"]`);
+                if (tr) tr.setAttribute("data-status-id", data.statusId);
+
+                // Update actions (icon) theo rule
+                const actions = document.getElementById(`actions-${orderId}`);
+                if (actions) actions.innerHTML = rebuildActions(orderId, Number(data.statusId));
+
+                notify("Đổi trạng thái thành công!");
+            } catch (err) {
+                notify("Đổi trạng thái thất bại: " + err);
+            }
         }
 
-        function closeStatusModal(e) {
-            if (e.target && e.target.id === 'statusMask') hideStatus();
+            function rebuildActions(orderId, statusId) {
+            // Lấy text hiện tại để nhét vào data-* nút sửa
+            const fullName = document.getElementById(`name-${orderId}`)?.innerText ?? "";
+            const phone = document.getElementById(`phone-${orderId}`)?.innerText ?? "";
+            const addr = document.getElementById(`addr-${orderId}`)?.innerText ?? "";
+
+            let html = `
+                <a class="btn-icon btn-view" title="Xem chi tiết" href="/admin/orders/${orderId}">
+                    <i class="fa-solid fa-eye"></i>
+                </a>
+            `;
+
+            // 1: Đang xử lý => (xem + truck->2 + hủy->4 + sửa)
+            if (statusId === 1) {
+                html += `
+                    <button type="button" class="btn-icon" title="Chuyển sang đang vận chuyển"
+                            style="background:#2563eb;color:#fff;"
+                            onclick="changeStatusAjax(${orderId}, 2, 'Chuyển đơn DH${orderId} sang Đang vận chuyển?')">
+                        <i class="fa-solid fa-truck"></i>
+                    </button>
+
+                    <button type="button" class="btn-icon btn-edit" title="Cập nhật"
+                            data-order-id="${orderId}"
+                            data-fullname="${escapeAttr(fullName)}"
+                            data-phone="${escapeAttr(phone)}"
+                            data-address="${escapeAttr(addr)}"
+                            onclick="openEditModal(this)">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                    </button>
+
+                    <button type="button" class="btn-icon btn-cancel" title="Hủy đơn"
+                            onclick="changeStatusAjax(${orderId}, 4, 'Bạn chắc chắn muốn hủy đơn DH${orderId}?')">
+                        <i class="fa-solid fa-ban"></i>
+                    </button>
+                `;
+            }
+
+            // 2: Đang vận chuyển => (xem + check->3)
+            if (statusId === 2) {
+                html += `
+                    <button type="button" class="btn-icon" title="Hoàn thành"
+                            style="background:#16a34a;color:#fff;"
+                            onclick="changeStatusAjax(${orderId}, 3, 'Xác nhận đơn DH${orderId} đã Hoàn thành?')">
+                        <i class="fa-solid fa-check"></i>
+                    </button>
+                `;
+            }
+
+            // 3,4: chỉ xem 
+            return html;
         }
 
-        // ===== Hủy đơn nhanh =====
-        function cancelOrder(btn) {
-            const id = btn.getAttribute('data-order-id');
-            if (!confirm('Bạn chắc chắn muốn hủy đơn DH' + id + ' ?')) return;
-
-            // submit form cập nhật status = Đã hủy
-            document.getElementById('statusOrderId').value = id;
-            document.getElementById('statusSelect').value = 'Đã hủy';
-            document.getElementById('frmStatus').submit();
-        }
+        // ===== Expose function cho onclick ở HTML  =====
+        window.openEditModal = openEditModal;
+        window.changeStatusAjax = changeStatusAjax;
+        window.hideEdit = hideEdit;
+        window.closeEditModal = closeEditModal;
     </script>
 }
+
+

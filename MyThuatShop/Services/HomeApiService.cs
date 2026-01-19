@@ -14,11 +14,43 @@ public class HomeApiService
         PropertyNameCaseInsensitive = true
     };
 
-    // ✅ Typed client: nhận HttpClient
+    // ✅ đổi đúng domain API của bạn
+    private const string ApiBaseUrl = "https://localhost:7090";
+
     public HomeApiService(HttpClient http, ILogger<HomeApiService> logger)
     {
         _http = http;
         _logger = logger;
+    }
+
+    // ✅ helper: /uploads/... -> https://localhost:7090/uploads/...
+    private static string? ToAbsoluteImageUrl(string? path)
+    {
+        if (string.IsNullOrWhiteSpace(path)) return path;
+
+        if (path.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
+            path.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+            return path;
+
+        if (!path.StartsWith("/")) path = "/" + path;
+
+        return ApiBaseUrl.TrimEnd('/') + path;
+    }
+
+    private static void NormalizeSectionImages(List<CategorySectionVm> sections)
+    {
+        foreach (var sec in sections)
+        {
+            sec.Thumbnail = ToAbsoluteImageUrl(sec.Thumbnail);
+
+            if (sec.Products != null && sec.Products.Count > 0)
+            {
+                foreach (var p in sec.Products)
+                {
+                    p.Thumbnail = ToAbsoluteImageUrl(p.Thumbnail);
+                }
+            }
+        }
     }
 
     public async Task<List<CategorySectionVm>> GetIndexSections(int takePerCategory = 5)
@@ -28,10 +60,14 @@ public class HomeApiService
             var url = $"/api/home/index?takePerCategory={takePerCategory}";
             _logger.LogInformation("Calling API: {Url}", url);
 
-            var data = await _http.GetFromJsonAsync<List<CategorySectionVm>>(url, _jsonOptions);
+            var data = await _http.GetFromJsonAsync<List<CategorySectionVm>>(url, _jsonOptions)
+                       ?? new List<CategorySectionVm>();
 
-            _logger.LogInformation("API returned {Count} categories", data?.Count ?? 0);
-            return data ?? new List<CategorySectionVm>();
+           
+            NormalizeSectionImages(data);
+
+            _logger.LogInformation("API returned {Count} categories", data.Count);
+            return data;
         }
         catch (HttpRequestException ex)
         {

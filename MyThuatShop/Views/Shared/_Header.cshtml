@@ -53,7 +53,8 @@
 
             @if (!string.IsNullOrEmpty(fullName))
             {
-                <div class="dangnhap">Hi, @fullName</div>
+                <a class="dangnhap" asp-controller="Account" asp-action="Profile">Hi, @fullName</a>
+
 
                 <form asp-controller="Account" asp-action="Logout" method="post" style="margin:0;">
                     @Html.AntiForgeryToken()

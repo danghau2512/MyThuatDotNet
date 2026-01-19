@@ -1,69 +1,50 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using MyThuatShop.Filters;
 using MyThuatShop.Services;
 
-namespace MyThuatShop.Controllers
+namespace MyThuatShop.Controllers;
+
+[RequireAdmin]
+public class AdminContactsController : Controller
 {
-    public class AdminContactsController : Controller
+    private readonly AdminContactsApiService _api;
+    public AdminContactsController(AdminContactsApiService api) => _api = api;
+
+    private static bool IsAjax(HttpRequest req) => req.Headers["X-Requested-With"] == "XMLHttpRequest";
+
+    [HttpGet("/admin/contacts")]
+    public async Task<IActionResult> Index()
     {
-        private readonly ContactApiService _contactApi;
+        ViewData["Title"] = "Quản lý liên hệ";
+        ViewData["ActiveMenu"] = "contacts";
+        var (data, err) = await _api.GetAllAsync();
+        if (!string.IsNullOrWhiteSpace(err)) TempData["ErrorMsg"] = "Không tải được liên hệ: " + err;
+        return View("~/Views/Admin/Contacts.cshtml", data ?? new());
+    }
 
-        public AdminContactsController(ContactApiService contactApi)
-        {
-            _contactApi = contactApi;
-        }
+    [HttpPost("/admin/contacts/reply")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Reply([FromForm] int contactId, [FromForm] string subject, [FromForm] string replyMessage)
+    {
+        var (ok, err) = await _api.ReplyAsync(contactId, subject, replyMessage);
 
-        private bool IsAdmin()
-        {
-            return (HttpContext.Session.GetString("Role") ?? "") == "Admin";
-        }
+        if (IsAjax(Request))
+            return Json(new { ok, err, contactId, status = ok ? "Đã phản hồi" : null });
 
-        [HttpGet("/admin/contacts")]
-        public async Task<IActionResult> Index()
-        {
-            if (!IsAdmin()) return Redirect("/login");
+        TempData[ok ? "SuccessMsg" : "ErrorMsg"] = ok ? "Đã gửi phản hồi!" : ("Gửi thất bại: " + err);
+        return RedirectToAction(nameof(Index));
+    }
 
-            var (items, err) = await _contactApi.GetAllAsync();
+    [HttpPost("/admin/contacts/delete")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Delete([FromForm] int contactId)
+    {
+        var (ok, err) = await _api.DeleteAsync(contactId);
 
-            if (!string.IsNullOrWhiteSpace(err))
-            {
-                TempData["ErrorMsg"] = "Không tải được danh sách liên hệ: " + err;
-            }
+        if (IsAjax(Request))
+            return Json(new { ok, err, contactId });
 
-            return View("~/Views/AdminContact/Index.cshtml", items);
-        }
-
-        [HttpPost("/admin/contacts/delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete([FromForm] int id)
-        {
-            if (!IsAdmin()) return Redirect("/login");
-
-            var (ok, err) = await _contactApi.DeleteAsync(id);
-
-            TempData["SuccessMsg"] = ok ? "Xóa liên hệ thành công!" : null;
-            TempData["ErrorMsg"] = ok ? null : ("Xóa liên hệ thất bại: " + err);
-
-            return RedirectToAction(nameof(Index));
-        }
-
-        [HttpPost("/admin/contacts/reply")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Reply([FromForm] int id, [FromForm] string subject, [FromForm] string replyMessage)
-        {
-            if (!IsAdmin()) return Redirect("/login");
-
-            if (string.IsNullOrWhiteSpace(subject) || string.IsNullOrWhiteSpace(replyMessage))
-            {
-                TempData["ErrorMsg"] = "Vui lòng nhập tiêu đề và nội dung phản hồi!";
-                return RedirectToAction(nameof(Index));
-            }
-
-            var (ok, err) = await _contactApi.ReplyAsync(id, subject, replyMessage);
-
-            TempData["SuccessMsg"] = ok ? "Phản hồi đã được gửi!" : null;
-            TempData["ErrorMsg"] = ok ? null : ("Gửi phản hồi thất bại: " + err);
-
-            return RedirectToAction(nameof(Index));
-        }
+        TempData[ok ? "SuccessMsg" : "ErrorMsg"] = ok ? "Đã xóa liên hệ!" : ("Xóa thất bại: " + err);
+        return RedirectToAction(nameof(Index));
     }
 }

@@ -1,30 +1,35 @@
 @model MyThuatShop.ViewModels.ProductDetailVm
 @using System.Linq
 @using System.Collections.Generic
+@using MyThuatShop.Helpers
 
 @{
     Layout = "_Layout";
     ViewData["Title"] = "Chi tiết sản phẩm";
 
-    // Gom ảnh: Thumbnail + SubImages (distinct)
-    var images = new List<string>();
+    var ApiBaseUrl = "https://localhost:7090";
+
+    
+    var rawImages = new List<string?>();
 
     if (!string.IsNullOrWhiteSpace(Model.Thumbnail))
-    {
-        images.Add(Model.Thumbnail!);
-    }
+        rawImages.Add(Model.Thumbnail);
 
     if (Model.SubImages != null && Model.SubImages.Any())
-    {
-        images.AddRange(Model.SubImages.Where(x => !string.IsNullOrWhiteSpace(x)));
-    }
+        rawImages.AddRange(Model.SubImages);
 
-    images = images.Distinct().ToList();
+    var images = rawImages
+        .Where(x => !string.IsNullOrWhiteSpace(x))
+        .Select(x => ImageUrlHelper.ToAbsolute(x, ApiBaseUrl))
+        .Distinct()
+        .ToList();
 
     var mainImg = images.FirstOrDefault() ?? "/assets/images/logo/list1-1.jpg";
+
     var statusText = Model.QuantityStock > 0 ? "Còn hàng" : "Hết hàng";
     var spec = Model.Specifications?.FirstOrDefault();
 }
+
 
 @section Styles {
     <style>
@@ -747,7 +752,10 @@
                 {
                     foreach (var p in Model.RelatedProducts)
                     {
-                        var thumb = string.IsNullOrWhiteSpace(p.Thumbnail) ? "/assets/images/logo/list1-1.jpg" : p.Thumbnail;
+                        var thumb = string.IsNullOrWhiteSpace(p.Thumbnail)
+                        ? "/assets/images/logo/list1-1.jpg"
+                        : ImageUrlHelper.ToAbsolute(p.Thumbnail, ApiBaseUrl);
+
 
                 <div class="card">
                     <a asp-controller="Product" asp-action="Detail" asp-route-id="@p.Id"

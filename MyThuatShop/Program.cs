@@ -111,12 +111,17 @@ builder.Services.AddHttpClient<AdminStatisticsApiService>(client =>
     client.BaseAddress = new Uri(apiBaseUrl);
 }).ConfigurePrimaryHttpMessageHandler(CreateHandler);
 
-// ✅ THÊM Category typed client (bắt buộc)
+
 builder.Services.AddHttpClient<AdminCategoryApiService>(client =>
 {
     client.BaseAddress = new Uri(apiBaseUrl);
 }).ConfigurePrimaryHttpMessageHandler(CreateHandler);
 
+
+builder.Services.AddHttpClient<AdminProductApiService>(client =>
+{
+    client.BaseAddress = new Uri(apiBaseUrl);
+}).ConfigurePrimaryHttpMessageHandler(CreateHandler);
 
 
 

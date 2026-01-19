@@ -4,7 +4,18 @@
         ViewData["Title"] = "Trang chủ";
         Layout = "_Layout";
     }
+@{
+    var ApiBaseUrl = "https://localhost:7090";
 
+    string FixImg(string? url)
+    {
+        if (string.IsNullOrWhiteSpace(url)) return "";
+        if (url.StartsWith("http", StringComparison.OrdinalIgnoreCase)) return url;
+
+        if (!url.StartsWith("/")) url = "/" + url;
+        return ApiBaseUrl + url;
+    }
+}
     @section Styles {
         <style>
             .container {
@@ -571,7 +582,8 @@
         {
             <div class="section-but">
                 <div class="container">
-                    <img src="@sec.Thumbnail" alt="@sec.CategoryName" />
+                <img src="@FixImg(sec.Thumbnail)" alt="@sec.CategoryName" />
+
 
                     <div class="section-but-header">
                         <h2 class="category-title">@sec.CategoryName</h2>
@@ -585,8 +597,9 @@
 
                                 <div class="list-product-list1">
                                     <a asp-controller="Product" asp-action="Detail" asp-route-id="@p.Id">
-                                        <img src="@(string.IsNullOrWhiteSpace(p.Thumbnail) ? "https://via.placeholder.com/300" : p.Thumbnail)"
-                                             alt="Sale Product">
+                                    <img src="@(string.IsNullOrWhiteSpace(p.Thumbnail) ? "https://via.placeholder.com/300" : FixImg(p.Thumbnail))"
+                                         alt="@p.Name">
+
 
                                         <div class="list-product-list1-content">
 

@@ -7,15 +7,32 @@
 
 @section Styles {
     <style>
+        #main .right .container {
+            width: calc(100% - 100px);
+            margin: 20px auto;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 10px;
+            padding: 18px 18px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
         .product-table {
             width: 100%;
             border-collapse: collapse;
+            margin-top: 10px;
         }
 
             .product-table th {
                 background: #2659F5;
                 color: #fff;
                 padding: 12px;
+                font-size: 14px;
             }
 
             .product-table td {
@@ -27,6 +44,21 @@
             .product-table tr:nth-child(even) td {
                 background: #f0f0f0;
             }
+
+            .product-table td, .product-table th {
+                border-bottom: 1px solid #ddd;
+                text-align: left;
+                border-left: 1px solid #ddd;
+                border-right: 1px solid #ddd;
+            }
+
+        .dataTables_wrapper .dataTables_filter input,
+        .dataTables_wrapper .dataTables_length select {
+            border: 1px solid #d0d7de !important;
+            border-radius: 6px !important;
+            padding: 6px 10px !important;
+            outline: none !important;
+        }
 
         .badge {
             display: inline-block;
@@ -140,6 +172,21 @@
         .btn-primary {
             background: #2659F3;
             color: #fff;
+        }
+
+        .msg {
+            padding: 10px 12px;
+            border-radius: 8px;
+        }
+
+        .msg-error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .msg-ok {
+            background: #d1fae5;
+            color: #065f46;
         }
     </style>
 }

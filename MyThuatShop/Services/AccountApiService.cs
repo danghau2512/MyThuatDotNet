@@ -1,7 +1,9 @@
-﻿using System.Net.Http.Json;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using MyThuatShop.ViewModels.Auth;
+using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Microsoft.Extensions.Configuration;
 
 namespace MyThuatShop.Services;
 
@@ -169,6 +171,14 @@ public class AccountApiService
         public string NewPassword { get; set; } = "";
         public string ConfirmNewPassword { get; set; } = "";
     }
+    // register
+    public class RegisterRequestDto
+    {
+        public string FullName { get; set; } = "";
+        public string Email { get; set; } = "";
+        public string? PhoneNumber { get; set; }
+        public string Password { get; set; } = "";
+    }
 
     // ===================== DateOnly Json Converters =====================
 
@@ -231,4 +241,53 @@ public class AccountApiService
             return (false, ex.Message);
         }
     }
+    // register
+    public async Task<(bool ok, string message)> RegisterAsync(RegisterRequestDto req)
+    {
+        try
+        {
+            // ⚠️ SỬA đúng route API đăng ký của bạn
+            var resp = await _http.PostAsJsonAsync("api/users/register", req, _json);
+
+            if (resp.IsSuccessStatusCode) return (true, "");
+
+            var msg = await resp.Content.ReadAsStringAsync();
+            return (false, string.IsNullOrWhiteSpace(msg) ? "Đăng ký thất bại." : msg);
+        }
+        catch (Exception ex)
+        {
+            return (false, ex.Message);
+        }
+    }
+    // quen mk
+    //public async Task<(bool ok, string message)> ForgotPasswordAsync(string email)
+    //{
+    //    var res = await _http.PostAsJsonAsync("/api/account/forgot-password", new { Email = email });
+
+    //    var msg = await res.Content.ReadAsStringAsync();
+    //    if (res.IsSuccessStatusCode) return (true, string.IsNullOrWhiteSpace(msg) ? "Đã gửi mật khẩu mới về email." : msg);
+
+    //    return (false, string.IsNullOrWhiteSpace(msg) ? "Không thể xử lý yêu cầu." : msg);
+    //}
+    public async Task<(bool ok, string message)> ForgotPasswordAsync(string email)
+    {
+        try
+        {
+            var res = await _http.PostAsJsonAsync("/api/users/forgot-password",
+                new { email = email?.Trim() });
+
+            var msg = await res.Content.ReadAsStringAsync();
+
+            if (res.IsSuccessStatusCode)
+                return (true, string.IsNullOrWhiteSpace(msg) ? "Mật khẩu mới đã được gửi về email." : msg);
+
+            return (false, string.IsNullOrWhiteSpace(msg) ? "Không thể xử lý yêu cầu." : msg);
+        }
+        catch (Exception ex)
+        {
+            return (false, "Lỗi gọi API: " + ex.Message);
+        }
+    }
+
+
 }

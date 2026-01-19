@@ -4,316 +4,198 @@
     Layout = "_Layout";
 }
 
-@section Styles {
-    <style>
-        /* ===== Header + Footer (giữ nguyên theo bạn) ===== */
-        /* Lưu ý: Mình không dùng class .container nữa để tránh đụng Bootstrap/Layout */
+<style>
+    .container { width: 1200px; margin: auto; }
 
-        #header-trang-chu {
-            background-color: var(--color-main);
-            display: flex;
-            align-items: center;
-            position: fixed;
-            z-index: 999;
-            width: 100%;
-            top: 0;
-            left: 0;
-        }
+    /* GIỐNG JSP */
+    .main {
+        margin: 0;
+        padding: 30px 0 0;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        min-height: calc(100vh - 80px);
+        background-color: #1E76EF;
+       
+    }
 
-            #header-trang-chu .logo-trang-chu {
-                margin-left: 50px;
-                margin-right: 50px;
-                margin-top: 25px;
-                margin-bottom: 25px;
-            }
+    .register-box {
+        background-color: rgba(0, 0, 0, 0.4);
+        padding: 40px 50px;
+        transition: 0.5s ease;
+        width: 530px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+        border-radius: 10px;
+    }
 
-                #header-trang-chu .logo-trang-chu img {
-                    background-color: transparent;
-                    width: 200px;
-                    height: 100%;
-                }
+    h2 {
+        color: white;
+        text-align: center;
+        text-transform: uppercase;
+        margin-bottom: 15px;
+    }
 
-            #header-trang-chu .tim-kiem-san-pham {
-                position: relative;
-                display: flex;
-            }
+    .infor {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px 20px;
+        margin-bottom: 20px;
+    }
 
-                #header-trang-chu .tim-kiem-san-pham input {
-                    padding: 10px 15px;
-                    width: 600px;
-                    border-radius: 10px;
-                    border: none;
-                }
+    .infor .tt-chitiet label {
+        font-size: 17px;
+        font-weight: normal;
+        color: white;
+    }
 
-                #header-trang-chu .tim-kiem-san-pham i {
-                    position: absolute;
-                    right: 0;
-                    width: 50px;
-                    height: 100%;
-                    background-color: #0b234d;
-                    line-height: 40px;
-                    cursor: pointer;
-                    color: white;
-                    border-top-right-radius: 10px;
-                    border-bottom-right-radius: 10px;
-                    text-align: center;
-                }
+    .infor .tt-chitiet input {
+        width: 100%;
+        border: none;
+        border-bottom: 1px solid #ccc;
+        outline: none;
+        font-size: 14px;
+        background: none;
+        color: white;
+        border-radius: 8px;
+        padding: 10px;
+        transition: border-color 0.3s;
+    }
 
-            #header-trang-chu .header-contact {
-                display: flex;
-                align-items: center;
-                margin-left: 100px;
-                margin-right: 50px;
-                cursor: pointer;
-            }
+    .infor .tt-chitiet input::placeholder {
+        color: #B0B0B0;
+    }
 
-                #header-trang-chu .header-contact i {
-                    width: 30px;
-                    height: 30px;
-                    border-radius: 50%;
-                    background-color: #0b234d;
-                    line-height: 30px;
-                    color: white;
-                    text-align: center;
-                }
+    .btn-DangKy {
+        background: linear-gradient(90deg, #FFD700, #FFC107);
+        width: 100%;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-bottom: 15px;
+        color: #000;
+        font-weight: bold;
+        transition: 0.3s;
+    }
 
-                #header-trang-chu .header-contact .contact {
-                    margin-left: 15px;
-                }
+    .btn-DangKy:hover { transform: scale(1.05); }
 
-                    #header-trang-chu .header-contact .contact .contact-phone-number {
-                        color: white;
-                        font-weight: 600;
-                        font-size: 18px;
-                    }
+    .text-login {
+        margin-top: 16px;
+        text-align: center;
+        color: #ffffff;
+        font-size: 16px;
+    }
 
-                    #header-trang-chu .header-contact .contact .contact-phone-help {
-                        color: white;
-                        font-size: 16px;
-                    }
+    .text-login a {
+        color: #FFD700;
+        text-decoration: none;
+        font-weight: 500;
+    }
 
-            #header-trang-chu .header-dangnhap-dangki {
-                display: flex;
-                align-items: center;
-                cursor: pointer;
-                margin-right: 50px;
-            }
+    .text-login a:hover { text-decoration: underline; }
 
-                #header-trang-chu .header-dangnhap-dangki i {
-                    width: 30px;
-                    height: 30px;
-                    border-radius: 50%;
-                    background-color: #0b234d;
-                    line-height: 30px;
-                    color: white;
-                    text-align: center;
-                }
+    .btn-dang-nhap-tt {
+        display: flex;
+        justify-content: space-between;
+    }
 
-                #header-trang-chu .header-dangnhap-dangki .dangnhap-dangki {
-                    margin-left: 15px;
-                }
+    .btn-gg {
+        background-color: #DE3F32;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 10px 80px;
+        margin-left: 27%;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
 
-                    #header-trang-chu .header-dangnhap-dangki .dangnhap-dangki .dangnhap {
-                        color: white;
-                        font-weight: 600;
-                        font-size: 18px;
-                    }
+    .field-warning {
+        color: #FFD700;
+        font-size: 14px;
+        display: block;
+        margin-top: 6px;
+    }
 
-                    #header-trang-chu .header-dangnhap-dangki .dangnhap-dangki .dangki {
-                        color: white;
-                        font-size: 16px;
-                    }
-
-            #header-trang-chu .header-giohang {
-                font-size: 25px;
-                color: white;
-                position: relative;
-                cursor: pointer;
-                margin-right: 20px;
-            }
-
-                #header-trang-chu .header-giohang::after {
-                    display: inline-flex;
-                    content: "0";
-                    width: 20px;
-                    height: 20px;
-                    left: 20px;
-                    bottom: 15px;
-                    justify-content: center;
-                    align-items: center;
-                    font-size: 15px;
-                    background-color: red;
-                    position: absolute;
-                    border-radius: 50%;
-                }
-
-        /* ===== Trang Register: CARD như hình 2 ===== */
-        .main {
-            margin: 0;
-            padding: 140px 16px 40px; /* chừa header fixed */
-            display: flex;
-            justify-content: center;
-            align-items: flex-start; /* card nằm dưới header */
-            min-height: 100vh;
-            background-color: #1E76EF;
-        }
-
-        /* KHÔNG dùng .container để tránh đụng layout */
-        .register-card {
-            width: 500px; /* giống hình 2 */
-            max-width: 100%;
-            background-color: rgba(0, 0, 0, 0.4);
-            padding: 40px 50px;
-            border-radius: 12px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-        }
-
-        h2 {
-            color: white;
-            text-align: center;
-            text-transform: uppercase;
-            margin-bottom: 15px;
-        }
-
-        .infor {
-            width: 100%;
-            max-width: 680px; /* input vừa như hình 2 */
-            margin: 0 auto 20px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px 20px;
-        }
-
-            .infor .tt-chitiet label {
-                font-size: 17px;
-                font-weight: normal;
-                color: white;
-                display: block;
-                margin-bottom: 6px;
-            }
-
-            .infor .tt-chitiet input {
-                width: 100%;
-                border: none;
-                border-bottom: 1px solid #ccc;
-                outline: none;
-                font-size: 14px;
-                background: none;
-                border-radius: 8px;
-                padding: 10px;
-                color: #fff;
-                transition: border-color 0.3s;
-            }
-
-                .infor .tt-chitiet input::placeholder {
-                    color: #B0B0B0;
-                }
-
-        .btn-DangKy {
-            background: linear-gradient(90deg, #FFD700, #FFC107);
-            width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            margin-bottom: 15px;
-            color: #000;
-            font-weight: bold;
-            transition: 0.3s;
-        }
-
-            .btn-DangKy:hover {
-                transform: scale(1.02);
-            }
-
-        .text-login {
-            margin-top: 16px;
-            text-align: center;
-            color: #ffffff;
-            font-size: 16px;
-        }
-
-            .text-login a {
-                color: #FFD700;
-                text-decoration: none;
-                font-weight: 500;
-            }
-
-                .text-login a:hover {
-                    text-decoration: underline;
-                }
-
-        .btn-dang-nhap-tt {
-            display: flex;
-            justify-content: center;
-        }
-
-            .btn-dang-nhap-tt a{
-                text-decoration: none;
-            }
-
-        .btn-gg {
-            background-color: #DE3F32;
-            border: none;
-            border-radius: 8px;
-            padding: 10px 18px;
-            font-size: 14px;
-            color: white;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            width: 220px;
-        }
-
-        /* responsive nhỏ */
-        @@media (max-width: 600px) {
-            .register-card {
-                padding: 24px 18px;
-            }
-
-            .infor {
-                grid-template-columns: 1fr;
-                max-width: 100%;
-            }
-        }
-    </style>
-}
-
-
+    .server-error {
+        color: red;
+        padding: 10px;
+    }
+</style>
 
 <div class="main">
-    <div class="register-card">
+    <div class="register-box">
         <h2>Đăng Ký</h2>
-        <div asp-validation-summary="All" style="color:#FFD700; font-size:14px; margin-bottom:10px;"></div>
 
-        <form asp-controller="Account" asp-action="Register" method="post" class="infor">
+        <form asp-controller="Account" asp-action="Register" method="post" class="infor" id="registerForm">
             @Html.AntiForgeryToken()
 
             <div class="tt-chitiet" style="grid-column: span 2;">
-                <label asp-for="FullName">Họ và Tên:</label>
-                <input asp-for="FullName" type="text" placeholder="Họ và Tên" novalidate />
-                <span asp-validation-for="FullName" style="color:#FFD700; font-size:14px;"></span>
+                <label for="Ho">Họ và Tên:</label>
+                <input asp-for="FullName" id="Ho" placeholder="Họ và Tên" required />
+                <span asp-validation-for="FullName" class="field-warning"></span>
             </div>
 
             <div class="tt-chitiet">
-                <label asp-for="Email">Email cá nhân:</label>
-                <input asp-for="Email" type="email" placeholder="Email cá nhân" novalidate />
-                <span asp-validation-for="Email" style="color:#FFD700; font-size:14px;"></span>
+                <label for="email">Email cá nhân:</label>
+                <input asp-for="Email"
+                       id="email"
+                       type="email"
+                       placeholder="Email cá nhân"
+                       required
+                       pattern="^[A-Za-z0-9._%+-]+@@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$"
+                       title="Email phải đúng định dạng, ví dụ: ten@@gmail.com"
+                       />
+                <span id="email-error" class="field-warning"></span>
+                <span asp-validation-for="Email" class="field-warning"></span>
             </div>
 
             <div class="tt-chitiet">
-                <label asp-for="PhoneNumber">Số điện thoại:</label>
-                <input asp-for="PhoneNumber" type="text" placeholder="Số điện thoại" />
-                <span asp-validation-for="PhoneNumber" style="color:#FFD700; font-size:14px;"></span>
+                <label for="sdt">Số điện thoại:</label>
+                <input asp-for="PhoneNumber"
+                       id="sdt"
+                       type="tel"
+                       required
+                       maxlength="10"
+                       placeholder="Số điện thoại"
+                       pattern="^0\d{9}$"
+                       title="Số điện thoại phải gồm 10 chữ số và bắt đầu bằng số 0" />
+                <span id="phonerror" class="field-warning"></span>
+                <span asp-validation-for="PhoneNumber" class="field-warning"></span>
             </div>
 
-            <div class="tt-chitiet" style="grid-column: span 2;">
-                <label asp-for="Password">Mật khẩu:</label>
-                <input asp-for="Password" type="password" placeholder="Mật khẩu" novalidate />
-                <span asp-validation-for="Password" style="color:#FFD700; font-size:14px;"></span>
+            <div class="tt-chitiet" style="grid-column: span 2; position: relative;">
+                <label for="Mk">Mật khẩu:</label>
+                <input asp-for="Password"
+                       id="Mk"
+                       type="password"
+                       placeholder="Mật khẩu"
+                       required
+                       minlength="8"
+                       pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*[^A-Za-z0-9]).{8,}$"
+                       title="Mật khẩu có ít nhất 8 kí tự gồm chữ hoa, chữ thường và các kí tự đặc biệt." />
+                <span id="pwerror" class="field-warning"></span>
+                <span asp-validation-for="Password" class="field-warning"></span>
+
+                @* Lỗi server *@
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div class="server-error">
+                        @foreach (var err in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                        {
+                            <div>@err.ErrorMessage</div>
+                        }
+                    </div>
+                }
             </div>
+
+            @* Không hiện “nhập lại mật khẩu”, nhưng nếu RegisterVm có ConfirmPassword (cách A) thì vẫn gửi hidden *@
+            <input asp-for="ConfirmPassword" type="hidden" id="ConfirmPassword" />
+
             <button type="submit" class="btn-DangKy" style="grid-column: span 2;">
                 Đăng ký
             </button>
@@ -325,31 +207,61 @@
         </p>
 
         <div class="btn-dang-nhap-tt">
-            <a class="btn-gg" asp-controller="Account" asp-action="GoogleLogin">
-                <i class="fa-brands fa-google"></i> Google
+            <a class="btn-gg"
+               asp-controller="Account"
+               asp-action="GoogleLogin"
+               asp-route-returnUrl="@Url.Action("Index","Home")"
+               style="text-align: center">
+                <i class="fa-brands fa-google"></i>
+                Google
             </a>
         </div>
-        
     </div>
 </div>
 
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-    
+<partial name="_ValidationScriptsPartial" />
 
-    <script>
-        $(function () {
-            const $form = $("form.infor");
+<script>
+    // set ConfirmPassword = Password để pass [Compare] (cách A)
+    document.getElementById("registerForm").addEventListener("submit", function () {
+        const pwd = document.getElementById("Mk");
+        const confirm = document.getElementById("ConfirmPassword");
+        if (pwd && confirm) confirm.value = pwd.value;
+    });
 
-            // Validate ngay khi gõ
-            $form.find("input").on("input", function () {
-                $(this).valid(); // hiện lỗi nếu sai, đúng thì tự mất
-            });
+    // check sdt
+    const phoneInput = document.getElementById("sdt");
+    const phoneError = document.getElementById("phonerror");
+    phoneInput.addEventListener("input", () => {
+        phoneInput.value = phoneInput.value.replace(/\D/g, "").slice(0, 10);
+        const ok = /^0\d{9}$/.test(phoneInput.value);
+        phoneError.textContent = ok || phoneInput.value.length === 0
+            ? ""
+            : "SĐT không hợp lệ (vd: 0912345678)";
+    });
 
-            // Validate thêm khi rời khỏi ô
-            $form.find("input").on("blur", function () {
-                $(this).valid();
-            });
-        });
-    </script>
-}
+    // check mk
+    const passInput = document.getElementById("Mk");
+    const passError = document.getElementById("pwerror");
+    passInput.addEventListener("input", () => {
+        const pass = passInput.value;
+        const okLength = pass.length >= 8;
+        const okLower  = /[a-z]/.test(pass);
+        const okUpper  = /[A-Z]/.test(pass);
+        const okSpecial = /[^A-Za-z0-9]/.test(pass);
+
+        passError.textContent = (okLength && okLower && okUpper && okSpecial)
+            ? ""
+            : "Mật khẩu có ít nhất 8 ký tự, có chữ hoa, chữ thường và ký tự đặc biệt.";
+    });
+
+    // check email
+    const emailInput = document.getElementById("email");
+    const emailError = document.getElementById("email-error");
+    const emailRegex = /^[A-Za-z0-9._%+-]+@@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+    emailInput.addEventListener("input", () => {
+        const email = emailInput.value.trim();
+        if (email.length === 0) { emailError.textContent = ""; return; }
+        emailError.textContent = emailRegex.test(email) ? "" : "Email không hợp lệ (vd: ten@gmail.com)";
+    });
+</script>

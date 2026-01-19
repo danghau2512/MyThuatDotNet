@@ -197,7 +197,6 @@ public class AccountController : Controller
         ViewBag.Success = success == true;
         return View(new ChangePasswordVm());
     }
-
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> ChangePassword(ChangePasswordVm vm)
@@ -206,23 +205,63 @@ public class AccountController : Controller
         if (userId == null)
             return RedirectToAction("Login", new { returnUrl = Url.Action("ChangePassword", "Account") });
 
-        if (string.IsNullOrWhiteSpace(vm.CurrentPassword))
-            ModelState.AddModelError("", "Vui lòng nhập mật khẩu hiện tại.");
-        if (string.IsNullOrWhiteSpace(vm.NewPassword))
-            ModelState.AddModelError("", "Vui lòng nhập mật khẩu mới.");
-        if (vm.NewPassword.Length < 6)
-            ModelState.AddModelError("", "Mật khẩu mới tối thiểu 6 ký tự.");
-        if (vm.NewPassword != vm.ConfirmNewPassword)
-            ModelState.AddModelError("", "Xác nhận mật khẩu mới không khớp.");
+        vm.CurrentPassword ??= "";
+        vm.NewPassword ??= "";
+        vm.ConfirmNewPassword ??= "";
 
-        if (!ModelState.IsValid) return View(vm);
-
-        var (ok, message) = await _accountApi.ChangePasswordAsync(userId.Value, new AccountApiService.ChangePasswordRequestDto
+        // ✅ Nếu cả 3 ô đều rỗng -> chỉ báo 1 dòng
+        if (string.IsNullOrWhiteSpace(vm.CurrentPassword)
+            && string.IsNullOrWhiteSpace(vm.NewPassword)
+            && string.IsNullOrWhiteSpace(vm.ConfirmNewPassword))
         {
-            CurrentPassword = vm.CurrentPassword,
-            NewPassword = vm.NewPassword,
-            ConfirmNewPassword = vm.ConfirmNewPassword
-        });
+            ModelState.AddModelError("", "Vui lòng nhập mật khẩu hiện tại.");
+            return View(vm);
+        }
+
+        // ✅ Validate theo thứ tự: thiếu cái nào báo cái đó (nhưng không bị nhiều dòng khi bấm rỗng)
+        if (string.IsNullOrWhiteSpace(vm.CurrentPassword))
+        {
+            ModelState.AddModelError("", "Vui lòng nhập mật khẩu hiện tại.");
+            return View(vm);
+        }
+
+        if (string.IsNullOrWhiteSpace(vm.NewPassword))
+        {
+            ModelState.AddModelError("", "Vui lòng nhập mật khẩu mới.");
+            return View(vm);
+        }
+        // ✅ mật khẩu mới phải khác mật khẩu hiện tại
+        if (vm.NewPassword == vm.CurrentPassword)
+        {
+            ModelState.AddModelError("", "Mật khẩu mới phải khác mật khẩu hiện tại.");
+            return View(vm);
+        }
+
+        if (vm.NewPassword.Length < 8)
+        {
+            ModelState.AddModelError("", "Mật khẩu mới tối thiểu 8 ký tự.");
+            return View(vm);
+        }
+
+        if (string.IsNullOrWhiteSpace(vm.ConfirmNewPassword))
+        {
+            ModelState.AddModelError("", "Vui lòng xác nhận mật khẩu mới.");
+            return View(vm);
+        }
+
+        if (vm.NewPassword != vm.ConfirmNewPassword)
+        {
+            ModelState.AddModelError("", "Xác nhận mật khẩu mới không khớp.");
+            return View(vm);
+        }
+
+        var (ok, message) = await _accountApi.ChangePasswordAsync(userId.Value,
+            new AccountApiService.ChangePasswordRequestDto
+            {
+                CurrentPassword = vm.CurrentPassword,
+                NewPassword = vm.NewPassword,
+                ConfirmNewPassword = vm.ConfirmNewPassword
+            });
 
         if (!ok)
         {
@@ -231,6 +270,63 @@ public class AccountController : Controller
         }
 
         return RedirectToAction("ChangePassword", new { success = "true" });
+    }
+
+
+    // registe
+    [HttpGet]
+    public IActionResult Register()
+    {
+        return View(new RegisterVm());
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Register(RegisterVm vm)
+    {
+        if (!ModelState.IsValid) return View(vm);
+
+        var (ok, message) = await _accountApi.RegisterAsync(new AccountApiService.RegisterRequestDto
+        {
+            FullName = vm.FullName.Trim(),
+            Email = vm.Email.Trim(),
+            PhoneNumber = vm.PhoneNumber?.Trim(),
+            Password = vm.Password
+        });
+
+        if (!ok)
+        {
+            ModelState.AddModelError("", message);
+            return View(vm);
+        }
+
+        TempData["Success"] = "Đăng ký thành công. Vui lòng đăng nhập.";
+        return RedirectToAction("Login");
+    }
+    // quen mk
+    [HttpGet]
+    public IActionResult ForgotPassword()
+    {
+        return View(new ForgotPasswordVm());
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ForgotPassword(ForgotPasswordVm vm)
+    {
+        if (!ModelState.IsValid) return View(vm);
+
+        var (ok, message) = await _accountApi.ForgotPasswordAsync(vm.Email);
+
+        if (!ok)
+        {
+            ViewBag.Error = message;
+            return View(vm);
+        }
+
+        ViewBag.Success = message;
+        ModelState.Clear();                 // clear validation
+        return View(new ForgotPasswordVm()); // clear input giống JSP
     }
 
 }

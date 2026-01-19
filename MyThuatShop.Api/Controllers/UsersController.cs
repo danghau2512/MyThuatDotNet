@@ -2,16 +2,12 @@
 using Microsoft.EntityFrameworkCore;
 using MyThuatShop.Api.Data;
 using MyThuatShop.Api.Dtos.Auth;
+using MyThuatShop.Api.Dtos.Users;
 using MyThuatShop.Api.Models;
+using MyThuatShop.Api.Services;   // ✅ IEmailSender
+using MyThuatShop.Api.Utils;
 using System.Security.Cryptography;
 using System.Text;
-using MyThuatShop.Api.Utils;
-using MyThuatShop.Api.Dtos.Users;
-using MyThuatShop.Api.Dtos.Users;
-using MyThuatShop.Api.Utils;
-using Microsoft.EntityFrameworkCore;
-
-
 
 namespace MyThuatShop.Api.Controllers;
 
@@ -20,10 +16,12 @@ namespace MyThuatShop.Api.Controllers;
 public class UsersController : ControllerBase
 {
     private readonly MyThuatDotNetContext _db;
+    private readonly IEmailSender _emailSender;
 
-    public UsersController(MyThuatDotNetContext db)
+    public UsersController(MyThuatDotNetContext db, IEmailSender emailSender) // ✅ nhận emailSender
     {
         _db = db;
+        _emailSender = emailSender; // ✅ gán đúng
     }
 
     // MD5 hex lowercase
@@ -235,6 +233,52 @@ public class UsersController : ControllerBase
         await _db.SaveChangesAsync();
         return NoContent();
     }
+    public class ForgotPasswordRequestDto
+    {
+        public string Email { get; set; } = "";
+    }
 
+    [HttpPost("forgot-password")]
+    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequestDto req)
+    {
+        if (req == null || string.IsNullOrWhiteSpace(req.Email))
+            return BadRequest("Vui lòng nhập email.");
+
+        var email = req.Email.Trim();
+
+        var user = await _db.Users.FirstOrDefaultAsync(x => x.Email == email);
+        if (user == null) return BadRequest("Email không tồn tại.");
+
+        // Nếu IsActive của bạn là int (0/1/3) thì dùng dòng này:
+        // if (user.IsActive == 3) return BadRequest("Tài khoản đang bị khóa.");
+
+        // Nếu IsActive của bạn là bool? thì dùng kiểu này:
+        // if (user.IsActive != true) return BadRequest("Tài khoản chưa kích hoạt hoặc đang bị khóa.");
+
+        var newPlain = GenerateTempPassword(10);
+
+        user.RandomKey = MyUtils.keyGenerator(10);
+        user.Password = MyUtils.ToMd5Hash(newPlain, user.RandomKey);
+
+        await _db.SaveChangesAsync();
+
+        var html = $@"
+            <p>Mật khẩu mới của bạn là: <b>{newPlain}</b></p>
+            <p>Vui lòng đăng nhập và đổi mật khẩu ngay sau khi đăng nhập.</p>";
+
+        await _emailSender.SendHtmlAsync(user.Email, "Đặt lại mật khẩu - MyThuatShop", html);
+
+        return Ok("Mật khẩu mới đã được gửi về email.");
+    }
+
+    private static string GenerateTempPassword(int len)
+    {
+        const string chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789@#$!";
+        var sb = new StringBuilder(len);
+        var rng = new Random();
+        for (int i = 0; i < len; i++)
+            sb.Append(chars[rng.Next(chars.Length)]);
+        return sb.ToString();
+    }
 
 }

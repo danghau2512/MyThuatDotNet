@@ -37,7 +37,9 @@ public class AdminOrdersController : ControllerBase
             CreateAt = o.CreateAt,
             Address = o.Address,
             TotalPrice = o.TotalPrice,
+            StatusId = o.OrderStatusId,
             StatusName = o.OrderStatus.StatusName,
+                
 
             Items = o.OrderDetails.Select(d => new AdminOrderItemDto
             {
@@ -54,19 +56,44 @@ public class AdminOrdersController : ControllerBase
         return Ok(data);
     }
 
-    [HttpPost("status")]
-    public async Task<IActionResult> UpdateStatus([FromBody] UpdateOrderStatusRequest req)
+    [HttpPost("update-info")]
+    public async Task<IActionResult> UpdateInfo([FromBody] UpdateOrderInfoRequest req)
     {
         if (req.OrderId <= 0) return BadRequest("OrderId không hợp lệ.");
-        if (string.IsNullOrWhiteSpace(req.StatusName)) return BadRequest("Thiếu StatusName.");
 
         var order = await _db.Orders.FirstOrDefaultAsync(o => o.Id == req.OrderId);
         if (order == null) return NotFound("Không tìm thấy đơn.");
 
-        var st = await _db.OrderStatuses.FirstOrDefaultAsync(s => s.StatusName == req.StatusName.Trim());
+        order.FullName = (req.FullName ?? "").Trim();
+        order.PhoneNumber = (req.PhoneNumber ?? "").Trim();
+        order.Address = (req.Address ?? "").Trim();
+
+        await _db.SaveChangesAsync();
+        return Ok(new { success = true });
+    }
+    [HttpPost("change-status")]
+    public async Task<IActionResult> ChangeStatus([FromBody] ChangeOrderStatusRequest req)
+    {
+        if (req.OrderId <= 0) return BadRequest("OrderId không hợp lệ.");
+        if (req.StatusId is < 1 or > 4) return BadRequest("StatusId không hợp lệ.");
+
+        var order = await _db.Orders.FirstOrDefaultAsync(o => o.Id == req.OrderId);
+        if (order == null) return NotFound("Không tìm thấy đơn.");
+
+        var current = order.OrderStatusId;
+        var target = req.StatusId;
+
+        var ok =
+            (current == 1 && (target == 2 || target == 4)) ||
+            (current == 2 && target == 3);
+
+        if (!ok) return BadRequest($"Không thể chuyển trạng thái từ {current} sang {target}.");
+
+        // kiểm tra status tồn tại
+        var st = await _db.OrderStatuses.FirstOrDefaultAsync(s => s.Id == target);
         if (st == null) return BadRequest("Trạng thái không tồn tại trong DB.");
 
-        order.OrderStatusId = st.Id;
+        order.OrderStatusId = target;
         await _db.SaveChangesAsync();
 
         return Ok(new { success = true });

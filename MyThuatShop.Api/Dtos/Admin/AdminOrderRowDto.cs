@@ -12,6 +12,8 @@ public class AdminOrderRowDto
 
     public List<AdminOrderItemDto> Items { get; set; } = new();
     public string? ProductNames { get; set; }
+    public int StatusId { get; set; }
+
 }
 
 public class AdminOrderItemDto
@@ -22,4 +24,5 @@ public class AdminOrderItemDto
     public decimal UnitPrice { get; set; }
 }
 
-public record UpdateOrderStatusRequest(int OrderId, string StatusName);
+public record ChangeOrderStatusRequest(int OrderId, int StatusId);
+public record UpdateOrderInfoRequest(int OrderId, string FullName, string PhoneNumber, string Address);

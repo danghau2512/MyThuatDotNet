@@ -11,6 +11,7 @@ public class AdminOrderRowDto
 
     public decimal TotalPrice { get; set; }
     public string? StatusName { get; set; }
+    public int StatusId { get; set; }
 
     // hiển thị list sản phẩm theo đơn (nếu có)
     public List<AdminOrderItemDto> Items { get; set; } = new();

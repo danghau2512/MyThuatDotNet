@@ -8,6 +8,9 @@ using MyThuatShop.Api.Services;   // ✅ IEmailSender
 using MyThuatShop.Api.Utils;
 using System.Security.Cryptography;
 using System.Text;
+using MyThuatShop.Api.Dtos;
+using MyThuatShop.Api.Dtos.Users;
+
 namespace MyThuatShop.Api.Controllers;
 
 [ApiController]
@@ -279,5 +282,71 @@ public class UsersController : ControllerBase
             sb.Append(chars[rng.Next(chars.Length)]);
         return sb.ToString();
     }
+    // ql nguoi dung
+    // GET: /api/users/admin?q=&page=1&pageSize=10
+    [HttpGet("admin")]
+    public async Task<ActionResult<PagedResultDto<AdminUserItemDto>>> AdminListUsers(
+        [FromQuery] string? q,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10)
+    {
+        if (page < 1) page = 1;
+        if (pageSize < 1 || pageSize > 100) pageSize = 10;
+
+        var query = _db.Users.AsNoTracking();
+
+        if (!string.IsNullOrWhiteSpace(q))
+        {
+            q = q.Trim();
+            query = query.Where(u =>
+                (u.FullName != null && u.FullName.Contains(q)) ||
+                (u.Email != null && u.Email.Contains(q)) ||
+                (u.PhoneNumber != null && u.PhoneNumber.Contains(q)));
+        }
+
+        var total = await query.CountAsync();
+
+        var items = await query
+            .OrderByDescending(u => u.Id)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .Select(u => new AdminUserItemDto
+            {
+                Id = u.Id,
+                FullName = u.FullName,
+                PhoneNumber = u.PhoneNumber,
+                Address = u.Address,
+                CreatedAt = u.CreateAt.HasValue ? u.CreateAt.Value.ToString("yyyy-MM-ddTHH:mm:ss") : null,
+                Dob = u.Dob.HasValue ? u.Dob.Value.ToString("yyyy-MM-dd") : null,
+                Role = (u.Role ?? "USER").ToUpper(),
+                IsActive = u.IsActive
+            })
+            .ToListAsync();
+
+        return Ok(new PagedResultDto<AdminUserItemDto>
+        {
+            Items = items,
+            Page = page,
+            PageSize = pageSize,
+            TotalItems = total
+        });
+    }
+    public class SetActiveDto
+    {
+        public bool IsActive { get; set; }
+    }
+
+    // PUT: /api/users/admin/{id}/set-active
+    [HttpPut("admin/{id:int}/set-active")]
+    public async Task<IActionResult> AdminSetActive(int id, [FromBody] SetActiveDto req)
+    {
+        var user = await _db.Users.FirstOrDefaultAsync(x => x.Id == id);
+        if (user == null) return NotFound("Không tìm thấy user.");
+
+        user.IsActive = req.IsActive;
+        await _db.SaveChangesAsync();
+        return NoContent();
+    }
+
 
 }

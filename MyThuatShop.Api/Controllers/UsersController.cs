@@ -285,7 +285,7 @@ public class UsersController : ControllerBase
     // ql nguoi dung
     // GET: /api/users/admin?q=&page=1&pageSize=10
     [HttpGet("admin")]
-    public async Task<ActionResult<PagedResultDto<AdminUserItemDto>>> AdminListUsers(
+    public async Task<ActionResult<AdminPagedResultDto<AdminUserItemDto>>> AdminListUsers(
         [FromQuery] string? q,
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 10)
@@ -323,7 +323,7 @@ public class UsersController : ControllerBase
             })
             .ToListAsync();
 
-        return Ok(new PagedResultDto<AdminUserItemDto>
+        return Ok(new AdminPagedResultDto<AdminUserItemDto>
         {
             Items = items,
             Page = page,

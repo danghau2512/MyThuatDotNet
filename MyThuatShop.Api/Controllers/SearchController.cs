@@ -60,7 +60,7 @@ namespace MyThuatShop.Api.Controllers
 
             if (string.IsNullOrWhiteSpace(q))
             {
-                return Ok(new PagedResultDto<ProductCardDto>
+                return Ok(new AdminPagedResultDto<ProductCardDto>
                 {
                     Page = page,
                     PageSize = pageSize,
@@ -101,7 +101,7 @@ namespace MyThuatShop.Api.Controllers
                 })
                 .ToListAsync();
 
-            return Ok(new PagedResultDto<ProductCardDto>
+            return Ok(new AdminPagedResultDto<ProductCardDto>
             {
                 Page = page,
                 PageSize = pageSize,

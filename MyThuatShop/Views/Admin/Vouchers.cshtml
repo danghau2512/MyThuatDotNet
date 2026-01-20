@@ -1,0 +1,550 @@
+﻿@model MyThuatShop.Services.AdminVoucherApiService.PagedResultVm<MyThuatShop.Services.AdminVoucherApiService.AdminVoucherRowVm>
+
+@{
+    ViewData["Title"] = "Quản lý khuyến mãi";
+    ViewData["ActiveMenu"] = "vouchers";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+
+    var keyword = (ViewBag.Keyword as string) ?? "";
+    var page = (int)(ViewBag.Page ?? 1);
+    var pageSize = (int)(ViewBag.PageSize ?? 10);
+    var totalPages = (int)(ViewBag.TotalPages ?? 1);
+}
+
+@section Styles {
+<style>
+    #main .right .container { display:flex; flex-direction:column; width:calc(100% - 100px); margin:20px auto 0; }
+    .order-container { width:95%; margin:10px auto 5px; background:#fff; padding:25px; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,.1); }
+    h1 { margin:0 0 10px; color:#222; }
+
+    .search { display:flex; align-items:center; justify-content:end; gap:10px; width:100%; margin:0 auto 15px; }
+    .search-input-icon { display:flex; align-items:center; border:1px solid #ddd; border-radius:10px; overflow:hidden; background:#fff; }
+    .search-input-icon input { padding:10px 15px; border:none; outline:none; width:250px; font-size:14px; }
+    .icon { background:#f1f1f1; padding:10px 15px; display:flex; align-items:center; justify-content:center; cursor:pointer; border:none; }
+    .icon i { font-size:16px; color:#333; }
+
+    .order-table { width:100%; border-collapse:collapse; margin-top:10px; }
+    .order-table th { background:#2659F5; color:#fff; padding:12px; font-size:14px; }
+    .order-table td { padding:12px; background:#fafafa; }
+    .order-table tr:nth-child(even) td { background:#f0f0f0; }
+    .order-table td, .order-table th { border-bottom:1px solid #ddd; text-align:left; border-left:1px solid #ddd; border-right:1px solid #ddd; }
+
+    .btn-Sua { background:#FFC107; color:#000; border:none; padding:6px 10px; cursor:pointer; font-size:14px; border-radius:4px; transition:.2s; }
+    .btn-Sua:hover { background:#e0a800; }
+
+    .btn-Xoa { background:#DC3545; color:#fff; border:none; padding:6px 10px; cursor:pointer; font-size:14px; border-radius:4px; transition:.2s; margin-top:5px; }
+    .btn-Xoa:hover { background:#b02a37; }
+
+    .btn-them-km { background:#2659F5; border:none; color:#fff; padding:8px 16px; font-size:14px; border-radius:5px; cursor:pointer; }
+
+    .pagination { display:flex; justify-content:center; align-items:center; margin:25px 0; gap:5px; }
+    .page-link { padding:6px 12px; border:1px solid #d0d7de; border-radius:4px; color:#0d6efd; background:#fff; text-decoration:none; font-size:14px; transition:.2s; }
+    .page-link:hover { background:#e9ecef; }
+    .page-link.active { background:#2659F5; color:#fff; font-weight:700; border-color:#2659F5; }
+
+    .modal { position:fixed; inset:0; background:rgba(0,0,0,.4); display:none; align-items:center; justify-content:center; z-index:999; }
+    .modal-content { background:#fff; width:400px; max-width:95%; border-radius:10px; box-shadow:0 4px 15px rgba(0,0,0,.2); overflow:hidden; animation:fadeInScale .2s ease-out; }
+    .modal-header { display:flex; justify-content:space-between; align-items:center; padding:12px 16px; background:#2659F5; color:#fff; }
+    .modal-header h2 { margin:0; font-size:18px; width:100%; text-align:center; }
+    .close-modal, .close-edit-modal, .close-delete-modal { cursor:pointer; font-size:20px; padding:0 5px; }
+
+    .modal-body { padding:15px 16px 5px; }
+    .form-group { display:flex; flex-direction:column; margin-bottom:10px; }
+    .form-group label { font-size:14px; margin-bottom:4px; color:#333; }
+    .form-group input { padding:8px 10px; border-radius:6px; border:1px solid #ddd; font-size:14px; outline:none; }
+    .modal-footer { display:flex; justify-content:flex-end; gap:8px; padding:10px 16px 14px; background:#f7f7f7; }
+    .btn-cancel, .btn-save, .btn-edit-cancel, .btn-edit-save, .btn-delete-cancel, .btn-delete-confirm {
+        border:none; border-radius:5px; padding:8px 14px; font-size:14px; cursor:pointer;
+    }
+    .btn-cancel, .btn-edit-cancel, .btn-delete-cancel { background:#e0e0e0; color:#333; }
+    .btn-save, .btn-edit-save { background:#2659F5; color:#fff; }
+    .btn-delete-confirm { background:#DC3545; color:#fff; }
+
+    @@keyframes fadeInScale {
+        from { opacity:0; transform:scale(.9); }
+        to { opacity:1; transform:scale(1); }
+    }
+</style>
+}
+
+<div class="container">
+    <div class="order-container">
+        <h1>Danh sách khuyến mãi</h1>
+        <form id="antiForgerySource" style="display:none;">
+            @Html.AntiForgeryToken()
+        </form>
+
+        @if (TempData["ErrorMsg"] != null)
+        {
+            <div style="color:#d93025;font-weight:700;margin-bottom:12px;">@TempData["ErrorMsg"]</div>
+        }
+        @if (TempData["SuccessMsg"] != null)
+        {
+            <div style="color:#0a8a0a;font-weight:700;margin-bottom:12px;">@TempData["SuccessMsg"]</div>
+        }
+
+        <div class="search">
+            <div class="search-input-icon">
+                <form id="voucherSearchForm" action="/admin/vouchers" method="get" style="display:flex;" onsubmit="return false;">
+                    <input id="searchInput" type="text" name="keyword" placeholder="Tìm kiếm khuyến mãi..." value="@keyword" />
+                    <button type="button" class="icon" id="btnSearch">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </button>
+                </form>
+
+            </div>
+            <button type="button" class="btn-them-km">Thêm khuyến mãi</button>
+        </div>
+
+        <table class="order-table">
+            <thead>
+                <tr>
+                    <th>STT</th>
+                    <th>Mã khuyến mãi</th>
+                    <th>Tên khuyến mãi</th>
+                    <th>Mô tả</th>
+                    <th>Ngày bắt đầu</th>
+                    <th>Ngày kết thúc</th>
+                    <th>Giảm giá</th>
+                    <th>Tùy chọn</th>
+                </tr>
+            </thead>
+
+            <tbody id="vouchersTbody">
+                @if (Model.Items.Count == 0)
+                {
+                    <tr><td colspan="8">Không có khuyến mãi nào.</td></tr>
+                }
+                else
+                {
+                    var sttBase = (page - 1) * pageSize;
+                    for (int i = 0; i < Model.Items.Count; i++)
+                    {
+                        var v = Model.Items[i];
+                        <tr data-id="@v.Id"
+                            data-min="@v.MinOrderValue"
+                            data-used="@v.QuantityUsed"
+                            data-active="@v.IsActive"
+                            data-qty="@v.Quantity">
+                            <td>@(sttBase + i + 1)</td>
+                            <td class="col-code">@v.Code</td>
+                            <td class="col-name">@v.Name</td>
+                            <td class="col-desc">@v.Description</td>
+                            <td class="col-start" data-value="@v.StartDate.ToString("yyyy-MM-dd")">@v.StartDate.ToString("yyyy-MM-dd")</td>
+                            <td class="col-end" data-value="@v.EndDate.ToString("yyyy-MM-dd")">@v.EndDate.ToString("yyyy-MM-dd")</td>
+                            <td class="col-cash" data-value="@v.VoucherCash">@($"{v.VoucherCash}đ")</td>
+                            <td>
+                                <button class="btn-Sua" type="button">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                </button>
+
+                                <form action="/admin/vouchers" method="post" style="display:inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="action" value="delete" />
+                                    <input type="hidden" name="id" value="@v.Id" />
+
+                                    <!-- giữ state -->
+                                    <input type="hidden" name="keyword" value="@keyword" />
+                                    <input type="hidden" name="page" value="@@page" />
+                                    <input type="hidden" name="pageSize" value="@pageSize" />
+
+                                    <!-- dummy fields để binder đủ -->
+                                    <input type="hidden" name="code" value="@v.Code" />
+                                    <input type="hidden" name="name" value="@v.Name" />
+                                    <input type="hidden" name="description" value="@v.Description" />
+                                    <input type="hidden" name="startDate" value="@v.StartDate.ToString("yyyy-MM-dd")" />
+                                    <input type="hidden" name="endDate" value="@v.EndDate.ToString("yyyy-MM-dd")" />
+                                    <input type="hidden" name="voucherCash" value="@v.VoucherCash" />
+                                    <input type="hidden" name="minOrderValue" value="@v.MinOrderValue" />
+                                    <input type="hidden" name="quantity" value="@v.Quantity" />
+                                    <input type="hidden" name="quantityUsed" value="@v.QuantityUsed" />
+                                    <input type="hidden" name="isActive" value="@v.IsActive" />
+
+                                    <button class="btn-Xoa" type="button">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+
+        <div class="pagination" id="vouchersPagination">
+            @if (page > 1)
+            {
+                <a class="page-link" href="/admin/vouchers?page=@(page-1)&keyword=@keyword">Trước</a>
+            }
+            @for (int p = 1; p <= totalPages; p++)
+            {
+                <a class="page-link @(p == page ? "active" : "")" href="/admin/vouchers?page=@p&keyword=@keyword">@p</a>
+            }
+            @if (page < totalPages)
+            {
+                <a class="page-link" href="/admin/vouchers?page=@(page+1)&keyword=@keyword">Sau</a>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Modal thêm -->
+<div id="Dialog-them-km" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Thêm khuyến mãi</h2>
+            <span class="close-modal">&times;</span>
+        </div>
+
+        <form action="/admin/vouchers" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="action" value="create" />
+            <input type="hidden" name="id" value="0" />
+            <input type="hidden" name="quantityUsed" value="0" />
+            <input type="hidden" name="isActive" value="1" />
+
+            <input type="hidden" name="keyword" value="@keyword" />
+            <input type="hidden" name="page" value="@@page" />
+            <input type="hidden" name="pageSize" value="@pageSize" />
+
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Mã khuyến mãi</label>
+                    <input type="text" name="code" placeholder="Nhập mã khuyến mãi" />
+                </div>
+                <div class="form-group">
+                    <label>Tên khuyến mãi</label>
+                    <input type="text" name="name" placeholder="Nhập tên khuyến mãi" />
+                </div>
+                <div class="form-group">
+                    <label>Mô tả</label>
+                    <input type="text" name="description" placeholder="Nhập mô tả" />
+                </div>
+                <div class="form-group">
+                    <label>Ngày bắt đầu</label>
+                    <input type="date" name="startDate" />
+                </div>
+                <div class="form-group">
+                    <label>Ngày kết thúc</label>
+                    <input type="date" name="endDate" />
+                </div>
+                <div class="form-group">
+                    <label>Giảm giá</label>
+                    <input type="number" name="voucherCash" placeholder="Nhập số tiền giảm" />
+                </div>
+                <div class="form-group">
+                    <label>Đơn tối thiểu</label>
+                    <input type="number" name="minOrderValue" value="0" />
+                </div>
+                <div class="form-group">
+                    <label>Số lượng</label>
+                    <input type="number" name="quantity" />
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn-cancel">Hủy</button>
+                <button type="submit" class="btn-save">Lưu</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal sửa -->
+<div id="Dialog-sua-km" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Chỉnh sửa khuyến mãi</h2>
+            <span class="close-edit-modal">&times;</span>
+        </div>
+
+        <form action="/admin/vouchers" method="post" id="editVoucherForm">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="action" value="update" />
+            <input type="hidden" name="id" id="editId" />
+
+            <input type="hidden" name="minOrderValue" id="editMinOrderValue" />
+            <input type="hidden" name="quantityUsed" id="editQuantityUsed" />
+            <input type="hidden" name="isActive" id="editIsActive" />
+
+            <input type="hidden" name="keyword" value="@keyword" />
+            <input type="hidden" name="page" value="@@page" />
+            <input type="hidden" name="pageSize" value="@pageSize" />
+
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Mã khuyến mãi</label>
+                    <input type="text" name="code" id="editCode" required />
+                </div>
+                <div class="form-group">
+                    <label>Tên khuyến mãi</label>
+                    <input type="text" name="name" id="editName" required />
+                </div>
+                <div class="form-group">
+                    <label>Mô tả</label>
+                    <input type="text" name="description" id="editDesc" />
+                </div>
+                <div class="form-group">
+                    <label>Ngày bắt đầu</label>
+                    <input type="date" name="startDate" id="editStartDate" />
+                </div>
+                <div class="form-group">
+                    <label>Ngày kết thúc</label>
+                    <input type="date" name="endDate" id="editEndDate" />
+                </div>
+                <div class="form-group">
+                    <label>Giảm giá</label>
+                    <input type="number" name="voucherCash" id="editCash" required />
+                </div>
+                <div class="form-group">
+                    <label>Số lượng</label>
+                    <input type="number" name="quantity" id="editQuantity" required />
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn-edit-cancel">Hủy</button>
+                <button type="submit" class="btn-edit-save">Lưu thay đổi</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal xóa -->
+<div id="Dialog-xoa-km" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Xóa khuyến mãi</h2>
+            <span class="close-delete-modal">&times;</span>
+        </div>
+        <div class="modal-body">
+            <p>Bạn chắc chắn muốn xóa khuyến mãi này?</p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn-delete-cancel">Hủy</button>
+            <button type="button" class="btn-delete-confirm">Xóa</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+<script>
+    // ===== Add modal =====
+    const btnThemKM = document.querySelector('.btn-them-km');
+    const modalAdd = document.getElementById('Dialog-them-km');
+    const btnCloseAdd = document.querySelector('.close-modal');
+    const btnCancelAdd = document.querySelector('.btn-cancel');
+
+    if (btnThemKM) btnThemKM.onclick = () => modalAdd.style.display = 'flex';
+    if (btnCloseAdd) btnCloseAdd.onclick = () => modalAdd.style.display = 'none';
+    if (btnCancelAdd) btnCancelAdd.onclick = () => modalAdd.style.display = 'none';
+    window.addEventListener('click', e => { if (e.target === modalAdd) modalAdd.style.display = 'none'; });
+
+    // ===== Edit modal (giống JSP: lấy dữ liệu từ row) =====
+    const modalEdit = document.getElementById("Dialog-sua-km");
+    const btnCloseEdit = document.querySelector(".close-edit-modal");
+    const btnEditCancel = document.querySelector(".btn-edit-cancel");
+
+    // document.querySelectorAll(".btn-Sua").forEach(btn => {
+    //     btn.addEventListener("click", () => {
+    //         const row = btn.closest("tr");
+    //         document.getElementById("editId").value = row.getAttribute("data-id") || "";
+
+    //         document.getElementById("editCode").value = row.querySelector(".col-code")?.innerText.trim() || "";
+    //         document.getElementById("editName").value = row.querySelector(".col-name")?.innerText.trim() || "";
+    //         document.getElementById("editDesc").value = row.querySelector(".col-desc")?.innerText.trim() || "";
+
+    //         const start = row.querySelector(".col-start")?.getAttribute("data-value") || "";
+    //         const end   = row.querySelector(".col-end")?.getAttribute("data-value") || "";
+    //         document.getElementById("editStartDate").value = start.substring(0, 10);
+    //         document.getElementById("editEndDate").value   = end.substring(0, 10);
+
+    //         document.getElementById("editCash").value = row.querySelector(".col-cash")?.getAttribute("data-value") || "0";
+    //         document.getElementById("editQuantity").value = row.getAttribute("data-qty") || "0";
+
+    //         document.getElementById("editMinOrderValue").value = row.getAttribute("data-min") || "0";
+    //         document.getElementById("editQuantityUsed").value = row.getAttribute("data-used") || "0";
+    //         document.getElementById("editIsActive").value = row.getAttribute("data-active") || "1";
+
+    //         modalEdit.style.display = "flex";
+    //     });
+    // });
+
+    if (btnCloseEdit) btnCloseEdit.onclick = () => modalEdit.style.display = "none";
+    if (btnEditCancel) btnEditCancel.onclick = () => modalEdit.style.display = "none";
+    window.addEventListener("click", e => { if (e.target === modalEdit) modalEdit.style.display = "none"; });
+
+    // ===== Delete confirm modal =====
+    const deleteModal = document.getElementById("Dialog-xoa-km");
+    const btnCloseDelete = document.querySelector(".close-delete-modal");
+    const btnDeleteCancel = document.querySelector(".btn-delete-cancel");
+    const btnDeleteConfirm = document.querySelector(".btn-delete-confirm");
+    let deleteForm = null;
+
+    document.querySelectorAll(".btn-Xoa").forEach(btn => {
+        btn.addEventListener("click", () => {
+            deleteForm = btn.closest("form");
+            deleteModal.style.display = "flex";
+        });
+    });
+
+    if (btnDeleteConfirm) btnDeleteConfirm.onclick = () => { if (deleteForm) deleteForm.submit(); };
+    if (btnCloseDelete) btnCloseDelete.onclick = () => { deleteModal.style.display = "none"; deleteForm = null; };
+    if (btnDeleteCancel) btnDeleteCancel.onclick = () => { deleteModal.style.display = "none"; deleteForm = null; };
+
+    window.addEventListener("click", e => {
+        if (e.target === deleteModal) { deleteModal.style.display = "none"; deleteForm = null; }
+    });
+</script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const searchForm = document.getElementById("voucherSearchForm");
+            const btnSearch = document.getElementById("btnSearch");
+            const searchInput = document.getElementById("searchInput");
+            const tbody = document.getElementById("vouchersTbody");
+            const pagination = document.getElementById("vouchersPagination");
+
+            if (!searchInput || !tbody || !pagination) return;
+
+            const pageSize = @pageSize; // lấy đúng pageSize server
+            let typingTimer = null;
+            let abortCtrl = null;
+
+            function getAntiForgeryToken() {
+                return document.querySelector('#antiForgerySource input[name="__RequestVerificationToken"]')?.value || "";
+            }
+
+            async function loadVouchers(page = 1) {
+                const keyword = (searchInput.value || "").trim();
+
+                if (abortCtrl) abortCtrl.abort();
+                abortCtrl = new AbortController();
+
+                try {
+                    const url = `/admin/vouchers/ajax?keyword=${encodeURIComponent(keyword)}&page=${page}&pageSize=${pageSize}`;
+                    const res = await fetch(url, { signal: abortCtrl.signal });
+
+                    if (!res.ok) return;
+
+                    const data = await res.json();
+                    renderTable(data);
+                    renderPagination(data);
+                } catch (err) {
+                    if (err?.name !== "AbortError") console.error(err);
+                }
+            }
+
+            // để bạn vẫn gọi được từ onclick nếu cần
+            window.loadVouchers = loadVouchers;
+
+            function renderTable(data) {
+                const token = getAntiForgeryToken();
+                const keyword = data.keyword || "";
+                const page = data.page || 1;
+
+                if (!data.items || data.items.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="8">Không có khuyến mãi nào.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = data.items.map((v, idx) => {
+                    const stt = (page - 1) * pageSize + idx + 1;
+
+                    return `
+                    <tr data-id="${v.id}"
+                        data-min="${v.minOrderValue}"
+                        data-used="${v.quantityUsed}"
+                        data-active="${v.isActive}"
+                        data-qty="${v.quantity}">
+                        <td>${stt}</td>
+                        <td class="col-code">${escapeHtml(v.code)}</td>
+                        <td class="col-name">${escapeHtml(v.name)}</td>
+                        <td class="col-desc">${escapeHtml(v.description)}</td>
+                        <td class="col-start" data-value="${v.startDate}">${v.startDate}</td>
+                        <td class="col-end" data-value="${v.endDate}">${v.endDate}</td>
+                        <td class="col-cash" data-value="${v.voucherCash}">${formatMoney(v.voucherCash)}đ</td>
+                        <td>
+                            <button class="btn-Sua" type="button">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </button>
+
+                            <form action="/admin/vouchers" method="post" style="display:inline" class="deleteForm">
+                                <input type="hidden" name="__RequestVerificationToken" value="${token}" />
+                                <input type="hidden" name="action" value="delete" />
+                                <input type="hidden" name="id" value="${v.id}" />
+
+                                <input type="hidden" name="keyword" value="${escapeAttr(keyword)}" />
+                                <input type="hidden" name="page" value="${page}" />
+                                <input type="hidden" name="pageSize" value="${pageSize}" />
+
+                                <input type="hidden" name="code" value="${escapeAttr(v.code)}" />
+                                <input type="hidden" name="name" value="${escapeAttr(v.name)}" />
+                                <input type="hidden" name="description" value="${escapeAttr(v.description)}" />
+                                <input type="hidden" name="startDate" value="${v.startDate}" />
+                                <input type="hidden" name="endDate" value="${v.endDate}" />
+                                <input type="hidden" name="voucherCash" value="${v.voucherCash}" />
+                                <input type="hidden" name="minOrderValue" value="${v.minOrderValue}" />
+                                <input type="hidden" name="quantity" value="${v.quantity}" />
+                                <input type="hidden" name="quantityUsed" value="${v.quantityUsed}" />
+                                <input type="hidden" name="isActive" value="${v.isActive}" />
+
+                                <button class="btn-Xoa" type="button">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>`;
+                }).join("");
+            }
+
+            function renderPagination(data) {
+                const page = data.page || 1;
+                const totalPages = data.totalPages || 1;
+
+                let html = "";
+                if (page > 1) html += `<a href="#" class="page-link" data-page="${page - 1}">Trước</a>`;
+                for (let p = 1; p <= totalPages; p++) {
+                    html += `<a href="#" class="page-link ${p === page ? "active" : ""}" data-page="${p}">${p}</a>`;
+                }
+                if (page < totalPages) html += `<a href="#" class="page-link" data-page="${page + 1}">Sau</a>`;
+
+                pagination.innerHTML = html;
+            }
+
+            pagination.addEventListener("click", (e) => {
+                const a = e.target.closest("a.page-link");
+                if (!a) return;
+                e.preventDefault();
+                loadVouchers(parseInt(a.dataset.page || "1", 10));
+            });
+
+            // ✅ Gõ là tìm (150ms)
+            searchInput.addEventListener("input", () => {
+                clearTimeout(typingTimer);
+                typingTimer = setTimeout(() => loadVouchers(1), 150);
+            });
+
+            // click kính lúp
+            btnSearch?.addEventListener("click", () => loadVouchers(1));
+
+            // Enter trong input
+            searchForm?.addEventListener("submit", (e) => {
+                e.preventDefault();
+                loadVouchers(1);
+            });
+
+            function escapeHtml(s) {
+                return (s ?? "").toString()
+                    .replaceAll("&", "&amp;")
+                    .replaceAll("<", "&lt;")
+                    .replaceAll(">", "&gt;")
+                    .replaceAll('"', "&quot;")
+                    .replaceAll("'", "&#39;");
+            }
+            function escapeAttr(s) { return escapeHtml(s); }
+            function formatMoney(n) { return Number(n || 0).toLocaleString("vi-VN"); }
+        });
+    </script>
+
+
+}

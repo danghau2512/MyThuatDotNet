@@ -22,6 +22,17 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
+// ql nguoi dung
+builder.Services.AddHttpClient<AdminUserApiService>(c =>
+{
+    c.BaseAddress = new Uri(builder.Configuration["ApiBaseUrl"]!);
+});
+// quan ly voucher
+builder.Services.AddHttpClient<AdminVoucherApiService>(c =>
+{
+    c.BaseAddress = new Uri(builder.Configuration["ApiBaseUrl"]!);
+});
+
 
 // ===== API BaseUrl =====
 var apiBaseUrl = builder.Configuration["ApiBaseUrl"];

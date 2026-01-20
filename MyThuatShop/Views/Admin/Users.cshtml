@@ -1,0 +1,799 @@
+﻿@model MyThuatShop.ViewModels.Admin.AdminUsersIndexVm
+
+@{
+    ViewData["Title"] = "Quản lý người dùng";
+    ViewData["ActiveMenu"] = "users";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+
+    var q = Model.Q ?? "";
+    var currentPage = Model.Paged.Page;
+    var totalPages = Model.Paged.TotalPages;
+}
+
+@section Styles {
+    <style>
+        #main .right .container {
+            display: flex;
+            flex-direction: column;
+            width: calc(100% - 100px);
+            margin-top: 20px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .order-container {
+            width: 95%;
+            margin: 10px auto 5px;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            margin: 0;
+            margin-bottom: 10px;
+            color: #222;
+        }
+
+        .search {
+            display: flex;
+            align-items: center;
+            justify-content: end;
+            gap: 10px;
+            width: 100%;
+            margin: 0 auto;
+            margin-bottom: 15px;
+        }
+
+        .search-input-icon {
+            display: flex;
+            align-items: center;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #fff;
+        }
+
+            .search-input-icon input {
+                padding: 10px 15px;
+                border: none;
+                outline: none;
+                width: 250px;
+                font-size: 14px;
+            }
+
+        .icon {
+            background: #f1f1f1;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: none;
+        }
+
+            .icon i {
+                font-size: 16px;
+                color: #333;
+            }
+
+        .order-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+            .order-table th {
+                background: #2659F5;
+                color: white;
+                padding: 12px;
+                font-size: 14px;
+            }
+
+            .order-table td {
+                padding: 12px;
+                background: #fafafa;
+            }
+
+            .order-table tr:nth-child(even) td {
+                background: #f0f0f0;
+            }
+
+            .order-table td, .order-table th {
+                border-bottom: 1px solid #ddd;
+                text-align: left;
+                border-left: 1px solid #ddd;
+                border-right: 1px solid #ddd;
+            }
+
+        .btn-Sua {
+            background-color: #FFC107;
+            color: black;
+            border: none;
+            padding: 6px 10px;
+            cursor: pointer;
+            font-size: 14px;
+            border-radius: 4px;
+            transition: 0.2s;
+        }
+
+            .btn-Sua:hover {
+                background-color: #e0a800;
+            }
+
+        .btn-Xoa {
+            background-color: #DC3545;
+            color: white;
+            border: none;
+            padding: 6px 10px;
+            cursor: pointer;
+            font-size: 14px;
+            border-radius: 4px;
+            transition: 0.2s;
+        }
+
+            .btn-Xoa:hover {
+                background-color: #b02a37;
+            }
+
+        .btn-unlock {
+            background-color: #FFC107;
+            color: black;
+            border: none;
+            padding: 6px 10px;
+            cursor: pointer;
+            font-size: 14px;
+            border-radius: 4px;
+            transition: 0.2s;
+        }
+
+            .btn-unlock:hover {
+                background-color: #e0a800;
+            }
+
+        .btn-them-khach-hang {
+            background-color: #2659F5;
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            font-size: 14px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 0;
+        }
+
+        /* modal */
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+        }
+
+        .modal-content {
+            background: #fff;
+            width: 400px;
+            max-width: 95%;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            animation: fadeInScale 0.2s ease-out;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background-color: #2659F5;
+            color: #fff;
+            text-align: center;
+        }
+
+            .modal-header h2 {
+                margin: 0;
+                font-size: 18px;
+                width: 100%;
+                text-align: center;
+            }
+
+        .close-modal, .close-edit-modal, .close-lock-modal {
+            cursor: pointer;
+            font-size: 20px;
+            padding: 0 5px;
+        }
+
+        .modal-body {
+            padding: 15px 16px 5px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 10px;
+        }
+
+            .form-group label {
+                font-size: 14px;
+                margin-bottom: 4px;
+                color: #333;
+            }
+
+            .form-group input, .form-group select {
+                padding: 8px 10px;
+                border-radius: 6px;
+                border: 1px solid #ddd;
+                font-size: 14px;
+                outline: none;
+            }
+
+                .form-group input:focus, .form-group select:focus {
+                    border-color: #17479D;
+                }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            padding: 10px 16px 14px;
+            background: #f7f7f7;
+        }
+
+        .btn-cancel, .btn-save, .btn-edit-cancel, .btn-edit-save, .btn-lock-cancel {
+            border: none;
+            border-radius: 5px;
+            padding: 8px 14px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .btn-cancel, .btn-edit-cancel, .btn-lock-cancel {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .btn-save, .btn-edit-save {
+            background: #2659F5;
+            color: #fff;
+        }
+
+        /* pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 25px 0;
+            gap: 5px;
+        }
+
+        .page-link {
+            padding: 6px 12px;
+            border: 1px solid #d0d7de;
+            border-radius: 4px;
+            color: #0d6efd;
+            background-color: white;
+            text-decoration: none;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+
+            .page-link:hover {
+                background-color: #e9ecef;
+            }
+
+            .page-link.active {
+                background-color: #2659F5;
+                color: white;
+                font-weight: bold;
+                border-color: #2659F5;
+            }
+
+        @@keyframes fadeInScale {
+            from
+
+        {
+            opacity: 0;
+            transform: scale(0.9);
+        }
+
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        }
+
+        .toast-msg {
+            margin: 0 0 12px 0;
+            font-weight: 700;
+        }
+
+        .toast-err {
+            color: #d93025;
+        }
+
+        .toast-ok {
+            color: #0a8a0a;
+        }
+    </style>
+}
+
+<div class="container">
+    <div class="order-container">
+        <h1>Danh sách người dùng</h1>
+        <form id="antiForgerySource" style="display:none;">
+            @Html.AntiForgeryToken()
+        </form>
+
+
+        @if (TempData["ErrorMsg"] != null)
+        {
+            <div class="toast-msg toast-err">@TempData["ErrorMsg"]</div>
+        }
+        @if (TempData["SuccessMsg"] != null)
+        {
+            <div class="toast-msg toast-ok">@TempData["SuccessMsg"]</div>
+        }
+
+        <form class="search" method="get" action="/admin/users">
+            <div class="search-input-icon">
+                <input id="searchInput" type="text" name="q" value="@q" placeholder="Tìm kiếm người dùng..." />
+
+                <button type="submit" class="icon"><i class="fa-solid fa-magnifying-glass"></i></button>
+            </div>
+            <button type="button" class="btn-them-khach-hang">Thêm khách hàng</button>
+        </form>
+
+        <table class="order-table">
+            <thead>
+                <tr>
+                    <th style="width:70px;">ID</th>
+                    <th>Họ và tên</th>
+                    <th style="width:140px;">Số điện thoại</th>
+                    <th>Địa chỉ</th>
+                    <th style="width:190px;">Ngày đăng ký</th>
+                    <th style="width:120px;">Năm sinh</th>
+                    <th style="width:90px;">Vai trò</th>
+                    <th style="width:140px;">Tùy chọn</th>
+                </tr>
+            </thead>
+            <tbody id="usersTbody">
+                @foreach (var u in Model.Paged.Items)
+                {
+                    <tr>
+                        <td class="col-id">@u.Id</td>
+                        <td class="col-ten">@u.FullName</td>
+                        <td class="col-sdt">@u.PhoneNumber</td>
+                        <td class="col-diachi">@u.Address</td>
+                        <td>@u.CreatedAt</td>
+                        <td>@u.Dob</td>
+                        <td class="col-vaitro">@u.Role</td>
+                        <td>
+                            <button type="button" class="btn-Sua"
+                                    data-id="@u.Id"
+                                    data-fullname="@u.FullName"
+                                    data-phone="@u.PhoneNumber"
+                                    data-address="@u.Address"
+                                    data-dob="@u.Dob"
+                                    data-role="@u.Role">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </button>
+
+                            @if (u.IsActive)
+                            {
+                                <form class="lockForm" method="post" action="/admin/users" style="display:inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="action" value="lock" />
+                                    <input type="hidden" name="id" value="@u.Id" />
+                                    <input type="hidden" name="page" value="@currentPage" />
+                                    <input type="hidden" name="q" value="@q" />
+                                    <input type="hidden" name="email" value="" />
+                                    <input type="hidden" name="fullName" value="x" />
+                                    <input type="hidden" name="role" value="USER" />
+                                    <button class="btn-Xoa btn-open-lock" type="button" title="Khóa">
+                                        <i class="fa-solid fa-lock"></i>
+                                    </button>
+                                </form>
+                            }
+                            else
+                            {
+                                <form class="lockForm" method="post" action="/admin/users" style="display:inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="action" value="unlock" />
+                                    <input type="hidden" name="id" value="@u.Id" />
+                                    <input type="hidden" name="page" value="@currentPage" />
+                                    <input type="hidden" name="q" value="@q" />
+                                    <input type="hidden" name="email" value="" />
+                                    <input type="hidden" name="fullName" value="x" />
+                                    <input type="hidden" name="role" value="USER" />
+                                    <button class="btn-unlock btn-open-lock" type="button" title="Mở khóa">
+                                        <i class="fa-solid fa-lock-open"></i>
+                                    </button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <div class="pagination" id="usersPagination">
+            @if (currentPage > 1)
+            {
+                <a class="page-link" href="/admin/users?page=@(currentPage - 1)&q=@q">Trước</a>
+            }
+
+            @for (int p = 1; p <= totalPages; p++)
+            {
+                <a class="page-link @(p == currentPage ? "active" : "")" href="/admin/users?page=@p&q=@q">@p</a>
+            }
+
+            @if (currentPage < totalPages)
+            {
+                <a class="page-link" href="/admin/users?page=@(currentPage + 1)&q=@q">Sau</a>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Modal thêm khách hàng -->
+<div id="customerModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Thêm khách hàng</h2>
+            <span class="close-modal">&times;</span>
+        </div>
+
+        <form method="post" action="/admin/users">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="action" value="create" />
+            <input type="hidden" name="page" value="@currentPage" />
+            <input type="hidden" name="q" value="@q" />
+            <input type="hidden" name="id" value="0" />
+
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="tenKH">Họ và tên</label>
+                    <input type="text" id="tenKH" name="fullName" placeholder="Nhập họ và tên" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="emailKH">Email</label>
+                    <input type="email" id="emailKH" name="email" placeholder="Nhập email" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="sdtKH">Số điện thoại</label>
+                    <input type="text" id="sdtKH" name="phoneNumber" placeholder="Nhập số điện thoại">
+                </div>
+
+                <div class="form-group">
+                    <label for="diaChiKH">Địa chỉ</label>
+                    <input type="text" id="diaChiKH" name="address" placeholder="Nhập địa chỉ">
+                </div>
+
+                <div class="form-group">
+                    <label for="dobKH">Ngày sinh</label>
+                    <input type="date" id="dobKH" name="dob">
+                </div>
+
+                <div class="form-group">
+                    <label for="vaiTroKH">Vai trò</label>
+                    <select id="vaiTroKH" name="role">
+                        <option value="USER" selected>USER</option>
+                        <option value="ADMIN">ADMIN</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn-cancel">Hủy</button>
+                <button type="submit" class="btn-save">Lưu</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal sửa -->
+<div id="editCustomerModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Chỉnh sửa thông tin</h2>
+            <span class="close-edit-modal">&times;</span>
+        </div>
+
+        <form method="post" action="/admin/users">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="action" value="update" />
+            <input type="hidden" name="id" id="editId" />
+            <input type="hidden" name="page" value="@currentPage" />
+            <input type="hidden" name="q" value="@q" />
+            <input type="hidden" name="email" value="dummy@dummy.com" />
+
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="editTenKH">Họ và tên</label>
+                    <input type="text" id="editTenKH" name="fullName" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="editSdtKH">Số điện thoại</label>
+                    <input type="text" id="editSdtKH" name="phoneNumber">
+                </div>
+
+                <div class="form-group">
+                    <label for="editDiaChiKH">Địa chỉ</label>
+                    <input type="text" id="editDiaChiKH" name="address">
+                </div>
+
+                <div class="form-group">
+                    <label for="editDobKH">Ngày sinh</label>
+                    <input type="date" id="editDobKH" name="dob">
+                </div>
+
+                <div class="form-group">
+                    <label for="editVaiTroKH">Vai trò</label>
+                    <select id="editVaiTroKH" name="role">
+                        <option value="USER">USER</option>
+                        <option value="ADMIN">ADMIN</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn-edit-cancel">Hủy</button>
+                <button type="submit" class="btn-edit-save">Lưu thay đổi</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal xác nhận khóa/mở -->
+<div id="lockConfirmModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header" style="background:#2659F5;">
+            <h2>Xác nhận</h2>
+            <span class="close-lock-modal">&times;</span>
+        </div>
+        <div class="modal-body" style="text-align:center;">
+            <p id="lockConfirmText">Bạn chắc chắn muốn khóa không?</p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn-lock-cancel">Hủy</button>
+            <button type="button" class="btn-lock-ok" id="lockConfirmOkBtn"
+                    style="background:#DC3545;color:#fff;border:none;border-radius:5px;padding:8px 14px;cursor:pointer;">
+                Đồng ý
+            </button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // ===== MODAL ADD =====
+        const btnThemKH = document.querySelector('.btn-them-khach-hang');
+        const modalAdd = document.getElementById('customerModal');
+        const btnCloseAdd = document.querySelector('.close-modal');
+        const btnCancelAdd = document.querySelector('.btn-cancel');
+
+        btnThemKH?.addEventListener('click', () => modalAdd.style.display = 'flex');
+        btnCloseAdd?.addEventListener('click', () => modalAdd.style.display = 'none');
+        btnCancelAdd?.addEventListener('click', () => modalAdd.style.display = 'none');
+
+        window.addEventListener('click', (e) => { if (e.target === modalAdd) modalAdd.style.display = 'none'; });
+
+        // ===== MODAL EDIT =====
+        const modalEdit = document.getElementById("editCustomerModal");
+        const btnCloseEdit = document.querySelector(".close-edit-modal");
+        const btnEditCancel = document.querySelector(".btn-edit-cancel");
+
+        // document.querySelectorAll(".btn-Sua").forEach(btn => {
+        //     btn.addEventListener("click", () => {
+        //         modalEdit.style.display = "flex";
+
+        //         const id = btn.dataset.id || "";
+        //         const ten = btn.dataset.fullname || "";
+        //         const sdt = btn.dataset.phone || "";
+        //         const diachi = btn.dataset.address || "";
+        //         const dob = btn.dataset.dob || "";
+        //         const vaitro = (btn.dataset.role || "USER").toUpperCase();
+
+        //         document.getElementById("editId").value = id;
+        //         document.getElementById("editTenKH").value = ten;
+        //         document.getElementById("editSdtKH").value = sdt;
+        //         document.getElementById("editDiaChiKH").value = diachi;
+        //         document.getElementById("editDobKH").value = dob;
+        //         document.getElementById("editVaiTroKH").value = vaitro;
+        //     });
+        // });
+
+        btnCloseEdit?.addEventListener("click", () => modalEdit.style.display = "none");
+        btnEditCancel?.addEventListener("click", () => modalEdit.style.display = "none");
+        window.addEventListener("click", (e) => { if (e.target === modalEdit) modalEdit.style.display = "none"; });
+
+        // ===== LOCK/UNLOCK CONFIRM MODAL =====
+        const lockModal = document.getElementById("lockConfirmModal");
+        const btnCloseLock = document.querySelector(".close-lock-modal");
+        const btnLockCancel = document.querySelector(".btn-lock-cancel");
+        const btnLockOk = document.getElementById("lockConfirmOkBtn");
+        const lockConfirmText = document.getElementById("lockConfirmText");
+
+        let formToSubmit = null;
+
+        document.addEventListener("click", (e) => {
+            const btn = e.target.closest(".btn-open-lock");
+            if (!btn) return;
+
+            formToSubmit = btn.closest("form");
+            const action = formToSubmit.querySelector('input[name="action"]').value;
+
+            if (action === "unlock") {
+                lockConfirmText.textContent = "Bạn chắc chắn muốn mở khóa không?";
+                btnLockOk.textContent = "Mở khóa";
+                btnLockOk.style.background = "#2659F5";
+            } else {
+                lockConfirmText.textContent = "Bạn chắc chắn muốn khóa không?";
+                btnLockOk.textContent = "Khóa";
+                btnLockOk.style.background = "#DC3545";
+            }
+
+            lockModal.style.display = "flex";
+        });
+
+        btnCloseLock?.addEventListener("click", () => lockModal.style.display = "none");
+        btnLockCancel?.addEventListener("click", () => lockModal.style.display = "none");
+
+        btnLockOk?.addEventListener("click", () => { if (formToSubmit) formToSubmit.submit(); });
+
+        window.addEventListener("click", (e) => { if (e.target === lockModal) lockModal.style.display = "none"; });
+    </script>
+    <script>
+        const searchInput = document.getElementById("searchInput");
+        const tbody = document.getElementById("usersTbody");
+        const pagination = document.getElementById("usersPagination");
+
+        const pageSize = 10; // bạn muốn bao nhiêu thì chỉnh
+        let typingTimer = null;
+        let abortCtrl = null;
+
+        function getAntiForgeryToken() {
+            return document.querySelector('#antiForgerySource input[name="__RequestVerificationToken"]')?.value || "";
+        }
+
+        async function loadUsers(page = 1) {
+            const q = (searchInput.value || "").trim();
+
+            // hủy request cũ nếu còn chạy
+            if (abortCtrl) abortCtrl.abort();
+            abortCtrl = new AbortController();
+
+            const url = `/admin/users/ajax?q=${encodeURIComponent(q)}&page=${page}&pageSize=${pageSize}`;
+            const res = await fetch(url, { signal: abortCtrl.signal });
+            if (!res.ok) return;
+
+            const data = await res.json();
+            renderTable(data);
+            renderPagination(data);
+        }
+
+        function renderTable(data) {
+            const token = getAntiForgeryToken();
+            const q = (data.q || "");
+            const page = data.page || 1;
+
+            tbody.innerHTML = (data.items || []).map(u => {
+                const lockAction = u.isActive ? "lock" : "unlock";
+                const lockIcon = u.isActive ? "fa-lock" : "fa-lock-open";
+                const lockBtnClass = u.isActive ? "btn-Xoa" : "btn-unlock";
+                const lockTitle = u.isActive ? "Khóa" : "Mở khóa";
+
+                return `
+                <tr>
+                    <td class="col-id">${u.id}</td>
+                    <td class="col-ten">${escapeHtml(u.fullName)}</td>
+                    <td class="col-sdt">${escapeHtml(u.phoneNumber)}</td>
+                    <td class="col-diachi">${escapeHtml(u.address)}</td>
+                    <td>${u.createdAt}</td>
+                    <td>${u.dob}</td>
+                    <td class="col-vaitro">${escapeHtml(u.role)}</td>
+                    <td>
+                        <button type="button" class="btn-Sua"
+                            data-id="${u.id}"
+                            data-fullname="${escapeAttr(u.fullName)}"
+                            data-phone="${escapeAttr(u.phoneNumber)}"
+                            data-address="${escapeAttr(u.address)}"
+                            data-dob="${escapeAttr(u.dob)}"
+                            data-role="${escapeAttr(u.role)}">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </button>
+
+                        <form class="lockForm" method="post" action="/admin/users" style="display:inline">
+                            <input type="hidden" name="__RequestVerificationToken" value="${token}" />
+                            <input type="hidden" name="action" value="${lockAction}" />
+                            <input type="hidden" name="id" value="${u.id}" />
+                            <input type="hidden" name="page" value="${page}" />
+                            <input type="hidden" name="q" value="${escapeAttr(q)}" />
+
+                            <!-- dummy để khớp action Post() hiện tại -->
+                            <input type="hidden" name="email" value="" />
+                            <input type="hidden" name="fullName" value="x" />
+                            <input type="hidden" name="role" value="USER" />
+
+                            <button class="${lockBtnClass} btn-open-lock" type="button" title="${lockTitle}">
+                                <i class="fa-solid ${lockIcon}"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                `;
+            }).join("");
+        }
+
+        function renderPagination(data) {
+            const page = data.page || 1;
+            const totalPages = data.totalPages || 1;
+
+            let html = "";
+
+            if (page > 1) html += `<a href="#" class="page-link" data-page="${page - 1}">Trước</a>`;
+
+            for (let p = 1; p <= totalPages; p++) {
+                html += `<a href="#" class="page-link ${p === page ? "active" : ""}" data-page="${p}">${p}</a>`;
+            }
+
+            if (page < totalPages) html += `<a href="#" class="page-link" data-page="${page + 1}">Sau</a>`;
+
+            pagination.innerHTML = html;
+        }
+
+        // click phân trang -> load AJAX
+        pagination.addEventListener("click", (e) => {
+            const a = e.target.closest("a.page-link");
+            if (!a) return;
+            e.preventDefault();
+            const p = parseInt(a.dataset.page || "1", 10);
+            loadUsers(p);
+        });
+
+        // gõ search -> debounce 300ms
+        searchInput.addEventListener("input", () => {
+            clearTimeout(typingTimer);
+            typingTimer = setTimeout(() => loadUsers(1), 300);
+        });
+
+        // ====== QUAN TRỌNG: sửa phần EDIT thành event delegation (để row AJAX mới vẫn bấm sửa được) ======
+        document.addEventListener("click", (e) => {
+            const btn = e.target.closest(".btn-Sua");
+            if (!btn) return;
+
+            const modalEdit = document.getElementById("editCustomerModal");
+            modalEdit.style.display = "flex";
+
+            document.getElementById("editId").value = btn.dataset.id || "";
+            document.getElementById("editTenKH").value = btn.dataset.fullname || "";
+            document.getElementById("editSdtKH").value = btn.dataset.phone || "";
+            document.getElementById("editDiaChiKH").value = btn.dataset.address || "";
+            document.getElementById("editDobKH").value = btn.dataset.dob || "";
+            document.getElementById("editVaiTroKH").value = (btn.dataset.role || "USER").toUpperCase();
+        });
+
+        // helper escape (tránh XSS khi render)
+        function escapeHtml(s) {
+            return (s ?? "").toString()
+                .replaceAll("&", "&amp;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;")
+                .replaceAll('"', "&quot;")
+                .replaceAll("'", "&#39;");
+        }
+        function escapeAttr(s) { return escapeHtml(s); }
+
+        // load lần đầu (để đồng bộ nếu muốn)
+        // loadUsers(@Model.Paged.Page); // nếu thích auto load ngay
+    </script>
+
+}

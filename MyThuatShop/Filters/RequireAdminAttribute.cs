@@ -7,20 +7,21 @@ public class RequireAdminAttribute : ActionFilterAttribute
 {
     public override void OnActionExecuting(ActionExecutingContext context)
     {
-        var role = (context.HttpContext.Session.GetString("Role") ?? "")
-            .Trim().ToLower();
+        var roleRaw = context.HttpContext.Session.GetString("Role");
+
+        // chưa login
+        if (string.IsNullOrWhiteSpace(roleRaw))
+        {
+            var returnUrl = context.HttpContext.Request.Path + context.HttpContext.Request.QueryString;
+            context.Result = new RedirectToActionResult("Login", "Account", new { returnUrl });
+            return;
+        }
+
+        var role = roleRaw.Trim().ToLower();
 
         // chỉ cho admin
         if (role != "admin" && role != "administrator")
         {
-            // nếu chưa login -> đá về login
-            if (string.IsNullOrWhiteSpace(role))
-            {
-                context.Result = new RedirectToActionResult("Login", "Account", new { });
-                return;
-            }
-
-            // có login nhưng không phải admin -> về home
             context.Result = new RedirectToActionResult("Index", "Home", new { });
             return;
         }

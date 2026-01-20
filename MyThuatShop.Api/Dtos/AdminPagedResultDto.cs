@@ -1,6 +1,6 @@
 ﻿namespace MyThuatShop.Api.Dtos
 {
-    public class PagedResultDto<T>
+    public class AdminPagedResultDto<T>
     {
         public int Page { get; set; }
         public int PageSize { get; set; }

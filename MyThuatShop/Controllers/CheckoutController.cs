@@ -27,11 +27,14 @@ public class CheckoutController : Controller
         if (cart == null || cart.Carts.Count == 0) return RedirectToAction("Index", "Cart");
 
         var fullName = HttpContext.Session.GetString("FullName") ?? "";
-        var currentUser = HttpContext.Session.GetObject<object>("currentUser"); 
+        var email = HttpContext.Session.GetString("Email") ?? "";
+        var phoneNumber = HttpContext.Session.GetString("PhoneNumber") ?? "";
 
         var vm = new CheckoutVm
         {
             FullName = fullName,
+            Email = email,
+            PhoneNumber = phoneNumber,
             Cart = cart,
             TotalAmount = cart.TotalAmount()
         };

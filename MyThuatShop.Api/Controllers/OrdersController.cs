@@ -3,6 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using MyThuatShop.Api.Data;
 using MyThuatShop.Api.Dtos.Orders;
 using MyThuatShop.Api.Models;
+using MyThuatShop.Api.Services;
+using System.Net;
+using System.Text;
 
 namespace MyThuatShop.Api.Controllers;
 
@@ -10,8 +13,17 @@ namespace MyThuatShop.Api.Controllers;
 [Route("api/orders")]
 public class OrdersController : ControllerBase
 {
+
     private readonly MyThuatDotNetContext _db;
-    public OrdersController(MyThuatDotNetContext db) => _db = db;
+    private readonly IEmailSender _email;
+    private readonly ILogger<OrdersController> _logger;
+
+    public OrdersController(MyThuatDotNetContext db, IEmailSender email, ILogger<OrdersController> logger)
+    {
+        _db = db;
+        _email = email;
+        _logger = logger;
+    }
 
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateOrderRequestDto req)
@@ -157,6 +169,22 @@ public class OrdersController : ControllerBase
 
             await _db.SaveChangesAsync();
             await tx.CommitAsync();
+            if (!isVnPay && !string.IsNullOrWhiteSpace(order.Email))
+            {
+                try
+                {
+                    var html = BuildOrderEmailHtml(order.Id, order.FullName, order.Email, order.PhoneNumber, order.Address,
+                                                   details, products, itemsTotal, voucherDiscount, req.ShippingFee, finalTotal,
+                                                   paymentName, order.PaymentStatus);
+
+                    await _email.SendHtmlAsync(order.Email, $"Xác nhận đơn hàng DH{order.Id}", html);
+                }
+                catch (Exception ex)
+                {
+                    // KHÔNG làm fail đơn hàng nếu gửi mail lỗi
+                    _logger.LogError(ex, "Send order email failed for OrderId={OrderId}", order.Id);
+                }
+            }
 
             return Ok(new { success = true, orderId = order.Id });
         }
@@ -220,6 +248,26 @@ public class OrdersController : ControllerBase
 
             await _db.SaveChangesAsync();
             await tx.CommitAsync();
+            try
+            {
+                var toEmail = string.IsNullOrWhiteSpace(order.Email) ? order.User.Email : order.Email;
+                if (!string.IsNullOrWhiteSpace(toEmail))
+                {
+                    var itemsTotal = order.OrderDetails.Sum(d => d.Price * d.Quantity);
+                    var voucherDiscount = order.Discount ?? 0m;
+
+                    var html = BuildOrderEmailHtml(order.Id, order.FullName, toEmail, order.PhoneNumber, order.Address,
+                                                   order.OrderDetails.ToList(), null,
+                                                   itemsTotal, voucherDiscount, order.ShippingFee, order.TotalPrice,
+                                                   order.Payment?.PaymentName ?? "VNPAY", order.PaymentStatus);
+
+                    await _email.SendHtmlAsync(toEmail, $"Thanh toán thành công - DH{order.Id}", html);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Send VNPay success email failed for OrderId={OrderId}", order.Id);
+            }
 
             return Ok(new { success = true });
         }
@@ -229,6 +277,42 @@ public class OrdersController : ControllerBase
             return BadRequest(new { success = false, message = ex.Message });
         }
     }
+    [HttpGet("user/{userId:int}")]
+    public async Task<IActionResult> GetByUser(int userId, [FromQuery] int? statusId = null)
+    {
+        var q = _db.Orders
+            .AsNoTracking()
+            .Where(o => o.UserId == userId)
+            .Include(o => o.OrderStatus)
+            .Include(o => o.OrderDetails)
+                .ThenInclude(d => d.Product)
+            .OrderByDescending(o => o.CreateAt);
+
+        if (statusId.HasValue && statusId.Value > 0)
+            q = q.Where(o => o.OrderStatusId == statusId.Value)
+                 .OrderByDescending(o => o.CreateAt);
+
+        var data = await q.Select(o => new
+        {
+            o.Id,
+            o.CreateAt,
+            o.TotalPrice,
+            StatusId = o.OrderStatusId,
+            StatusName = o.OrderStatus.StatusName,
+            Items = o.OrderDetails.Select(d => new
+            {
+                d.ProductId,
+                d.Quantity,
+                UnitPrice = d.Price,
+                ProductName = d.Product.Name,
+                Thumbnail = d.Product.Thumbnail,
+                LineTotal = d.Price * d.Quantity
+            }).ToList()
+        }).ToListAsync();
+
+        return Ok(data);
+    }
+
 
     [HttpGet("{id:int}")]
     public async Task<IActionResult> Get(int id)
@@ -262,4 +346,79 @@ public class OrdersController : ControllerBase
             })
         });
     }
+    private static string BuildOrderEmailHtml(
+    int orderId,
+    string fullName,
+    string toEmail,
+    string? phone,
+    string? address,
+    IEnumerable<OrderDetail> details,
+    List<Product>? products, // truyền null nếu details đã include Product
+    decimal itemsTotal,
+    decimal voucherDiscount,
+    decimal shippingFee,
+    decimal total,
+    string paymentName,
+    string paymentStatus)
+    {
+        string E(string? s) => WebUtility.HtmlEncode(s ?? "");
+
+        var sb = new StringBuilder();
+        sb.Append($@"
+<div style='font-family:Roboto,Arial,sans-serif;line-height:1.5'>
+  <h2 style='margin:0 0 10px 0'>Xác nhận đơn hàng DH{orderId}</h2>
+  <p>Xin chào <b>{E(fullName)}</b>, cảm ơn bạn đã đặt hàng.</p>
+
+  <p style='margin:8px 0'><b>Email:</b> {E(toEmail)}<br/>
+     <b>SĐT:</b> {E(phone)}<br/>
+     <b>Địa chỉ:</b> {E(address)}</p>
+
+  <h3 style='margin:14px 0 8px 0'>Sản phẩm</h3>
+  <table style='width:100%;border-collapse:collapse' border='1' cellpadding='8'>
+    <tr>
+      <th align='left'>Tên</th>
+      <th align='right'>SL</th>
+      <th align='right'>Đơn giá</th>
+      <th align='right'>Thành tiền</th>
+    </tr>
+");
+
+        foreach (var d in details)
+        {
+            var name = d.Product?.Name
+                       ?? products?.FirstOrDefault(p => p.Id == d.ProductId)?.Name
+                       ?? "Sản phẩm";
+            var line = d.Price * d.Quantity;
+
+            sb.Append($@"
+    <tr>
+      <td>{E(name)}</td>
+      <td align='right'>{d.Quantity}</td>
+      <td align='right'>{d.Price:N0} VNĐ</td>
+      <td align='right'>{line:N0} VNĐ</td>
+    </tr>");
+        }
+
+        sb.Append($@"
+  </table>
+
+  <p style='margin:12px 0 0 0'>
+    <b>Tạm tính:</b> {itemsTotal:N0} VNĐ<br/>
+    <b>Giảm giá:</b> {voucherDiscount:N0} VNĐ<br/>
+    <b>Phí ship:</b> {shippingFee:N0} VNĐ<br/>
+    <b>Tổng thanh toán:</b> {total:N0} VNĐ
+  </p>
+
+  <p style='margin:10px 0 0 0'>
+    <b>Phương thức:</b> {E(paymentName)}<br/>
+    <b>Trạng thái thanh toán:</b> {E(paymentStatus)}
+  </p>
+
+  <hr style='margin:16px 0;border:none;border-top:1px solid #ddd'/>
+  <p style='color:#666;font-size:13px;margin:0'>MyThuatShop - Email tự động, vui lòng không trả lời email này.</p>
+</div>");
+
+        return sb.ToString();
+    }
+
 }

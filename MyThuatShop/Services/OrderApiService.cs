@@ -1,5 +1,7 @@
 ﻿using System.Net.Http.Json;
 using System.Text.Json;
+using MyThuatShop.Dtos.Orders;
+
 
 namespace MyThuatShop.Services;
 
@@ -95,4 +97,35 @@ public class OrderApiService
             return (false, 0, null, msg);
         }
     }
+    public async Task<List<OrderHistoryOrderDto>?> GetByUserAsync(int userId, int? statusId = null)
+    {
+        var baseUrl = _config["ApiBaseUrl"]?.TrimEnd('/');
+        if (string.IsNullOrWhiteSpace(baseUrl)) return null;
+
+        using var client = new HttpClient(new HttpClientHandler
+        {
+            ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+        });
+
+        var url = $"{baseUrl}/api/orders/user/{userId}";
+        if (statusId.HasValue && statusId.Value > 0)
+            url += $"?statusId={statusId.Value}";
+
+        return await client.GetFromJsonAsync<List<OrderHistoryOrderDto>>(url, _jsonOptions);
+    }
+    public async Task<OrderDetailDto?> GetDetailAsync(int orderId)
+    {
+        var baseUrl = _config["ApiBaseUrl"]?.TrimEnd('/');
+        if (string.IsNullOrWhiteSpace(baseUrl)) return null;
+
+        using var client = new HttpClient(new HttpClientHandler
+        {
+            ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+        });
+
+        var url = $"{baseUrl}/api/orders/{orderId}";
+        return await client.GetFromJsonAsync<OrderDetailDto>(url, _jsonOptions);
+    }
+
+
 }

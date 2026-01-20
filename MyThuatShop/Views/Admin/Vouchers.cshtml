@@ -345,30 +345,30 @@
     const btnCloseEdit = document.querySelector(".close-edit-modal");
     const btnEditCancel = document.querySelector(".btn-edit-cancel");
 
-    // document.querySelectorAll(".btn-Sua").forEach(btn => {
-    //     btn.addEventListener("click", () => {
-    //         const row = btn.closest("tr");
-    //         document.getElementById("editId").value = row.getAttribute("data-id") || "";
+    document.querySelectorAll(".btn-Sua").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const row = btn.closest("tr");
+            document.getElementById("editId").value = row.getAttribute("data-id") || "";
 
-    //         document.getElementById("editCode").value = row.querySelector(".col-code")?.innerText.trim() || "";
-    //         document.getElementById("editName").value = row.querySelector(".col-name")?.innerText.trim() || "";
-    //         document.getElementById("editDesc").value = row.querySelector(".col-desc")?.innerText.trim() || "";
+            document.getElementById("editCode").value = row.querySelector(".col-code")?.innerText.trim() || "";
+            document.getElementById("editName").value = row.querySelector(".col-name")?.innerText.trim() || "";
+            document.getElementById("editDesc").value = row.querySelector(".col-desc")?.innerText.trim() || "";
 
-    //         const start = row.querySelector(".col-start")?.getAttribute("data-value") || "";
-    //         const end   = row.querySelector(".col-end")?.getAttribute("data-value") || "";
-    //         document.getElementById("editStartDate").value = start.substring(0, 10);
-    //         document.getElementById("editEndDate").value   = end.substring(0, 10);
+            const start = row.querySelector(".col-start")?.getAttribute("data-value") || "";
+            const end   = row.querySelector(".col-end")?.getAttribute("data-value") || "";
+            document.getElementById("editStartDate").value = start.substring(0, 10);
+            document.getElementById("editEndDate").value   = end.substring(0, 10);
 
-    //         document.getElementById("editCash").value = row.querySelector(".col-cash")?.getAttribute("data-value") || "0";
-    //         document.getElementById("editQuantity").value = row.getAttribute("data-qty") || "0";
+            document.getElementById("editCash").value = row.querySelector(".col-cash")?.getAttribute("data-value") || "0";
+            document.getElementById("editQuantity").value = row.getAttribute("data-qty") || "0";
 
-    //         document.getElementById("editMinOrderValue").value = row.getAttribute("data-min") || "0";
-    //         document.getElementById("editQuantityUsed").value = row.getAttribute("data-used") || "0";
-    //         document.getElementById("editIsActive").value = row.getAttribute("data-active") || "1";
+            document.getElementById("editMinOrderValue").value = row.getAttribute("data-min") || "0";
+            document.getElementById("editQuantityUsed").value = row.getAttribute("data-used") || "0";
+            document.getElementById("editIsActive").value = row.getAttribute("data-active") || "1";
 
-    //         modalEdit.style.display = "flex";
-    //     });
-    // });
+            modalEdit.style.display = "flex";
+        });
+    });
 
     if (btnCloseEdit) btnCloseEdit.onclick = () => modalEdit.style.display = "none";
     if (btnEditCancel) btnEditCancel.onclick = () => modalEdit.style.display = "none";

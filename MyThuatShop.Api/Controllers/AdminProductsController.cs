@@ -55,7 +55,9 @@ namespace MyThuatShop.Api.Controllers
                 Status = qty > 0 ? "Còn hàng" : "Hết hàng",
                 CreateAt = DateTime.Now,
                 Brand = form.Brand,
+                Content = form.Content,
                 IsActive = true
+
             };
 
             _db.Products.Add(p);
@@ -112,6 +114,7 @@ namespace MyThuatShop.Api.Controllers
             p.DiscountDefault = form.DiscountDefault ?? 0;
             p.QuantityStock = form.QuantityStock ?? 0;
             p.Brand = form.Brand;
+            p.Content = form.Content;
 
             // remove thumbnail (giống categories)
             if (form.RemoveThumbnail == 1)

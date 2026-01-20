@@ -41,6 +41,8 @@ namespace MyThuatShop.Controllers
             [FromForm] int discountDefault,
             [FromForm] int quantityStock,
             [FromForm] string? brand,
+            [FromForm] string? content,
+
 
             // spec
             [FromForm] string? size,
@@ -72,7 +74,8 @@ namespace MyThuatShop.Controllers
                     Size = size,
                     Standard = standard,
                     MadeIn = madeIn,
-                    Warning = warning
+                    Warning = warning,
+                    Content = content
                 }, thumbnailMain, thumbnailSubs);
             }
             else if (action == "update")
@@ -90,6 +93,7 @@ namespace MyThuatShop.Controllers
                     Standard = standard,
                     MadeIn = madeIn,
                     Warning = warning,
+                    Content = content,
                     RemoveThumbnail = removeThumbnail == 1
                 }, thumbnailMain, thumbnailSubs);
             }

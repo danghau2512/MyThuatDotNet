@@ -25,6 +25,7 @@
         public string? Thumbnail { get; set; }
         public string? Brand { get; set; }
         public string? Status { get; set; }
+        public string? Content { get; set; }
 
         public int QuantityStock { get; set; }
         public int SoldQuantity { get; set; }

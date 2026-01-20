@@ -62,6 +62,7 @@ namespace MyThuatShop.Api.Controllers
                 Thumbnail = p.Thumbnail,
                 Brand = p.Brand,
                 Status = p.Status,
+                Content = p.Content,
 
                 QuantityStock = p.QuantityStock ?? 0,
                 SoldQuantity = p.SoldQuantity ?? 0,

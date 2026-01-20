@@ -277,11 +277,14 @@ public partial class MyThuatDotNetContext : DbContext
             entity.Property(e => e.Thumbnail)
                 .HasMaxLength(255)
                 .HasColumnName("thumbnail");
-
+            entity.Property(e => e.Content)
+    .HasColumnType("longtext")
+    .HasColumnName("content");
             entity.HasOne(d => d.Category).WithMany(p => p.Products)
                 .HasForeignKey(d => d.CategoryId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_products_category");
+            
         });
 
         modelBuilder.Entity<ProductReview>(entity =>
@@ -460,6 +463,8 @@ public partial class MyThuatDotNetContext : DbContext
             entity.Property(e => e.VoucherCash)
                 .HasPrecision(10, 2)
                 .HasColumnName("voucherCash");
+            
+
         });
 
         OnModelCreatingPartial(modelBuilder);

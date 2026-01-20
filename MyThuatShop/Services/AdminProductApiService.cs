@@ -67,7 +67,7 @@ namespace MyThuatShop.Services
             Add("DiscountDefault", vm.DiscountDefault.ToString());
             Add("QuantityStock", vm.QuantityStock.ToString());
             Add("Brand", vm.Brand);
-
+            Add("Content", vm.Content);
             Add("Size", vm.Size);
             Add("Standard", vm.Standard);
             Add("MadeIn", vm.MadeIn);
@@ -106,6 +106,7 @@ namespace MyThuatShop.Services
         public int DiscountDefault { get; set; }
         public int QuantityStock { get; set; }
         public string? Brand { get; set; }
+        public string? Content { get; set; }
 
         public string? Size { get; set; }
         public string? Standard { get; set; }
@@ -130,6 +131,8 @@ namespace MyThuatShop.Services
         public DateTime? CreateAt { get; set; }
         public string? Brand { get; set; }
         public bool IsActive { get; set; }
+        public string? Content { get; set; }
+
 
         public List<SubimageDto> Subimages { get; set; } = new();
         public List<SpecificationDto> Specifications { get; set; } = new();

@@ -10,6 +10,8 @@
         public string? Thumbnail { get; set; }
         public int QuantityStock { get; set; }
         public string? Brand { get; set; }
+        public string? Content { get; set; }
+
         public int IsActive { get; set; }
     }
 

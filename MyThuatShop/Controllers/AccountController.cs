@@ -18,22 +18,34 @@ public class AccountController : Controller
     {
         _accountApi = accountApi;
     }
-
+    // return url
     [HttpGet]
     public IActionResult Login(int? expired, string? returnUrl = null)
     {
         if (expired == 1) ViewBag.SessionExpired = true;
 
+        
+        returnUrl ??= Request.Query["returnUrl"].ToString();
+
+        
+        var vm = new LoginVm { ReturnUrl = returnUrl };
+
         ViewBag.ReturnUrl = returnUrl;
-        return View(new LoginVm());
+        return View(vm);
     }
+
 
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Login(LoginVm vm, string? returnUrl = null)
     {
+        // ✅ Ưu tiên returnUrl từ param, nếu null thì lấy từ vm.ReturnUrl, cuối cùng lấy query
+        returnUrl ??= vm.ReturnUrl;
+        returnUrl ??= Request.Query["returnUrl"].ToString();
+
         if (!ModelState.IsValid)
         {
+            vm.ReturnUrl = returnUrl;
             ViewBag.ReturnUrl = returnUrl;
             return View(vm);
         }
@@ -42,6 +54,7 @@ public class AccountController : Controller
         if (res == null)
         {
             ModelState.AddModelError("", "Sai email hoặc mật khẩu.");
+            vm.ReturnUrl = returnUrl;
             ViewBag.ReturnUrl = returnUrl;
             return View(vm);
         }
@@ -53,19 +66,20 @@ public class AccountController : Controller
         HttpContext.Session.SetString("Role", res.User.Role ?? "user");
         HttpContext.Session.SetString("Email", res.User.Email ?? "");
 
-        // ✅ admin luôn vào overview
+        //  admin luôn vào overview
         if (!string.IsNullOrWhiteSpace(res.User.Role) &&
             string.Equals(res.User.Role, "ADMIN", StringComparison.OrdinalIgnoreCase))
         {
             return Redirect("/admin/overview");
         }
 
-        // ✅ user quay lại trang cũ
+        //  user quay lại trang cũ
         if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
             return LocalRedirect(returnUrl);
 
         return RedirectToAction("Index", "Home");
     }
+
 
     [HttpGet]
     public IActionResult GoogleLogin(string? returnUrl = null)
@@ -87,19 +101,19 @@ public class AccountController : Controller
 
         var external = await HttpContext.AuthenticateAsync("External");
         if (!external.Succeeded || external.Principal == null)
-            return RedirectToAction("Login");
+            return RedirectToAction("Login", new { returnUrl });
 
         var email = external.Principal.FindFirstValue(ClaimTypes.Email);
         var fullName = external.Principal.FindFirstValue(ClaimTypes.Name) ?? "";
 
         if (string.IsNullOrWhiteSpace(email))
-            return RedirectToAction("Login");
+            return RedirectToAction("Login", new { returnUrl });
 
         var res = await _accountApi.GoogleLoginAsync(email, fullName);
         if (res == null)
         {
             TempData["Error"] = "Đăng nhập Google thất bại.";
-            return RedirectToAction("Login");
+            return RedirectToAction("Login", new { returnUrl });
         }
 
         HttpContext.Session.SetObject("currentUser", res.User);
@@ -109,7 +123,6 @@ public class AccountController : Controller
         HttpContext.Session.SetString("Email", res.User.Email ?? email);
         HttpContext.Session.SetString("PhoneNumber", res.User.PhoneNumber ?? "");
 
-
         await HttpContext.SignOutAsync("External");
 
         if (!string.IsNullOrWhiteSpace(res.User.Role) &&
@@ -118,8 +131,13 @@ public class AccountController : Controller
             return Redirect("/admin/overview");
         }
 
-        return LocalRedirect(returnUrl);
+        //  chỉ redirect nếu local
+        if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
+            return LocalRedirect(returnUrl);
+
+        return RedirectToAction("Index", "Home");
     }
+
     [HttpPost]
     [ValidateAntiForgeryToken]
     public IActionResult Logout()

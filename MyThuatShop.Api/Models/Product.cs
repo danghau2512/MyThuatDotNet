@@ -27,6 +27,7 @@ public partial class Product
     public DateTime? CreateAt { get; set; }
 
     public string? Brand { get; set; }
+    public string? Content { get; set; }
 
     public bool IsActive { get; set; } = true;
 

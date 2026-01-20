@@ -1,4 +1,5 @@
 ﻿@model List<MyThuatShop.Services.ProductDto>
+@using System.Text.Encodings.Web
 
 @{
     ViewData["Title"] = "Quản lý sản phẩm";
@@ -214,7 +215,8 @@
         }
 
         .modal-content input,
-        .modal-content select {
+        .modal-content select,
+        .modal-content textarea {
             width: 100%;
             padding: 8px;
             margin-top: 4px;
@@ -332,12 +334,10 @@
             </thead>
 
             <tbody>
-                @* ✅ KHÔNG render "Không có sản phẩm" bằng colspan để tránh lỗi DataTables *@
                 @if (Model != null && Model.Count > 0)
                 {
                     foreach (var p in Model)
                     {
-                        // main thumb url
                         var thumb = p.Thumbnail ?? "";
                         var imgUrl = thumb;
 
@@ -348,13 +348,9 @@
                             imgUrl = ApiBaseUrl + imgUrl;
                         }
 
-                        // category name
                         var catName = categories.FirstOrDefault(x => x.Id == p.CategoryId)?.CategoryName ?? "-";
-
-                        // spec (lấy record đầu tiên)
                         var spec = (p.Specifications != null && p.Specifications.Count > 0) ? p.Specifications[0] : null;
 
-                        // subimages list => csv full-url để edit preview
                         var subCsv = "";
                         if (p.Subimages != null && p.Subimages.Count > 0)
                         {
@@ -383,7 +379,6 @@
                                 }
                                 else
                                 {
-
                                     <span>-</span>
                                 }
                             </td>
@@ -405,7 +400,6 @@
                             </td>
 
                             <td>
-                                <!-- EDIT -->
                                 <button type="button"
                                         class="btn-icon btn-edit btnEdit"
                                         data-id="@p.Id"
@@ -420,11 +414,11 @@
                                         data-size="@(spec?.Size ?? "")"
                                         data-standard="@(spec?.Standard ?? "")"
                                         data-madein="@(spec?.MadeIn ?? "")"
-                                        data-warning="@(spec?.Warning ?? "")">
+                                        data-warning="@(spec?.Warning ?? "")"
+                                        data-content="@(HtmlEncoder.Default.Encode(p.Content ?? ""))">
                                     <i class="fa-solid fa-pen-to-square"></i>
                                 </button>
 
-                                
                                 <form asp-controller="AdminProduct" asp-action="Post" method="post" style="display:inline">
                                     @Html.AntiForgeryToken()
                                     <input type="hidden" name="action" value="toggleActive" />
@@ -449,7 +443,6 @@
                                         </button>
                                     }
                                 </form>
-
                             </td>
                         </tr>
                     }
@@ -471,11 +464,8 @@
               enctype="multipart/form-data">
             @Html.AntiForgeryToken()
 
-            <!-- hidden -->
             <input type="hidden" name="action" id="action" value="create" />
             <input type="hidden" name="id" id="dbId" value="" />
-
-            <!-- ✅ remove main thumbnail giống categories -->
             <input type="hidden" name="removeThumbnail" id="removeThumbnail" value="0" />
 
             <div class="form-row">
@@ -525,6 +515,9 @@
 
                     <label>Cảnh báo an toàn</label>
                     <input type="text" id="warning" name="warning" />
+
+                    <label>Nội dung sản phẩm</label>
+                    <textarea id="content" name="content" rows="8"></textarea>
                 </div>
             </div>
 
@@ -539,6 +532,7 @@
 @section Scripts {
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
 
     <script>
         // ===== Modal controls =====
@@ -578,6 +572,25 @@
         function openModal(){ modal.style.display = "flex"; }
         function closeModal(){ modal.style.display = "none"; }
 
+        // ===== CKEDITOR init =====
+        function ensureEditor() {
+            if (window.CKEDITOR && !CKEDITOR.instances.content) {
+                CKEDITOR.replace('content', { height: 220 });
+            }
+        }
+
+        // Set data into editor safely
+        function setEditorData(html) {
+            ensureEditor();
+            if (window.CKEDITOR && CKEDITOR.instances.content) {
+                CKEDITOR.instances.content.setData(html || "");
+            } else {
+                // fallback
+                document.getElementById("content").value = html || "";
+            }
+        }
+
+        // ===== ADD =====
         btnAdd.addEventListener("click", () => {
             modalTitle.innerText = "Thêm sản phẩm";
             actionInput.value = "create";
@@ -608,6 +621,9 @@
             subLocalFiles = [];
             subPreview.innerHTML = "";
 
+            // ✅ reset CKEditor content
+            setEditorData("");
+
             openModal();
         });
 
@@ -630,7 +646,6 @@
             previewMain.src = "";
             previewMain.style.display = "none";
             removeMainBtn.style.display = "none";
-            // ✅ giống categories
             removeThumbnailInput.value = "1";
         });
 
@@ -727,8 +742,20 @@
                 subLocalFiles = [];
                 renderSub();
 
+                // ✅ set CKEditor data from DB
+                const htmlContent = btn.getAttribute("data-content") || "";
+                setEditorData(htmlContent);
+
                 openModal();
             });
+        });
+
+        // ✅ IMPORTANT: before submit -> sync CKEditor => textarea
+        document.getElementById("productForm").addEventListener("submit", function () {
+            ensureEditor();
+            if (window.CKEDITOR && CKEDITOR.instances.content) {
+                CKEDITOR.instances.content.updateElement();
+            }
         });
 
         // ===== DataTables + Auto STT =====
@@ -756,5 +783,8 @@
                     });
             }).draw();
         });
+
+        // init editor once
+        document.addEventListener("DOMContentLoaded", ensureEditor);
     </script>
 }

@@ -846,6 +846,17 @@
             </div>
         </div>
     </div>
+    @if (!string.IsNullOrWhiteSpace(Model.Content))
+    {
+        <div class="product_content">
+            <div class="box">
+                <div class="box-title">Mô tả sản phẩm</div>
+                <div style="line-height:1.8; color:#1e293b;">
+                    @Html.Raw(Model.Content)
+                </div>
+            </div>
+        </div>
+    }
 
     <!-- ✅ NÚT XEM ĐÁNH GIÁ -> NHẢY SANG TRANG RIÊNG -->
     <div class="product_rate">
@@ -912,10 +923,11 @@
                     body: params.toString()
                 });
 
-                if (resp.status === 401) {
-                    window.location.href = '@Url.Action("Login", "Account")';
-                    return;
-                }
+                        if (resp.status === 401) {
+            window.location.href = '@Url.Action("Login", "Account", new { returnUrl = Url.Action("Detail", "Product", new { id = Model.Id }) })';
+            return;
+        }
+
 
                 const data = await resp.json().catch(() => null);
 

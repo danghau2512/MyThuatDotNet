@@ -8,10 +8,12 @@ namespace MyThuatShop.Controllers;
 public class AdminOrdersController : Controller
 {
     private readonly AdminOrdersApiService _api;
+    private readonly IConfiguration _config;
 
-    public AdminOrdersController(AdminOrdersApiService api)
+    public AdminOrdersController(AdminOrdersApiService api, IConfiguration config)
     {
         _api = api;
+        _config = config;
     }
 
     [HttpGet("/admin/orders")]
@@ -30,6 +32,24 @@ public class AdminOrdersController : Controller
             TempData["ErrorMsg"] = "Không tải được danh sách đơn hàng: " + err;
 
         return View("~/Views/Admin/Orders.cshtml", data ?? new());
+    }
+
+    [HttpGet("/admin/orders/{id:int}")]
+    public async Task<IActionResult> Detail(int id)
+    {
+        ViewData["Title"] = $"Chi tiết đơn hàng #DH{id:D2}";
+        ViewData["ActiveMenu"] = "orders";
+        ViewBag.ApiBaseUrl = _config["ApiBaseUrl"] ?? "https://localhost:7090";
+
+        var (data, err) = await _api.GetDetailAsync(id);
+
+        if (data == null)
+        {
+            TempData["ErrorMsg"] = "Không tìm thấy đơn hàng: " + (err ?? "");
+            return RedirectToAction(nameof(Index));
+        }
+
+        return View("~/Views/Admin/OrderDetail.cshtml", data);
     }
 
     private static bool IsAjax(HttpRequest req)

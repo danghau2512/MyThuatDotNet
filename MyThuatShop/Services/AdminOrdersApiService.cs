@@ -1,6 +1,7 @@
 ﻿using System.Net.Http.Json;
 using System.Text.Json;
 using MyThuatShop.Dtos.Admin;
+using MyThuatShop.Dtos.Orders;
 
 namespace MyThuatShop.Services;
 
@@ -78,5 +79,23 @@ public class AdminOrdersApiService
         catch (Exception ex) { return (false, ex.Message); }
     }
 
+    public async Task<(OrderDetailDto? data, string? err)> GetDetailAsync(int orderId)
+    {
+        try
+        {
+            var resp = await _http.GetAsync($"/api/orders/{orderId}");
+            if (!resp.IsSuccessStatusCode)
+            {
+                var body = await resp.Content.ReadAsStringAsync();
+                return (null, string.IsNullOrWhiteSpace(body) ? resp.ReasonPhrase : body);
+            }
 
+            var data = await resp.Content.ReadFromJsonAsync<OrderDetailDto>(_json);
+            return (data, null);
+        }
+        catch (Exception ex)
+        {
+            return (null, ex.Message);
+        }
+    }
 }

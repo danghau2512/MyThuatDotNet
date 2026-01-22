@@ -11,7 +11,7 @@ namespace MyThuatShop.Api.Controllers
     [Route("api/admin/products")]
     public class AdminProductsController : ControllerBase
     {
-        private readonly MyThuatDotNetContext _db; // ✅ đổi đúng DbContext của bạn
+        private readonly MyThuatDotNetContext _db; 
         private readonly IWebHostEnvironment _env;
 
         public AdminProductsController(MyThuatDotNetContext db, IWebHostEnvironment env)

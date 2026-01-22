@@ -316,12 +316,13 @@
                                             </div>
 
                                             <div class="qty-wrap">
-                                                <!-- ✅ nút Xóa (giống JSP) -->
-                                                <a class="Xoa-sp"
-                                                   href="~/AddToCart?action=remove&productId=@item.ProductId"
-                                                   aria-label="Xóa sản phẩm">
+                                                <button type="button"
+                                                        class="Xoa-sp"
+                                                        aria-label="Xóa sản phẩm"
+                                                        onclick="removeCartItemAjax(@item.ProductId)">
                                                     <i class="fa-solid fa-xmark"></i>
-                                                </a>
+                                                </button>
+
 
                                                 <input type="hidden" name="productId" value="@item.ProductId" />
 
@@ -413,6 +414,63 @@
                 input.value = currentQty;
                 updateCartItem(productId, currentQty);
             }
+        }
+                function removeCartItemAjax(productId) {
+            const removeUrl = '/AddToCart?action=ajaxRemove';
+            const params = 'productId=' + encodeURIComponent(productId);
+
+            fetch(removeUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                },
+                body: params
+            })
+            .then(async (resp) => {
+                const data = await resp.json().catch(() => null);
+                return { ok: resp.ok, status: resp.status, data };
+            })
+            .then(({ ok, status, data }) => {
+
+                // nếu bị 401 => bắt login (giống add to cart)
+                if (status === 401) {
+                    // returnUrl là trang cart
+                    window.location.href = '/Account/Login?returnUrl=' + encodeURIComponent('/cart');
+                    return;
+                }
+
+                if (!ok || !data || !data.success) {
+                    alert((data && data.message) ? data.message : 'Không thể xóa sản phẩm');
+                    return;
+                }
+
+                //  remove item khỏi UI
+                const row = document.getElementById('cart-item-' + productId);
+                if (row) row.remove();
+
+                //  update badge + tổng số lượng
+                if (typeof data.cartCount !== 'undefined') {
+                    setCartCountUI(String(data.cartCount));
+                }
+
+                //  update tổng tiền
+                if (typeof data.totalAmount !== 'undefined') {
+                    const totalSpan = document.getElementById('cart-total-amount');
+                    if (totalSpan) totalSpan.textContent = formatCurrency(data.totalAmount);
+                }
+
+                
+                const cartList = document.querySelector('.cart-list');
+                if (cartList) {
+                    const stillHasItems = cartList.querySelector('[id^="cart-item-"]');
+                    if (!stillHasItems) {
+                        window.location.reload();
+                    }
+                }
+            })
+            .catch(err => console.error(err));
         }
 
         function formatCurrency(value) {

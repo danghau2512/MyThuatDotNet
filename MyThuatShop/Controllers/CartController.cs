@@ -10,7 +10,6 @@ public class CartController : Controller
     [HttpGet("/cart")]
     public IActionResult Index()
     {
-        // ✅ CHẶN GIỎ HÀNG NẾU CHƯA LOGIN (giống JSP)
         var currentUser = HttpContext.Session.GetObject<object>("currentUser");
         if (currentUser == null)
             return RedirectToAction("Login", "Account");

@@ -39,7 +39,7 @@ public class AccountController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Login(LoginVm vm, string? returnUrl = null)
     {
-        // ✅ Ưu tiên returnUrl từ param, nếu null thì lấy từ vm.ReturnUrl, cuối cùng lấy query
+       
         returnUrl ??= vm.ReturnUrl;
         returnUrl ??= Request.Query["returnUrl"].ToString();
 

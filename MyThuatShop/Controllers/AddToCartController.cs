@@ -15,11 +15,11 @@ public class AddToCartController : Controller
         _productApi = productApi;
     }
 
-    // ===== GET: remove item =====
+
     [HttpGet("/AddToCart")]
     public IActionResult Get([FromQuery] string? action, [FromQuery] int? productId)
     {
-        // ✅ BẮT BUỘC LOGIN (giống JSP)
+  
         if (!IsLoggedIn())
             return RedirectToAction("Login", "Account");
 
@@ -34,25 +34,38 @@ public class AddToCartController : Controller
         return RedirectToAction("Index", "Cart");
     }
 
-    // ===== POST: add / ajaxUpdate / update =====
+
     [HttpPost("/AddToCart")]
-    public async Task<IActionResult> Post([FromQuery] string? action, [FromForm] int? productId, [FromForm] int? quantity)
+    public async Task<IActionResult> Post(
+    [FromQuery] string? action,
+    [FromForm] int? productId,
+    [FromForm] int? quantity)
     {
-        // ✅ BẮT BUỘC LOGIN (giống JSP) — phân biệt AJAX vs thường
         if (!IsLoggedIn())
         {
             if (IsAjaxRequest())
                 return Unauthorized(new { success = false, message = "Vui lòng đăng nhập" });
 
-            return RedirectToAction("Login", "Account");
+            return RedirectToAction("Login", "Account", new { returnUrl = Request.Headers.Referer.ToString() });
         }
 
-        // validate
-        if (!productId.HasValue || productId.Value <= 0 || !quantity.HasValue)
+        // action nào cũng cần productId
+        if (!productId.HasValue || productId.Value <= 0)
+        {
+            if (IsAjaxRequest())
+                return BadRequest(new { success = false, message = "Thiếu productId" });
+
             return RedirectToRefererOr("/home");
+        }
 
         var pid = productId.Value;
-        var qty = quantity.Value;
+
+        // ✅ XÓA không cần quantity
+        if (action == "ajaxRemove")
+            return AjaxRemove(pid);
+
+        // các action còn lại mới cần quantity
+        var qty = quantity ?? 1;
         if (qty < 1) qty = 1;
 
         if (action == "ajaxUpdate")
@@ -64,6 +77,7 @@ public class AddToCartController : Controller
         // default: add
         return await Add(pid, qty);
     }
+
 
     // ===== ADD 1 PRODUCT =====
     private async Task<IActionResult> Add(int productId, int quantity)
@@ -106,7 +120,7 @@ public class AddToCartController : Controller
         return RedirectToRefererOr("/home");
     }
 
-    // ===== AJAX UPDATE (y hệt logic JSP) =====
+    //AJAX UPDATE
     private async Task<IActionResult> AjaxUpdate(int productId, int quantity)
     {
         var cart = GetOrCreateCart();
@@ -200,6 +214,25 @@ public class AddToCartController : Controller
             cartCount = cart.TotalQuantity()
         });
     }
+    //  AJAX REMOVE
+    private IActionResult AjaxRemove(int productId)
+    {
+        var cart = GetOrCreateCart();
+
+        // nếu không có sản phẩm thì vẫn trả về ok
+        cart.Remove(productId);
+
+        SaveCart(cart);
+
+        // trả về JSON 
+        return Json(new
+        {
+            success = true,
+            cartCount = cart.TotalQuantity(),
+            totalAmount = cart.TotalAmount()
+        });
+    }
+
 
     // ===== helpers =====
     private Cart GetOrCreateCart()

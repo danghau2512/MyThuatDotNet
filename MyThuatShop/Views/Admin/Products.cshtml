@@ -5,10 +5,10 @@
     ViewData["Title"] = "Quản lý sản phẩm";
     ViewData["ActiveMenu"] = "products";
 
-    // ✅ base URL của API để load ảnh /uploads/...
+ 
     var ApiBaseUrl = "https://localhost:7090";
 
-    // categories từ ViewBag
+
     var categories = ViewBag.Categories as List<MyThuatShop.Dtos.Admin.AdminCategoryDto> ?? new();
 }
 
@@ -579,13 +579,12 @@
             }
         }
 
-        // Set data into editor safely
         function setEditorData(html) {
             ensureEditor();
             if (window.CKEDITOR && CKEDITOR.instances.content) {
                 CKEDITOR.instances.content.setData(html || "");
             } else {
-                // fallback
+                
                 document.getElementById("content").value = html || "";
             }
         }

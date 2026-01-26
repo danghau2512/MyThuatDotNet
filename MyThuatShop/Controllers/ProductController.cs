@@ -65,7 +65,7 @@ public class ProductController : Controller
         return View(vm); // Views/Product/Search.cshtml
     }
 
-    // ajax phân trang (không reload)
+    // ajax phân trang
     [HttpGet]
     public async Task<IActionResult> SearchPartial(string q, string sort = "all", int page = 1)
     {

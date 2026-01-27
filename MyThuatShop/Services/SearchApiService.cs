@@ -25,8 +25,6 @@ namespace MyThuatShop.Services
             if (q.Length == 0) return new SearchPageVm { Keyword = q, Sort = sort, Page = page, PageSize = pageSize };
 
             var url = $"/api/search/products?q={Uri.EscapeDataString(q)}&sort={sort}&page={page}&pageSize={pageSize}";
-
-            // nhận dạng object { page, pageSize, totalItems, totalPages, items }
             var res = await _http.GetFromJsonAsync<PagedResultVm<ProductCardVm>>(url);
 
             return new SearchPageVm

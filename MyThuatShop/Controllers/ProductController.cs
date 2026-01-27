@@ -62,10 +62,10 @@ public class ProductController : Controller
     public async Task<IActionResult> Search(string q, string sort = "all", int page = 1)
     {
         var vm = await _search.SearchProductsPagedAsync(q, sort, page, 8);
-        return View(vm); // Views/Product/Search.cshtml
+        return View(vm); // Views/Product/Search.cshtml 
     }
 
-    // ajax phân trang (không reload)
+    // ajax phân trang
     [HttpGet]
     public async Task<IActionResult> SearchPartial(string q, string sort = "all", int page = 1)
     {

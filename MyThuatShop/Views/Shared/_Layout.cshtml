@@ -51,9 +51,9 @@
                         success: function (data) {
                             if (!data || data.length === 0) { hideSuggest(); return; }
 
-                            const $list = $("#suggestList");
+                            const $list = $("#suggestList"); //list ul
                             $list.empty();
-
+                            // duyệt qua từng sản phẩm mà server trả về với mỗi item là một sản phẩm
                             for (let i = 0; i < data.length; i++) {
                                 const item = data[i];
                                 const detailUrl = "/Product/Detail/" + item.id;
@@ -79,7 +79,7 @@
                             hideSuggest();
                         }
                     });
-                }, 250);
+                }, 250  );//Debounce
             });
 
             $(document).on("click", function (e) {

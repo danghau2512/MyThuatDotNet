@@ -88,7 +88,7 @@ namespace MyThuatShop.Api.Controllers
             if (totalPages > 0 && page > totalPages) page = totalPages;
 
             var items = await query
-                .Skip((page - 1) * pageSize)
+                .Skip((page - 1) * pageSize) // skip san pham de phan trang
                 .Take(pageSize)
                 .Select(p => new ProductCardDto
                 {

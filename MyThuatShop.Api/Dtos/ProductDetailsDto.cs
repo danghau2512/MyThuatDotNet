@@ -9,6 +9,8 @@
         public int DiscountDefault { get; set; }
         public decimal FinalPrice { get; set; }
         public int SoldQuantity { get; set; }
+        public bool IsActive { get; set; }
+
     }
 
     public class ProductDetailDto
@@ -38,5 +40,7 @@
         public List<ReviewDto> Reviews { get; set; } = new();
 
         public List<RelatedProductDto> RelatedProducts { get; set; } = new();
+        public bool IsActive { get; set; }
+
     }
 }

@@ -63,7 +63,6 @@ namespace MyThuatShop.Api.Controllers
             _db.Products.Add(p);
             await _db.SaveChangesAsync();
 
-            // subimages upload
             if (form.ThumbnailSubs != null && form.ThumbnailSubs.Count > 0)
             {
                 foreach (var f in form.ThumbnailSubs.Where(x => x != null && x.Length > 0))
@@ -81,7 +80,6 @@ namespace MyThuatShop.Api.Controllers
                 await _db.SaveChangesAsync();
             }
 
-            // spec insert 1 record
             _db.Specifications.Add(new Specification
             {
                 ProductId = p.Id,
@@ -116,14 +114,13 @@ namespace MyThuatShop.Api.Controllers
             p.Brand = form.Brand;
             p.Content = form.Content;
 
-            // remove thumbnail (giống categories)
+  
             if (form.RemoveThumbnail == 1)
             {
                 FileUploadHelper.TryDeleteIfLocal(_env, p.Thumbnail);
                 p.Thumbnail = null;
             }
 
-            // upload main new -> replace + delete old local
             if (form.ThumbnailMain != null && form.ThumbnailMain.Length > 0)
             {
                 var old = p.Thumbnail;
@@ -132,7 +129,7 @@ namespace MyThuatShop.Api.Controllers
                 FileUploadHelper.TryDeleteIfLocal(_env, old);
             }
 
-            // subimages: nếu upload => replace all
+          
             if (form.ThumbnailSubs != null && form.ThumbnailSubs.Count > 0)
             {
                 foreach (var s in p.Subimages)
@@ -154,7 +151,7 @@ namespace MyThuatShop.Api.Controllers
                 }
             }
 
-            // spec upsert: dùng record đầu tiên trong ICollection
+      
             var spec = p.Specifications.FirstOrDefault();
             if (spec == null)
             {

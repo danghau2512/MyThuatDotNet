@@ -49,7 +49,7 @@ public class AddToCartController : Controller
             return RedirectToAction("Login", "Account", new { returnUrl = Request.Headers.Referer.ToString() });
         }
 
-        // action nào cũng cần productId
+
         if (!productId.HasValue || productId.Value <= 0)
         {
             if (IsAjaxRequest())
@@ -60,11 +60,11 @@ public class AddToCartController : Controller
 
         var pid = productId.Value;
 
-        // ✅ XÓA không cần quantity
+      
         if (action == "ajaxRemove")
             return AjaxRemove(pid);
 
-        // các action còn lại mới cần quantity
+      
         var qty = quantity ?? 1;
         if (qty < 1) qty = 1;
 
@@ -74,12 +74,12 @@ public class AddToCartController : Controller
         if (action == "update")
             return RedirectToAction("Index", "Cart");
 
-        // default: add
+    
         return await Add(pid, qty);
     }
 
 
-    // ===== ADD 1 PRODUCT =====
+    
     private async Task<IActionResult> Add(int productId, int quantity)
     {
         var p = await _productApi.GetProductForCart(productId);
@@ -120,7 +120,7 @@ public class AddToCartController : Controller
         return RedirectToRefererOr("/home");
     }
 
-    //AJAX UPDATE
+    // ajax update
     private async Task<IActionResult> AjaxUpdate(int productId, int quantity)
     {
         var cart = GetOrCreateCart();
@@ -214,17 +214,16 @@ public class AddToCartController : Controller
             cartCount = cart.TotalQuantity()
         });
     }
-    //  AJAX REMOVE
+    //  ajax remove
     private IActionResult AjaxRemove(int productId)
     {
         var cart = GetOrCreateCart();
 
-        // nếu không có sản phẩm thì vẫn trả về ok
+
         cart.Remove(productId);
 
         SaveCart(cart);
 
-        // trả về JSON 
         return Json(new
         {
             success = true,
@@ -234,7 +233,7 @@ public class AddToCartController : Controller
     }
 
 
-    // ===== helpers =====
+
     private Cart GetOrCreateCart()
     {
         return HttpContext.Session.GetObject<Cart>("cart") ?? new Cart();

@@ -198,7 +198,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-// ✅ Session trước Auth để đọc session trong layout/admin
+// Session trước Auth để đọc session trong layout/admin
 app.UseSession();
 
 app.UseAuthentication();

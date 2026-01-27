@@ -10,7 +10,7 @@
         public int? DiscountDefault { get; set; }
         public int? QuantityStock { get; set; }
         public string? Brand { get; set; }
-        public string? Content { get; set; } // CKEditor HTML
+        public string? Content { get; set; } // ckeditor html
 
         public string? Size { get; set; }
         public string? Standard { get; set; }

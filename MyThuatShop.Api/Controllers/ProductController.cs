@@ -13,8 +13,6 @@ namespace MyThuatShop.Api.Controllers
         private readonly MyThuatDotNetContext _db;
         public ProductsController(MyThuatDotNetContext db) => _db = db;
 
-        // GET: /api/products?take=10
-        // ✅ chỉ lấy sản phẩm đang active
         [HttpGet]
         public async Task<IActionResult> Get(int take = 10)
         {

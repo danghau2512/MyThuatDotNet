@@ -37,7 +37,7 @@
             padding-top: 30px;
         }
 
-        /* ========== BREADCRUMB ========== */
+
         .breadcrumb {
             background-color: #f0f4f8;
             padding: 1rem 2.5rem;
@@ -62,7 +62,7 @@
                 margin: 0 0.5rem;
             }
 
-        /* ========== PRODUCT DETAIL ========== */
+        
         .product-detail-container {
             max-width: 1400px;
             margin: 0 auto;
@@ -79,7 +79,7 @@
             box-shadow: 0 2px 8px rgba(0,0,0,.08);
         }
 
-        /* Product Images */
+  
         .product-images {
             display: flex;
             flex-direction: column;
@@ -136,7 +136,7 @@
                 font-weight: 700;
             }
 
-        /* Main Image Navigation Buttons */
+
         .main-image-nav {
             position: absolute;
             top: 50%;
@@ -174,7 +174,7 @@
             right: 15px;
         }
 
-        /* Thumbnail Gallery */
+
         .thumbnail-gallery {
             display: flex;
             justify-content: center;
@@ -229,7 +229,7 @@
                 object-fit: contain;
             }
 
-        /* Product Info */
+
         .product-info {
             display: flex;
             flex-direction: column;
@@ -269,7 +269,7 @@
             font-weight: 600;
         }
 
-        /* Price Section */
+
         .product-price-section {
             background: #f9fafb;
             padding: 1.5rem;
@@ -296,7 +296,7 @@
             text-decoration: line-through;
         }
 
-        /* Quantity Selector */
+  
         .quantity-section {
             display: flex;
             flex-direction: column;
@@ -334,7 +334,7 @@
             text-align: center;
         }
 
-        /* Action Buttons */
+  
         .product-actions {
             display: flex;
             gap: 1rem;
@@ -380,7 +380,7 @@
                 box-shadow: 0 8px 20px rgba(23,71,157,.4);
             }
 
-        /* ========== RELATED PRODUCTS (JSP: section-but) ========== */
+   
         .section-but {
             margin: 40px auto 30px;
             max-width: 1400px;
@@ -483,7 +483,7 @@
                 color: #fff;
             }
 
-        /* ========== POLICY + SPECS (JSP style) ========== */
+     
         .policy, .product_content, .product_rate {
             max-width: 1400px;
             margin: 1.5rem auto 0;
@@ -563,7 +563,7 @@
             line-height: 1.6;
         }
 
-        /* Button "Xem đánh giá" giống JSP */
+   
         .btn_view {
             display: inline-block;
             width: 100%;
@@ -622,7 +622,7 @@
 
 <div class="page-offset">
 
-    <!-- Breadcrumb -->
+  
     <div class="breadcrumb">
         <a asp-controller="Home" asp-action="Index">Trang chủ</a>
         <span>/</span>
@@ -631,11 +631,11 @@
         <span>@Model.Name</span>
     </div>
 
-    <!-- Product Detail -->
+
     <div class="product-detail-container">
         <div class="product-detail">
 
-            <!-- CỘT 1: HÌNH ẢNH -->
+          
             <div class="product-images">
                 <div class="product-main-image">
                     <img src="@mainImg" alt="@Model.Name" id="mainProductImage" />
@@ -652,7 +652,7 @@
                     <a href="javascript:void(0)" id="nextImageBtn" class="main-image-nav main-image-next">&gt;</a>
                 </div>
 
-                <!-- Thumbnail Gallery -->
+           
                 <div class="thumbnail-gallery">
                     <div class="thumbnail-container" id="thumbnailContainer">
                         @if (images.Any())
@@ -726,7 +726,6 @@
                             <i class="fa-solid fa-cart-plus"></i> THÊM VÀO GIỎ
                         </button>
 
-                        <!-- ✅ JSP: mua ngay -> sang trang reviews (bạn có thể đổi sau thành checkout) -->
                         <a class="btn btn-buy-now"
                            asp-controller="Product"
                            asp-action="Reviews"
@@ -740,7 +739,6 @@
         </div>
     </div>
 
-    <!-- ✅ SẢN PHẨM CÙNG LOẠI (theo CategoryId) -->
     <div class="section-but">
         <div class="wrap">
             <div class="section-but-header">
@@ -790,7 +788,7 @@
         </div>
     </div>
 
-    <!-- ✅ POLICY: Thiên Long xin cam kết -->
+
     <div class="policy">
         <div class="box">
             <div class="box-title">Thiên Long xin cam kết</div>
@@ -812,7 +810,7 @@
         </div>
     </div>
 
-    <!-- ✅ THÔNG SỐ KĨ THUẬT -->
+    <!-- THÔNG SỐ KĨ THUẬT -->
     <div class="product_content">
         <div class="box">
             <div class="box-title">Thông số kĩ thuật</div>
@@ -858,7 +856,6 @@
         </div>
     }
 
-    <!-- ✅ NÚT XEM ĐÁNH GIÁ -> NHẢY SANG TRANG RIÊNG -->
     <div class="product_rate">
         <a class="btn_view"
            asp-controller="Product"
@@ -873,7 +870,6 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
 
-            // ===== +/- số lượng =====
             const qtyInput = document.getElementById('quantity');
             const btnMinus = document.getElementById('qtyMinus');
             const btnPlus  = document.getElementById('qtyPlus');
@@ -934,11 +930,11 @@
                     return;
                 }
 
-                // ✅ cập nhật badge
+             
                 const cartIcon = document.getElementById('cartIcon');
                 if (cartIcon) cartIcon.setAttribute('data-count', String(data.cartCount));
 
-                // ✅ ở lại trang (không redirect)
+                
                 alert('Đã thêm vào giỏ hàng');
 
             } catch (err) {

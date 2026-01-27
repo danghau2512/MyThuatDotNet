@@ -96,7 +96,7 @@ namespace MyThuatShop.Services
         }
     }
 
-    // ===== ViewModel post lên MVC controller =====
+
     public class ProductUpsertVm
     {
         public int Id { get; set; }               // update
@@ -113,10 +113,10 @@ namespace MyThuatShop.Services
         public string? MadeIn { get; set; }
         public string? Warning { get; set; }
 
-        public bool RemoveThumbnail { get; set; } // giống categories
+        public bool RemoveThumbnail { get; set; } 
     }
 
-    // ===== DTO nhận từ API =====
+    // DTO nhận từ API 
     public class ProductDto
     {
         public int Id { get; set; }

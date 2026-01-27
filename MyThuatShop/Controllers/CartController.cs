@@ -29,7 +29,6 @@ public class CartController : Controller
             CartSize = cart.CartSize()
         };
 
-        // ✅ lưu cartCount để badge header hiển thị
         HttpContext.Session.SetInt32("cartCount", vm.TotalQuantity);
 
         return View("~/Views/Cart/Cart.cshtml", vm);

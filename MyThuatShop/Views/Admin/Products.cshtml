@@ -17,7 +17,7 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css" />
 
     <style>
-        /* ===== Layout right ===== */
+       
         #main .right .container {
             display: flex;
             flex-direction: column;
@@ -122,7 +122,7 @@
             opacity: .85;
         }
 
-        /* ===== Badge ===== */
+     
         .badge-active {
             color: #28a745;
             font-weight: 600;
@@ -452,7 +452,7 @@
     </div>
 </div>
 
-<!-- ===== MODAL ADD/EDIT ===== -->
+//MODAL ADD/EDIT
 <div id="modal" class="modal">
     <div class="modal-content">
         <h2 id="modalTitle">Thêm sản phẩm</h2>
@@ -461,7 +461,8 @@
               asp-controller="AdminProduct"
               asp-action="Post"
               method="post"
-              enctype="multipart/form-data">
+         
+              enctype="multipart/form-data"> 
             @Html.AntiForgeryToken()
 
             <input type="hidden" name="action" id="action" value="create" />
@@ -535,7 +536,7 @@
     <script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
 
     <script>
-        // ===== Modal controls =====
+
         const modal = document.getElementById("modal");
         const btnAdd = document.getElementById("btnAdd");
         const btnClose = document.getElementById("btn-close");
@@ -556,13 +557,13 @@
         const madeInInput = document.getElementById("madeIn");
         const warningInput = document.getElementById("warning");
 
-        // main preview + remove
+    
         const removeThumbnailInput = document.getElementById("removeThumbnail");
         const thumbMainInput = document.getElementById("thumbnailMain");
         const previewMain = document.getElementById("previewMain");
         const removeMainBtn = document.getElementById("removeMainBtn");
 
-        // sub preview
+
         const thumbSubsInput = document.getElementById("thumbnailSubs");
         const subPreview = document.getElementById("subPreview");
 
@@ -572,7 +573,7 @@
         function openModal(){ modal.style.display = "flex"; }
         function closeModal(){ modal.style.display = "none"; }
 
-        // ===== CKEDITOR init =====
+        //ckeditor
         function ensureEditor() {
             if (window.CKEDITOR && !CKEDITOR.instances.content) {
                 CKEDITOR.replace('content', { height: 220 });
@@ -588,8 +589,6 @@
                 document.getElementById("content").value = html || "";
             }
         }
-
-        // ===== ADD =====
         btnAdd.addEventListener("click", () => {
             modalTitle.innerText = "Thêm sản phẩm";
             actionInput.value = "create";
@@ -614,13 +613,13 @@
             previewMain.style.display = "none";
             removeMainBtn.style.display = "none";
 
-            // reset subs
+            // reset subimages
             thumbSubsInput.value = "";
             subUrlsFromDb = [];
             subLocalFiles = [];
             subPreview.innerHTML = "";
 
-            // ✅ reset CKEditor content
+            //reset ckeditor
             setEditorData("");
 
             openModal();
@@ -629,7 +628,6 @@
         btnClose.addEventListener("click", closeModal);
         window.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
 
-        // ===== MAIN PREVIEW =====
         thumbMainInput.addEventListener("change", function(){
             const file = this.files && this.files[0];
             if (file) {
@@ -648,7 +646,7 @@
             removeThumbnailInput.value = "1";
         });
 
-        // ===== SUB PREVIEW (local upload) =====
+        
         thumbSubsInput.addEventListener("change", function(){
             subLocalFiles = Array.from(this.files || []).map(f => ({ file: f, url: URL.createObjectURL(f) }));
             renderSub();
@@ -698,10 +696,10 @@
             });
         }
 
-        // ===== EDIT fill =====
         document.querySelectorAll(".btnEdit").forEach(btn => {
             btn.addEventListener("click", () => {
                 modalTitle.innerText = "Cập nhật sản phẩm";
+                // value = update
                 actionInput.value = "update";
 
                 removeThumbnailInput.value = "0";
@@ -719,7 +717,7 @@
                 madeInInput.value = btn.getAttribute("data-madein") || "";
                 warningInput.value = btn.getAttribute("data-warning") || "";
 
-                // main thumb from DB
+
                 const thumb = btn.getAttribute("data-thumbnail") || "";
                 if (thumb.trim() !== "" && !thumb.endsWith("/")) {
                     previewMain.src = thumb;
@@ -731,17 +729,16 @@
                     removeMainBtn.style.display = "none";
                 }
 
-                // reset file inputs
+
                 thumbMainInput.value = "";
                 thumbSubsInput.value = "";
 
-                // subimages urls from DB
+
                 const csv = btn.getAttribute("data-subimages") || "";
                 subUrlsFromDb = csv.trim() ? csv.split(",").map(x => x.trim()).filter(x => x) : [];
                 subLocalFiles = [];
                 renderSub();
 
-                // ✅ set CKEditor data from DB
                 const htmlContent = btn.getAttribute("data-content") || "";
                 setEditorData(htmlContent);
 
@@ -749,7 +746,7 @@
             });
         });
 
-        // ✅ IMPORTANT: before submit -> sync CKEditor => textarea
+        //update nội dung ckeditor vào content
         document.getElementById("productForm").addEventListener("submit", function () {
             ensureEditor();
             if (window.CKEDITOR && CKEDITOR.instances.content) {
@@ -757,7 +754,7 @@
             }
         });
 
-        // ===== DataTables + Auto STT =====
+        // datatables
         $(function () {
             const viUrl = "https://cdn.datatables.net/plug-ins/1.13.8/i18n/vi.json";
 
@@ -783,7 +780,6 @@
             }).draw();
         });
 
-        // init editor once
         document.addEventListener("DOMContentLoaded", ensureEditor);
     </script>
 }

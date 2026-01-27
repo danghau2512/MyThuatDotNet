@@ -131,7 +131,6 @@ public class AccountController : Controller
             return Redirect("/admin/overview");
         }
 
-        //  chỉ redirect nếu local
         if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
             return LocalRedirect(returnUrl);
 
@@ -198,7 +197,7 @@ public class AccountController : Controller
             return View(vm);
         }
 
-        // update session giống JSP (để header/ sidebar đổi ngay)
+     
         HttpContext.Session.SetString("FullName", vm.FullName.Trim());
         HttpContext.Session.SetString("PhoneNumber", vm.PhoneNumber?.Trim() ?? "");
 
@@ -227,7 +226,7 @@ public class AccountController : Controller
         vm.NewPassword ??= "";
         vm.ConfirmNewPassword ??= "";
 
-        // ✅ Nếu cả 3 ô đều rỗng -> chỉ báo 1 dòng
+   
         if (string.IsNullOrWhiteSpace(vm.CurrentPassword)
             && string.IsNullOrWhiteSpace(vm.NewPassword)
             && string.IsNullOrWhiteSpace(vm.ConfirmNewPassword))
@@ -236,7 +235,7 @@ public class AccountController : Controller
             return View(vm);
         }
 
-        // ✅ Validate theo thứ tự: thiếu cái nào báo cái đó (nhưng không bị nhiều dòng khi bấm rỗng)
+      
         if (string.IsNullOrWhiteSpace(vm.CurrentPassword))
         {
             ModelState.AddModelError("", "Vui lòng nhập mật khẩu hiện tại.");
@@ -248,7 +247,7 @@ public class AccountController : Controller
             ModelState.AddModelError("", "Vui lòng nhập mật khẩu mới.");
             return View(vm);
         }
-        // ✅ mật khẩu mới phải khác mật khẩu hiện tại
+   
         if (vm.NewPassword == vm.CurrentPassword)
         {
             ModelState.AddModelError("", "Mật khẩu mới phải khác mật khẩu hiện tại.");
@@ -343,8 +342,8 @@ public class AccountController : Controller
         }
 
         ViewBag.Success = message;
-        ModelState.Clear();                 // clear validation
-        return View(new ForgotPasswordVm()); // clear input giống JSP
+        ModelState.Clear();                
+        return View(new ForgotPasswordVm());
     }
 
 }
